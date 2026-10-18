@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Station Route Maps</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--mut:#666;--line:#8884}
+@media (prefers-color-scheme:dark){:root{--bg:#161618;--fg:#eee;--mut:#aaa}}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Helvetica Neue,Helvetica,Arial,sans-serif}
+header{position:sticky;top:0;z-index:2;background:var(--bg);padding:10px 16px;border-bottom:1px solid var(--line);
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+input,select{font-size:16px;padding:6px 10px;max-width:100%}
+small{color:var(--mut)}
+img{display:block;max-width:100%;height:auto;margin:0 auto;background:#fff}
+</style></head><body>
+<header>
+  <label for="q"><b>Station</b></label>
+  <input id="q" type="search" placeholder="Search name or code" autocomplete="off">
+  <select id="s" aria-label="Station"></select>
+  <small id="n"></small>
+</header>
+<img id="m" alt="Route map">
+<script src="stations.js"></script>
+<script>
+const all = window.STATIONS || [], q = document.getElementById("q"), s = document.getElementById("s"),
+      m = document.getElementById("m"), n = document.getElementById("n");
+function fill() {
+  const t = q.value.trim().toLowerCase(), keep = s.value;
+  s.innerHTML = "";
+  for (const r of all) {
+    if (t && !(r.name.toLowerCase().includes(t) || r.crs.toLowerCase() === t)) continue;
+    const o = document.createElement("option");
+    o.value = r.crs; o.textContent = r.name + " (" + r.crs + ") · " + r.tph + " tph";
+    s.appendChild(o);
+  }
+  if ([...s.options].some(o => o.value === keep)) s.value = keep;
+  n.textContent = s.options.length + " of " + all.length + " stations";
+  show();
+}
+function show() { if (s.value) { m.src = s.value + ".svg"; try { location.hash = s.value; } catch (e) {} } }
+q.oninput = fill; s.onchange = show;
+const h = location.hash.slice(1); fill(); if (h && all.some(r => r.crs === h)) { s.value = h; show(); }
+</script></body></html>

@@ -1,0 +1,318 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2048.8 -2361.1 3536.0 3836.8" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<rect x="-2048.8" y="-2361.1" width="3536.0" height="3836.8" fill="#fff"/>
+<text x="-2018.8" y="-2291.1" font-size="56" font-weight="300" fill="#c2185b">Doncaster Routes</text>
+<text x="-2016.8" y="-2259.1" font-size="19" fill="#444">Normal daytime service pattern: average trains per hour (tph) each way, Tuesday&#8211;Thursday 09:00&#8211;16:00, September 2026</text>
+<text x="-2016.8" y="-2235.1" font-size="14" fill="#777">Source: National Rail Darwin Push Port, services that ran. Routes are drawn to their termini; stations no route here stops at are left out.</text>
+<text x="-2016.8" y="-2216.1" font-size="14" fill="#777">Number beside a station: tph calling. White dot: the route stops. Capsule: major interchange between routes going different ways.</text>
+<path d="M-6.7 6.7 L-1335.0 -1321.6" fill="none" stroke="#0a6e3d" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M681.0 966.3 L681.0 665.4 Q681.0 647.4 668.3 634.7 L16.8 -16.8" fill="none" stroke="#d62828" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M0.0 0.0 L-1328.3 -1328.3" fill="none" stroke="#d62828" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M796.4 -2142.6 L796.4 -2116.1 Q796.4 -2098.1 809.1 -2085.4 L1195.9 -1698.6 Q1208.6 -1685.8 1208.6 -1667.8 L1208.6 -1616.9 Q1208.6 -1598.9 1195.9 -1586.2 L1162.7 -1553.0 Q1149.9 -1540.2 1149.9 -1522.2 L1149.9 -975.2 Q1149.9 -957.2 1137.2 -944.5 L917.3 -724.6 Q904.6 -711.9 886.6 -711.9 L736.6 -711.9 Q718.6 -711.9 705.9 -699.2 L3.4 3.4" fill="none" stroke="#1b4f9c" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M10.1 10.1 L-256.1 276.3" fill="none" stroke="#1b4f9c" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-281.1 -254.2 L-13.4 13.4" fill="none" stroke="#f28c00" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M0.0 0.0 L-389.0 0.0 Q-407.0 0.0 -419.7 12.7 L-616.7 209.7 L-419.7 12.7 Q-407.0 0.0 -389.0 0.0 L-11.3 0.0 Q6.7 -0.0 -6.0 12.7 L-262.9 269.6" fill="none" stroke="#f28c00" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-10.1 -10.1 L698.0 -718.2 Q710.8 -730.9 728.8 -730.9 L878.8 -730.9 Q896.8 -730.9 909.5 -743.6 L1105.8 -939.9" fill="none" stroke="#7b4fa3" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M1343.8 -283.1 L321.2 -283.1 Q303.2 -283.1 290.5 -270.4 L10.1 10.1" fill="none" stroke="#00a5b5" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-10.1 -10.1 L-290.5 270.4 Q-303.2 283.1 -321.2 283.1 L-356.4 283.1 Q-374.4 283.1 -387.2 270.4 L-420.4 237.1 Q-433.1 224.4 -451.1 224.4 L-1748.1 224.4 Q-1766.1 224.4 -1778.9 211.7 L-1794.8 195.7" fill="none" stroke="#00a5b5" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-0.0 -874.5 L0.0 0.0" fill="none" stroke="#c2185b" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-3.4 -3.4 L-289.4 282.6 Q-302.1 295.4 -302.1 313.4 L-302.1 614.3 Q-302.1 632.3 -289.4 645.0 L-79.3 855.0 Q-66.6 867.8 -66.6 885.8 L-66.6 932.8 Q-66.6 950.8 -53.9 963.5 L-32.4 985.0" fill="none" stroke="#c2185b" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-26.2 -1200.6 L-3.2 -1177.7 Q9.5 -1164.9 9.5 -1146.9 L9.5 -0.0" fill="none" stroke="#8b5a2b" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M10.1 -10.1 L658.8 638.6 Q671.5 651.4 671.5 669.4 L671.5 966.3" fill="none" stroke="#8b5a2b" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M1112.5 -933.2 L913.4 -734.1 Q900.7 -721.4 882.7 -721.4 L768.2 -721.4 L786.9 -721.4 Q804.9 -721.4 804.9 -739.4 L804.9 -776.9 Q804.9 -794.9 786.9 -794.9 L763.2 -794.9 L786.9 -794.9 Q804.9 -794.9 804.9 -776.9 L804.9 -739.4 Q804.9 -721.4 786.9 -721.4 L732.7 -721.4 Q714.7 -721.4 702.0 -708.7 L-3.4 -3.4" fill="none" stroke="#1d1d2b" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M3.4 -3.4 L649.3 642.6 Q662.0 655.3 662.0 673.3 L662.0 966.3" fill="none" stroke="#1d1d2b" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-1451.9 -1312.9 L-1451.9 -1350.9 Q-1451.9 -1368.9 -1433.9 -1368.9 L-1373.5 -1368.9 Q-1355.5 -1368.9 -1342.7 -1356.2 L6.7 -6.7" fill="none" stroke="#9ccc3c" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-3.4 3.4 L639.8 646.5 Q652.5 659.2 652.5 677.2 L652.5 966.3" fill="none" stroke="#9ccc3c" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-1399.1 -1464.6 L-1399.1 -1444.0 Q-1399.1 -1426.0 -1386.4 -1413.2 L13.4 -13.4" fill="none" stroke="#5aa9e6" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-10.1 10.1 L630.3 650.4 Q643.0 663.2 643.0 681.2 L643.0 966.3" fill="none" stroke="#5aa9e6" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M633.5 966.3 L633.5 685.1 Q633.5 667.1 620.8 654.4 L-16.8 16.8" fill="none" stroke="#e6b800" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-9.5 0.0 L-9.5 -124.5" fill="none" stroke="#e6b800" stroke-width="5.4" stroke-linejoin="round"/>
+<line x1="113.9" y1="66.3" x2="95.6" y2="88.9" stroke="#777" stroke-width="1"/>
+<line x1="292.8" y1="240.3" x2="279.1" y2="259.0" stroke="#777" stroke-width="1"/>
+<line x1="469.6" y1="417.0" x2="462.6" y2="429.0" stroke="#777" stroke-width="1"/>
+<line x1="646.4" y1="593.8" x2="639.4" y2="605.8" stroke="#777" stroke-width="1"/>
+<line x1="623.5" y1="716.3" x2="643.0" y2="716.3" stroke="#777" stroke-width="1"/>
+<line x1="-111.3" y1="-65.4" x2="-104.3" y2="-77.4" stroke="#777" stroke-width="1"/>
+<line x1="-288.1" y1="-242.2" x2="-281.1" y2="-254.2" stroke="#777" stroke-width="1"/>
+<line x1="-458.1" y1="-425.7" x2="-451.1" y2="-437.7" stroke="#777" stroke-width="1"/>
+<line x1="-634.9" y1="-602.5" x2="-627.9" y2="-614.5" stroke="#777" stroke-width="1"/>
+<line x1="-811.7" y1="-779.3" x2="-804.7" y2="-791.3" stroke="#777" stroke-width="1"/>
+<line x1="-988.5" y1="-956.0" x2="-981.5" y2="-968.0" stroke="#777" stroke-width="1"/>
+<line x1="-1165.2" y1="-1132.8" x2="-1158.2" y2="-1144.8" stroke="#777" stroke-width="1"/>
+<line x1="-1371.9" y1="-1417.7" x2="-1378.9" y2="-1405.7" stroke="#777" stroke-width="1"/>
+<line x1="-72.4" y1="111.5" x2="-79.4" y2="99.5" stroke="#777" stroke-width="1"/>
+<line x1="-249.1" y1="288.3" x2="-255.6" y2="276.8" stroke="#777" stroke-width="1"/>
+<line x1="-410.1" y1="266.4" x2="-403.1" y2="254.4" stroke="#777" stroke-width="1"/>
+<line x1="-1801.8" y1="207.7" x2="-1794.8" y2="195.7" stroke="#777" stroke-width="1"/>
+<line x1="84.2" y1="-118.7" x2="79.4" y2="-99.5" stroke="#777" stroke-width="1"/>
+<line x1="249.1" y1="-288.3" x2="256.1" y2="-276.3" stroke="#777" stroke-width="1"/>
+<line x1="316.7" y1="-355.8" x2="323.7" y2="-343.8" stroke="#777" stroke-width="1"/>
+<line x1="493.5" y1="-532.6" x2="500.5" y2="-520.6" stroke="#777" stroke-width="1"/>
+<line x1="670.2" y1="-709.4" x2="677.2" y2="-697.4" stroke="#777" stroke-width="1"/>
+<line x1="761.2" y1="-742.9" x2="768.2" y2="-730.9" stroke="#777" stroke-width="1"/>
+<line x1="941.0" y1="-741.1" x2="929.0" y2="-763.1" stroke="#777" stroke-width="1"/>
+<line x1="1098.8" y1="-951.9" x2="1105.8" y2="-939.9" stroke="#777" stroke-width="1"/>
+<line x1="-1412.9" y1="-1380.9" x2="-1405.9" y2="-1368.9" stroke="#777" stroke-width="1"/>
+<line x1="-16.5" y1="-136.5" x2="-9.5" y2="-124.5" stroke="#777" stroke-width="1"/>
+<line x1="-19.2" y1="-1212.6" x2="-26.2" y2="-1200.6" stroke="#777" stroke-width="1"/>
+<line x1="-260.8" y1="654.6" x2="-267.8" y2="666.6" stroke="#777" stroke-width="1"/>
+<line x1="-84.0" y1="831.4" x2="-91.0" y2="843.4" stroke="#777" stroke-width="1"/>
+<line x1="-25.4" y1="973.0" x2="-32.4" y2="985.0" stroke="#777" stroke-width="1"/>
+<line x1="809.7" y1="-792.3" x2="804.9" y2="-763.2" stroke="#777" stroke-width="1"/>
+<line x1="1188.4" y1="-1559.7" x2="1181.4" y2="-1571.7" stroke="#777" stroke-width="1"/>
+<line x1="1181.4" y1="-1732.1" x2="1174.4" y2="-1720.1" stroke="#777" stroke-width="1"/>
+<line x1="1004.6" y1="-1908.9" x2="997.6" y2="-1896.9" stroke="#777" stroke-width="1"/>
+<line x1="827.8" y1="-2085.7" x2="820.8" y2="-2073.7" stroke="#777" stroke-width="1"/>
+<line x1="-127.5" y1="12.0" x2="-120.5" y2="0.0" stroke="#777" stroke-width="1"/>
+<line x1="-432.9" y1="44.9" x2="-439.9" y2="32.9" stroke="#777" stroke-width="1"/>
+<line x1="-611.8" y1="190.5" x2="-616.7" y2="209.7" stroke="#777" stroke-width="1"/>
+<rect x="-38.5" y="-38.5" width="77.0" height="77.0" rx="15" fill="#fff" stroke="#111" stroke-width="3.5"/>
+<rect x="-274.2" y="242.2" width="16" height="48.0" rx="8" fill="#fff" stroke="#111" stroke-width="2.4" transform="rotate(135.0 -266.2 266.2)"/>
+<circle cx="-97.6" cy="-84.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-274.4" cy="-260.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-451.1" cy="-437.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-627.9" cy="-614.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-804.7" cy="-791.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-981.5" cy="-968.0" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1158.2" cy="-1144.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1335.0" cy="-1321.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="681.0" cy="966.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="639.4" cy="605.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="462.6" cy="429.0" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-974.7" cy="-974.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1328.3" cy="-1328.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="796.4" cy="-2142.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="820.8" cy="-2073.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="997.6" cy="-1896.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1174.4" cy="-1720.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1208.6" cy="-1647.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1181.4" cy="-1571.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1149.9" cy="-1505.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1149.9" cy="-1255.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1149.9" cy="-1005.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1119.2" cy="-926.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="768.2" cy="-711.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="513.9" cy="-507.2" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-79.4" cy="99.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-255.6" cy="276.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-281.1" cy="-254.2" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-104.3" cy="-77.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-120.5" cy="0.0" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-370.5" cy="0.0" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-439.9" cy="32.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-616.7" cy="209.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-86.1" cy="92.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-262.7" cy="269.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="79.4" cy="-99.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="256.1" cy="-276.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="323.7" cy="-343.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="500.5" cy="-520.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="677.2" cy="-697.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="768.2" cy="-730.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="861.2" cy="-730.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="929.0" cy="-763.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1105.8" cy="-939.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1343.8" cy="-283.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1093.8" cy="-283.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="843.8" cy="-283.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="593.8" cy="-283.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="343.8" cy="-283.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-99.5" cy="79.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-276.8" cy="255.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-343.8" cy="283.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-403.1" cy="254.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-485.5" cy="224.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-735.5" cy="224.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-985.5" cy="224.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1235.5" cy="224.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1485.5" cy="224.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1735.5" cy="224.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1794.8" cy="195.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-0.0" cy="-874.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-0.0" cy="-624.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-0.0" cy="-374.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-0.0" cy="-124.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-269.8" cy="262.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-302.1" cy="343.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-302.1" cy="593.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-267.8" cy="666.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-91.0" cy="843.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-66.6" cy="912.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-32.4" cy="985.0" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-26.2" cy="-1200.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="9.5" cy="-1124.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="9.5" cy="-874.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="9.5" cy="-374.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="9.5" cy="-124.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="279.1" cy="259.0" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="632.7" cy="612.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="671.5" cy="966.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1112.5" cy="-933.2" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="768.2" cy="-721.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="804.9" cy="-763.2" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="763.2" cy="-794.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="95.6" cy="88.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="449.2" cy="442.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="662.0" cy="966.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1451.9" cy="-1312.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1405.9" cy="-1368.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1321.6" cy="-1335.0" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-968.0" cy="-981.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="265.7" cy="272.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="652.5" cy="716.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="652.5" cy="966.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1399.1" cy="-1464.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1378.9" cy="-1405.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1314.9" cy="-1341.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-961.3" cy="-988.2" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="259.0" cy="279.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="643.0" cy="716.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="643.0" cy="966.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="633.5" cy="966.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="605.8" cy="639.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="75.5" cy="109.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-9.5" cy="-124.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="46.5" y="4.5" font-size="22" font-weight="700" fill="#111" text-anchor="start" stroke="#fff" stroke-width="5" paint-order="stroke">Doncaster <tspan fill="#c2185b" font-size="15">8.9</tspan></text>
+<text x="111.1" y="63.5" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 111.1 63.5)"><tspan font-weight="500">Retford</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="294.8" y="236.3" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Newark North Gate</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.5</tspan></text>
+<text x="471.6" y="413.0" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Grantham</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.5</tspan></text>
+<text x="648.4" y="589.8" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Peterborough</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2</tspan></text>
+<text x="621.5" y="720.8" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Stevenage</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="693.0" y="970.8" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">London Kings Cross</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">3.5</tspan></text>
+<text x="-113.3" y="-52.4" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Bentley (S Yorks)</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2</tspan></text>
+<text x="-290.1" y="-229.2" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Adwick</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2</tspan></text>
+<g><circle cx="-367.3" cy="-233.2" r="8.5" fill="#f28c00"/><text x="-367.3" y="-230.0" font-size="10.2" font-weight="700" fill="#fff" text-anchor="middle">D</text></g>
+<text x="-460.1" y="-412.7" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">South Elmsall</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-636.9" y="-589.5" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Fitzwilliam</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-813.7" y="-766.3" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Sandal &amp; Agbrigg</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-990.5" y="-943.0" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Wakefield Westgate</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">3</tspan></text>
+<text x="-1167.2" y="-1119.8" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Outwood</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-1337.0" y="-1307.6" font-size="14.5" fill="#1a1a1a" text-anchor="end" transform="rotate(-45 -1337.0 -1307.6)"><tspan font-weight="500">Leeds</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">3</tspan></text>
+<g><circle cx="-1386.4" cy="-1262.2" r="8.5" fill="#0a6e3d"/><text x="-1386.4" y="-1259.0" font-size="10.2" font-weight="700" fill="#fff" text-anchor="middle">A</text></g>
+<g><circle cx="-1400.5" cy="-1248.1" r="8.5" fill="#d62828"/><text x="-1400.5" y="-1244.9" font-size="10.2" font-weight="700" fill="#fff" text-anchor="middle">B</text></g>
+<text x="-1369.9" y="-1421.7" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Horsforth</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.5</tspan></text>
+<text x="-1387.1" y="-1460.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Harrogate</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.5</tspan></text>
+<text x="-70.4" y="124.5" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Meadowhall</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.8</tspan></text>
+<text x="-247.1" y="301.3" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Sheffield</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">3.4</tspan></text>
+<g><circle cx="-132.9" cy="297.3" r="8.5" fill="#1b4f9c"/><text x="-132.9" y="300.5" font-size="10.2" font-weight="700" fill="#fff" text-anchor="middle">C</text></g>
+<g><circle cx="-112.9" cy="297.3" r="8.5" fill="#f28c00"/><text x="-112.9" y="300.5" font-size="10.2" font-weight="700" fill="#fff" text-anchor="middle">D</text></g>
+<text x="-341.8" y="271.1" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -341.8 271.1)"><tspan font-weight="500">Stockport</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-412.1" y="279.4" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Manchester Piccadilly</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-483.5" y="212.4" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -483.5 212.4)"><tspan font-weight="500">Manchester Oxford Road</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-733.5" y="212.4" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -733.5 212.4)"><tspan font-weight="500">Urmston</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-983.5" y="212.4" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -983.5 212.4)"><tspan font-weight="500">Irlam</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-1233.5" y="212.4" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -1233.5 212.4)"><tspan font-weight="500">Birchwood</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-1483.5" y="212.4" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -1483.5 212.4)"><tspan font-weight="500">Warrington Central</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-1733.5" y="212.4" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -1733.5 212.4)"><tspan font-weight="500">Liverpool South Parkway</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-1803.8" y="220.7" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Liverpool Lime Street</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="81.4" y="-121.5" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 81.4 -121.5)"><tspan font-weight="500">Kirk Sandall</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="247.1" y="-292.3" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Hatfield &amp; Stainforth</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="314.7" y="-359.8" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Thorne North</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="491.5" y="-536.6" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Goole</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2</tspan></text>
+<text x="668.2" y="-713.4" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Gilberdyke</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="759.2" y="-746.9" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Brough</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.5</tspan></text>
+<text x="863.2" y="-742.9" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 863.2 -742.9)"><tspan font-weight="500">Ferriby</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="943.0" y="-728.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Hessle</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="1096.8" y="-955.9" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Hull</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.5</tspan></text>
+<g><circle cx="1019.6" cy="-959.9" r="8.5" fill="#7b4fa3"/><text x="1019.6" y="-956.7" font-size="10.2" font-weight="700" fill="#fff" text-anchor="middle">E</text></g>
+<g><circle cx="999.6" cy="-959.9" r="8.5" fill="#1d1d2b"/><text x="999.6" y="-956.7" font-size="10.2" font-weight="700" fill="#fff" text-anchor="middle">I</text></g>
+<text x="345.8" y="-295.1" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 345.8 -295.1)"><tspan font-weight="500">Scunthorpe</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="595.8" y="-295.1" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 595.8 -295.1)"><tspan font-weight="500">Barnetby</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="845.8" y="-295.1" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 845.8 -295.1)"><tspan font-weight="500">Habrough</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="1095.8" y="-295.1" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1095.8 -295.1)"><tspan font-weight="500">Grimsby Town</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="1345.8" y="-295.1" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1345.8 -295.1)"><tspan font-weight="500">Cleethorpes</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-1414.9" y="-1384.9" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Shipley</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.5</tspan></text>
+<text x="-1463.9" y="-1308.4" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Bradford Forster Square</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.5</tspan></text>
+<text x="-18.5" y="-140.5" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">York</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.6</tspan></text>
+<g><circle cx="-95.7" cy="-144.5" r="8.5" fill="#e6b800"/><text x="-95.7" y="-141.3" font-size="10.2" font-weight="700" fill="#fff" text-anchor="middle">L</text></g>
+<text x="-12.0" y="-370.0" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Darlington</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.1</tspan></text>
+<text x="-12.0" y="-620.0" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Durham</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.6</tspan></text>
+<text x="-12.0" y="-870.0" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Newcastle</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.1</tspan></text>
+<g><circle cx="-126.2" cy="-874.0" r="8.5" fill="#c2185b"/><text x="-126.2" y="-870.8" font-size="10.2" font-weight="700" fill="#fff" text-anchor="middle">G</text></g>
+<text x="21.5" y="-1120.0" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Alnmouth</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.6</tspan></text>
+<text x="-17.2" y="-1216.6" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Edinburgh</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.6</tspan></text>
+<text x="-290.1" y="348.3" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Derby</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.6</tspan></text>
+<text x="-290.1" y="598.3" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Birmingham New Street</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.6</tspan></text>
+<text x="-258.8" y="650.6" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Leamington Spa</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.6</tspan></text>
+<text x="-82.0" y="827.4" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Banbury</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.6</tspan></text>
+<text x="-54.6" y="916.8" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Oxford</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.6</tspan></text>
+<text x="-23.4" y="969.0" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Reading</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.6</tspan></text>
+<text x="806.9" y="-795.2" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 806.9 -795.2)"><tspan font-weight="500">Howden</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.5</tspan></text>
+<text x="765.2" y="-806.9" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 765.2 -806.9)"><tspan font-weight="500">Selby</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.5</tspan></text>
+<text x="1161.9" y="-1001.2" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Cottingham</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="1161.9" y="-1251.2" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Beverley</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="1161.9" y="-1501.2" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Driffield</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="1190.4" y="-1546.7" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Bridlington</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="1220.6" y="-1642.9" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Bempton</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="1183.4" y="-1736.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Hunmanby</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="1006.6" y="-1912.9" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Filey</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="829.8" y="-2089.7" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Seamer</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="808.4" y="-2138.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Scarborough</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-129.5" y="25.0" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Conisbrough</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-368.5" y="-12.0" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -368.5 -12.0)"><tspan font-weight="500">Mexborough</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-430.9" y="57.9" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Swinton (South Yorks)</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-614.7" y="187.7" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -614.7 187.7)"><tspan font-weight="500">Rotherham Central</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<g><circle cx="709.8" cy="992.3" r="9.5" fill="#d62828"/><text x="709.8" y="995.9" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">B</text></g>
+<g><circle cx="688.8" cy="992.3" r="9.5" fill="#8b5a2b"/><text x="688.8" y="995.9" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">H</text></g>
+<g><circle cx="667.8" cy="992.3" r="9.5" fill="#1d1d2b"/><text x="667.8" y="995.9" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">I</text></g>
+<g><circle cx="646.8" cy="992.3" r="9.5" fill="#9ccc3c"/><text x="646.8" y="995.9" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">J</text></g>
+<g><circle cx="625.8" cy="992.3" r="9.5" fill="#5aa9e6"/><text x="625.8" y="995.9" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">K</text></g>
+<g><circle cx="604.8" cy="992.3" r="9.5" fill="#e6b800"/><text x="604.8" y="995.9" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">L</text></g>
+<g><circle cx="791.6" cy="-2168.6" r="9.5" fill="#1b4f9c"/><text x="791.6" y="-2165.0" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">C</text></g>
+<g><circle cx="1369.8" cy="-297.3" r="9.5" fill="#00a5b5"/><text x="1369.8" y="-293.7" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">F</text></g>
+<g><circle cx="-1823.3" cy="187.4" r="9.5" fill="#00a5b5"/><text x="-1823.3" y="191.0" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">F</text></g>
+<g><circle cx="-10.6" cy="1000.1" r="9.5" fill="#c2185b"/><text x="-10.6" y="1003.7" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">G</text></g>
+<g><circle cx="-51.3" cy="-1212.3" r="9.5" fill="#8b5a2b"/><text x="-51.3" y="-1208.7" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">H</text></g>
+<g><circle cx="-1442.4" cy="-1286.9" r="9.5" fill="#9ccc3c"/><text x="-1442.4" y="-1283.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">J</text></g>
+<g><circle cx="-1418.1" cy="-1490.6" r="9.5" fill="#5aa9e6"/><text x="-1418.1" y="-1487.0" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">K</text></g>
+<text x="-2018.8" y="1071.7" font-size="22" font-weight="500" fill="#111">Routes</text>
+<text x="-1318.8" y="1071.7" font-size="13" fill="#777" text-anchor="end">tph each way</text>
+<line x1="-2014.8" y1="1098.7" x2="-1974.8" y2="1098.7" stroke="#0a6e3d" stroke-width="5.4"/>
+<g><circle cx="-1954.8" cy="1098.7" r="9.5" fill="#0a6e3d"/><text x="-1954.8" y="1102.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">A</text></g>
+<text x="-1934.8" y="1103.7" font-size="15" fill="#1a1a1a">Leeds – Doncaster <tspan fill="#888" font-size="12">NT</tspan></text>
+<text x="-1318.8" y="1103.7" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">1.0</text>
+<line x1="-2014.8" y1="1125.7" x2="-1974.8" y2="1125.7" stroke="#d62828" stroke-width="5.4"/>
+<g><circle cx="-1954.8" cy="1125.7" r="9.5" fill="#d62828"/><text x="-1954.8" y="1129.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">B</text></g>
+<text x="-1934.8" y="1130.7" font-size="15" fill="#1a1a1a">Leeds – London Kings Cross <tspan fill="#888" font-size="12">GR</tspan></text>
+<text x="-1318.8" y="1130.7" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">1.0</text>
+<line x1="-2014.8" y1="1152.7" x2="-1974.8" y2="1152.7" stroke="#1b4f9c" stroke-width="5.4"/>
+<g><circle cx="-1954.8" cy="1152.7" r="9.5" fill="#1b4f9c"/><text x="-1954.8" y="1156.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">C</text></g>
+<text x="-1934.8" y="1157.7" font-size="15" fill="#1a1a1a">Scarborough – Sheffield <tspan fill="#888" font-size="12">NT</tspan></text>
+<text x="-1318.8" y="1157.7" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">1.0</text>
+<line x1="-2014.8" y1="1179.7" x2="-1974.8" y2="1179.7" stroke="#f28c00" stroke-width="5.4"/>
+<g><circle cx="-1954.8" cy="1179.7" r="9.5" fill="#f28c00"/><text x="-1954.8" y="1183.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">D</text></g>
+<text x="-1934.8" y="1184.7" font-size="15" fill="#1a1a1a">Sheffield – Adwick <tspan fill="#888" font-size="12">NT</tspan></text>
+<text x="-1318.8" y="1184.7" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">1.0</text>
+<line x1="-2014.8" y1="1206.7" x2="-1974.8" y2="1206.7" stroke="#7b4fa3" stroke-width="5.4"/>
+<g><circle cx="-1954.8" cy="1206.7" r="9.5" fill="#7b4fa3"/><text x="-1954.8" y="1210.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">E</text></g>
+<text x="-1934.8" y="1211.7" font-size="15" fill="#1a1a1a">Hull – Doncaster <tspan fill="#888" font-size="12">NT</tspan></text>
+<text x="-1318.8" y="1211.7" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">1.0</text>
+<line x1="-2014.8" y1="1233.7" x2="-1974.8" y2="1233.7" stroke="#00a5b5" stroke-width="5.4"/>
+<g><circle cx="-1954.8" cy="1233.7" r="9.5" fill="#00a5b5"/><text x="-1954.8" y="1237.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">F</text></g>
+<text x="-1934.8" y="1238.7" font-size="15" fill="#1a1a1a">Cleethorpes – Liverpool Lime Street <tspan fill="#888" font-size="12">TP</tspan></text>
+<text x="-1318.8" y="1238.7" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">0.9</text>
+<line x1="-2014.8" y1="1260.7" x2="-1974.8" y2="1260.7" stroke="#c2185b" stroke-width="5.4"/>
+<g><circle cx="-1954.8" cy="1260.7" r="9.5" fill="#c2185b"/><text x="-1954.8" y="1264.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">G</text></g>
+<text x="-1934.8" y="1265.7" font-size="15" fill="#1a1a1a">Newcastle – Reading <tspan fill="#888" font-size="12">XC</tspan></text>
+<text x="-1318.8" y="1265.7" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">0.6</text>
+<line x1="-2014.8" y1="1287.7" x2="-1974.8" y2="1287.7" stroke="#8b5a2b" stroke-width="5.4"/>
+<g><circle cx="-1954.8" cy="1287.7" r="9.5" fill="#8b5a2b"/><text x="-1954.8" y="1291.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">H</text></g>
+<text x="-1934.8" y="1292.7" font-size="15" fill="#1a1a1a">Edinburgh – London Kings Cross <tspan fill="#888" font-size="12">GR</tspan></text>
+<text x="-1318.8" y="1292.7" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">0.6</text>
+<line x1="-2014.8" y1="1314.7" x2="-1974.8" y2="1314.7" stroke="#1d1d2b" stroke-width="5.4"/>
+<g><circle cx="-1954.8" cy="1314.7" r="9.5" fill="#1d1d2b"/><text x="-1954.8" y="1318.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">I</text></g>
+<text x="-1934.8" y="1319.7" font-size="15" fill="#1a1a1a">London Kings Cross – Hull <tspan fill="#888" font-size="12">HT</tspan></text>
+<text x="-1318.8" y="1319.7" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">0.5</text>
+<line x1="-2014.8" y1="1341.7" x2="-1974.8" y2="1341.7" stroke="#9ccc3c" stroke-width="5.4"/>
+<g><circle cx="-1954.8" cy="1341.7" r="9.5" fill="#9ccc3c"/><text x="-1954.8" y="1345.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">J</text></g>
+<text x="-1934.8" y="1346.7" font-size="15" fill="#1a1a1a">London Kings Cross – Bradford Forster Square <tspan fill="#888" font-size="12">GR</tspan></text>
+<text x="-1318.8" y="1346.7" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">0.5</text>
+<line x1="-2014.8" y1="1368.7" x2="-1974.8" y2="1368.7" stroke="#5aa9e6" stroke-width="5.4"/>
+<g><circle cx="-1954.8" cy="1368.7" r="9.5" fill="#5aa9e6"/><text x="-1954.8" y="1372.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">K</text></g>
+<text x="-1934.8" y="1373.7" font-size="15" fill="#1a1a1a">Harrogate – London Kings Cross <tspan fill="#888" font-size="12">GR</tspan></text>
+<text x="-1318.8" y="1373.7" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">0.5</text>
+<line x1="-2014.8" y1="1395.7" x2="-1974.8" y2="1395.7" stroke="#e6b800" stroke-width="5.4"/>
+<g><circle cx="-1954.8" cy="1395.7" r="9.5" fill="#e6b800"/><text x="-1954.8" y="1399.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">L</text></g>
+<text x="-1934.8" y="1400.7" font-size="15" fill="#1a1a1a">London Kings Cross – York <tspan fill="#888" font-size="12">GR</tspan></text>
+<text x="-1318.8" y="1400.7" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">0.5</text>
+<!-- spacing 250 report {'routes': 12, 'dot_overlap': 0, 'label_collision': 0, 'crossings': 2, 'branch_overlap': 0, 'dot_on_line': 0, 'leader_lines': 39} -->
+</svg>

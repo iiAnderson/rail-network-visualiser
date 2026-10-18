@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "rail-network-visualiser"
+version = "0.1.0"
+description = "Avanti-style route maps, centred on any UK station, built from real service patterns"
+authors = ["Robbie Anderson <ra12g14@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.2.0"
+numpy = ">=1.26"
+shapely = "^2.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+
+[tool.poetry.group.extract.dependencies]
+pymupdf = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

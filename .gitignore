@@ -1,0 +1,9 @@
+# inputs and outputs stay local: Darwin-derived data, and anything derived from the RDG route map PDF
+data/
+*.pdf
+*.pkl
+# generated maps (the three in docs/examples are committed on purpose)
+maps/
+__pycache__/
+.venv/
+.pytest_cache/

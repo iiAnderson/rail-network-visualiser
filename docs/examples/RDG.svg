@@ -1,0 +1,407 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2139.3 -2260.7 5190.7 4072.3" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<rect x="-2139.3" y="-2260.7" width="5190.7" height="4072.3" fill="#fff"/>
+<text x="-2109.3" y="-2190.7" font-size="56" font-weight="300" fill="#c2185b">Reading Routes</text>
+<text x="-2107.3" y="-2158.7" font-size="19" fill="#444">Normal daytime service pattern: average trains per hour (tph) each way, Tuesday&#8211;Thursday 09:00&#8211;16:00, September 2026</text>
+<text x="-2107.3" y="-2134.7" font-size="14" fill="#777">Source: National Rail Darwin Push Port, services that ran. Routes are drawn to their termini; stations no route here stops at are left out.</text>
+<text x="-2107.3" y="-2115.7" font-size="14" fill="#777">Number beside a station: tph calling. White dot: the route stops. Capsule: major interchange between routes going different ways.</text>
+<path d="M2908.4 -1322.5 L1622.4 -36.5 Q1609.7 -23.8 1591.7 -23.8 L0.0 -23.8" fill="none" stroke="#0a6e3d" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-107.9 706.4 L-107.9 139.3 Q-107.9 121.3 -95.2 108.6 L6.7 6.7" fill="none" stroke="#d62828" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M6.7 -6.7 L490.4 477.0 Q503.2 489.7 521.2 489.7 L1280.3 489.7 Q1298.3 489.7 1311.0 477.0 L1471.5 316.5 Q1484.3 303.7 1502.3 303.7 L2269.3 303.7 Q2287.3 303.7 2300.0 291.0 L2444.6 146.4" fill="none" stroke="#1b4f9c" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M1676.0 -14.2 L0.0 -14.2" fill="none" stroke="#f28c00" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-3.4 3.4 L-625.3 -618.6 Q-638.0 -631.3 -656.0 -631.3 L-1336.0 -631.3 Q-1354.0 -631.3 -1366.7 -644.0 L-1527.3 -804.5 Q-1540.0 -817.3 -1558.0 -817.3 L-1584.5 -817.3" fill="none" stroke="#f28c00" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-1014.2 -563.1 L-799.8 -563.1 Q-781.8 -563.1 -769.1 -575.8 L-735.9 -609.1 Q-723.1 -621.8 -705.1 -621.8 L-659.9 -621.8 Q-641.9 -621.8 -629.2 -609.1 L-10.1 10.1" fill="none" stroke="#7b4fa3" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M0.0 -4.8 L1676.0 -4.8" fill="none" stroke="#7b4fa3" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-618.2 -584.6 L-16.8 16.8" fill="none" stroke="#00a5b5" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M0.0 4.8 L1676.0 4.8" fill="none" stroke="#00a5b5" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-612.8 210.8 L-574.8 210.8 Q-556.8 210.8 -556.8 228.8 L-556.8 275.8 Q-556.8 293.8 -538.8 293.8 L-325.3 293.8 Q-307.3 293.8 -294.6 281.1 L-6.7 -6.7" fill="none" stroke="#c2185b" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-2089.3 -1033.6 L-2089.3 -1068.0 Q-2089.3 -1086.0 -2076.6 -1098.7 L-1907.7 -1267.6 Q-1895.0 -1280.3 -1877.0 -1280.3 L-1278.2 -1280.3 Q-1260.2 -1280.3 -1247.4 -1267.6 L10.1 -10.1" fill="none" stroke="#8b5a2b" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M0.0 14.2 L1676.0 14.2" fill="none" stroke="#8b5a2b" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-1006.1 -1061.8 L-1024.8 -1043.1 Q-1037.5 -1030.3 -1037.5 -1012.3 L-1037.5 -969.3 Q-1037.5 -951.3 -1024.8 -938.5 L-739.8 -653.5 Q-727.1 -640.8 -709.1 -640.8 L-652.1 -640.8 Q-634.1 -640.8 -621.3 -628.1 L3.4 -3.4" fill="none" stroke="#1d1d2b" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M0.0 23.8 L1676.0 23.8" fill="none" stroke="#1d1d2b" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M2248.1 1309.1 L2248.1 1278.1 Q2248.1 1260.1 2235.3 1247.3 L2198.6 1210.6 Q2185.8 1197.8 2167.8 1197.8 L1215.8 1197.8 Q1197.8 1197.8 1185.1 1185.1 L0.0 0.0" fill="none" stroke="#9ccc3c" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M-659.4 1287.4 L-130.1 758.1 Q-117.4 745.4 -117.4 727.4 L-117.4 135.4 Q-117.4 117.4 -104.7 104.7 L0.0 0.0" fill="none" stroke="#5aa9e6" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M16.8 -16.8 L-661.8 -695.4 Q-674.5 -708.1 -674.5 -726.1 L-674.5 -773.1 Q-674.5 -791.1 -687.2 -803.8 L-1229.6 -1346.2 Q-1242.3 -1358.9 -1242.3 -1376.9 L-1242.3 -1963.9 Q-1242.3 -1981.9 -1255.1 -1994.6 L-1282.2 -2021.7" fill="none" stroke="#5aa9e6" stroke-width="5.4" stroke-linejoin="round"/>
+<path d="M2238.6 1309.1 L2238.6 1282.0 Q2238.6 1264.0 2225.8 1251.3 L2194.6 1220.1 Q2181.9 1207.3 2163.9 1207.3 L1211.9 1207.3 Q1193.9 1207.3 1181.2 1194.6 L-6.7 6.7" fill="none" stroke="#e6b800" stroke-width="5.4" stroke-linejoin="round"/>
+<line x1="1640.4" y1="-68.8" x2="1635.6" y2="-49.7" stroke="#777" stroke-width="1"/>
+<line x1="1769.9" y1="-165.0" x2="1762.9" y2="-177.0" stroke="#777" stroke-width="1"/>
+<line x1="1897.1" y1="-292.2" x2="1890.1" y2="-304.2" stroke="#777" stroke-width="1"/>
+<line x1="2024.4" y1="-419.5" x2="2017.4" y2="-431.5" stroke="#777" stroke-width="1"/>
+<line x1="2151.7" y1="-546.8" x2="2144.7" y2="-558.8" stroke="#777" stroke-width="1"/>
+<line x1="2279.0" y1="-674.1" x2="2272.0" y2="-686.1" stroke="#777" stroke-width="1"/>
+<line x1="2406.3" y1="-801.3" x2="2399.3" y2="-813.3" stroke="#777" stroke-width="1"/>
+<line x1="2533.5" y1="-928.6" x2="2526.5" y2="-940.6" stroke="#777" stroke-width="1"/>
+<line x1="2660.8" y1="-1055.9" x2="2653.8" y2="-1067.9" stroke="#777" stroke-width="1"/>
+<line x1="2788.1" y1="-1183.2" x2="2781.1" y2="-1195.2" stroke="#777" stroke-width="1"/>
+<line x1="2915.4" y1="-1310.5" x2="2908.4" y2="-1322.5" stroke="#777" stroke-width="1"/>
+<line x1="1669.0" y1="35.8" x2="1676.0" y2="23.8" stroke="#777" stroke-width="1"/>
+<line x1="-116.1" y1="-63.5" x2="-109.1" y2="-75.5" stroke="#777" stroke-width="1"/>
+<line x1="-243.4" y1="-190.8" x2="-236.4" y2="-202.8" stroke="#777" stroke-width="1"/>
+<line x1="-370.6" y1="-318.0" x2="-363.6" y2="-330.0" stroke="#777" stroke-width="1"/>
+<line x1="-497.9" y1="-445.3" x2="-490.9" y2="-457.3" stroke="#777" stroke-width="1"/>
+<line x1="-577.6" y1="-630.2" x2="-594.3" y2="-608.5" stroke="#777" stroke-width="1"/>
+<line x1="-646.9" y1="-699.5" x2="-653.9" y2="-687.5" stroke="#777" stroke-width="1"/>
+<line x1="-707.4" y1="-842.9" x2="-714.4" y2="-830.9" stroke="#777" stroke-width="1"/>
+<line x1="-834.6" y1="-970.2" x2="-841.6" y2="-958.2" stroke="#777" stroke-width="1"/>
+<line x1="-961.9" y1="-1097.5" x2="-968.9" y2="-1085.5" stroke="#777" stroke-width="1"/>
+<line x1="-1089.2" y1="-1224.8" x2="-1096.2" y2="-1212.8" stroke="#777" stroke-width="1"/>
+<line x1="-1216.5" y1="-1352.1" x2="-1223.5" y2="-1340.1" stroke="#777" stroke-width="1"/>
+<line x1="-1275.2" y1="-2033.7" x2="-1282.2" y2="-2021.7" stroke="#777" stroke-width="1"/>
+<line x1="-687.5" y1="-607.8" x2="-687.5" y2="-621.3" stroke="#777" stroke-width="1"/>
+<line x1="-751.8" y1="-569.1" x2="-751.8" y2="-593.1" stroke="#777" stroke-width="1"/>
+<line x1="-841.2" y1="-551.1" x2="-834.2" y2="-563.1" stroke="#777" stroke-width="1"/>
+<line x1="-975.6" y1="-981.8" x2="-975.6" y2="-995.8" stroke="#777" stroke-width="1"/>
+<line x1="-1109.9" y1="-1111.1" x2="-1102.9" y2="-1123.1" stroke="#777" stroke-width="1"/>
+<line x1="-1237.2" y1="-1238.3" x2="-1230.2" y2="-1250.3" stroke="#777" stroke-width="1"/>
+<line x1="-1925.0" y1="-1231.3" x2="-1932.0" y2="-1243.3" stroke="#777" stroke-width="1"/>
+<line x1="-2052.3" y1="-1104.0" x2="-2059.3" y2="-1116.0" stroke="#777" stroke-width="1"/>
+<line x1="101.8" y1="69.3" x2="94.8" y2="81.3" stroke="#777" stroke-width="1"/>
+<line x1="229.0" y1="196.6" x2="222.0" y2="208.6" stroke="#777" stroke-width="1"/>
+<line x1="356.3" y1="323.9" x2="349.3" y2="335.9" stroke="#777" stroke-width="1"/>
+<line x1="483.6" y1="451.2" x2="476.9" y2="462.8" stroke="#777" stroke-width="1"/>
+<line x1="552.7" y1="477.7" x2="545.7" y2="489.7" stroke="#777" stroke-width="1"/>
+<line x1="1335.4" y1="471.6" x2="1328.4" y2="459.6" stroke="#777" stroke-width="1"/>
+<line x1="1462.7" y1="344.3" x2="1455.7" y2="332.3" stroke="#777" stroke-width="1"/>
+<line x1="2324.3" y1="285.7" x2="2317.3" y2="273.7" stroke="#777" stroke-width="1"/>
+<line x1="2451.6" y1="158.4" x2="2444.6" y2="146.4" stroke="#777" stroke-width="1"/>
+<line x1="520.1" y1="552.6" x2="533.9" y2="533.9" stroke="#777" stroke-width="1"/>
+<line x1="668.1" y1="649.1" x2="661.1" y2="661.1" stroke="#777" stroke-width="1"/>
+<line x1="795.4" y1="776.4" x2="788.4" y2="788.4" stroke="#777" stroke-width="1"/>
+<line x1="922.7" y1="903.7" x2="915.7" y2="915.7" stroke="#777" stroke-width="1"/>
+<line x1="1050.0" y1="1031.0" x2="1043.0" y2="1043.0" stroke="#777" stroke-width="1"/>
+<line x1="1177.3" y1="1158.3" x2="1170.3" y2="1170.3" stroke="#777" stroke-width="1"/>
+<line x1="1431.7" y1="1188.7" x2="1426.8" y2="1207.3" stroke="#777" stroke-width="1"/>
+<line x1="1611.7" y1="1188.7" x2="1606.8" y2="1207.3" stroke="#777" stroke-width="1"/>
+<line x1="1971.7" y1="1188.7" x2="1966.8" y2="1207.3" stroke="#777" stroke-width="1"/>
+<line x1="2227.5" y1="1220.5" x2="2220.5" y2="1232.5" stroke="#777" stroke-width="1"/>
+<line x1="-74.3" y1="106.8" x2="-81.3" y2="94.8" stroke="#777" stroke-width="1"/>
+<line x1="-164.0" y1="131.5" x2="-157.0" y2="143.5" stroke="#777" stroke-width="1"/>
+<line x1="-277.3" y1="282.8" x2="-284.3" y2="270.8" stroke="#777" stroke-width="1"/>
+<line x1="-782.5" y1="-619.3" x2="-775.5" y2="-631.3" stroke="#777" stroke-width="1"/>
+<line x1="-948.5" y1="-643.3" x2="-955.5" y2="-631.3" stroke="#777" stroke-width="1"/>
+<line x1="-778.6" y1="-672.3" x2="-758.6" y2="-672.3" stroke="#777" stroke-width="1"/>
+<line x1="-892.8" y1="-787.6" x2="-885.8" y2="-799.6" stroke="#777" stroke-width="1"/>
+<line x1="-1020.1" y1="-914.8" x2="-1013.1" y2="-926.8" stroke="#777" stroke-width="1"/>
+<line x1="-1036.1" y1="-1061.8" x2="-1006.1" y2="-1061.8" stroke="#777" stroke-width="1"/>
+<line x1="-143.3" y1="790.3" x2="-150.3" y2="778.3" stroke="#777" stroke-width="1"/>
+<line x1="-270.5" y1="917.5" x2="-277.5" y2="905.5" stroke="#777" stroke-width="1"/>
+<line x1="-397.8" y1="1044.8" x2="-404.8" y2="1032.8" stroke="#777" stroke-width="1"/>
+<line x1="-525.1" y1="1172.1" x2="-532.1" y2="1160.1" stroke="#777" stroke-width="1"/>
+<line x1="-652.4" y1="1299.4" x2="-659.4" y2="1287.4" stroke="#777" stroke-width="1"/>
+<rect x="-38.5" y="-38.5" width="77.0" height="77.0" rx="15" fill="#fff" stroke="#111" stroke-width="3.5"/>
+<rect x="461.9" y="450.6" width="16" height="38.5" rx="8" fill="#fff" stroke="#111" stroke-width="2.4" transform="rotate(45.0 469.9 469.9)"/>
+<rect x="-695.5" y="-650.5" width="16" height="38.5" rx="8" fill="#fff" stroke="#111" stroke-width="2.4" transform="rotate(180.0 -687.5 -631.3)"/>
+<rect x="-609.4" y="-634.9" width="16" height="67.0" rx="8" fill="#fff" stroke="#111" stroke-width="2.4" transform="rotate(225.0 -601.4 -601.4)"/>
+<circle cx="2908.4" cy="-1322.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2781.1" cy="-1195.2" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2653.8" cy="-1067.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2526.5" cy="-940.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2399.3" cy="-813.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2272.0" cy="-686.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2144.7" cy="-558.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2017.4" cy="-431.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1890.1" cy="-304.2" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1762.9" cy="-177.0" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1635.6" cy="-49.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1570.5" cy="-23.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1390.5" cy="-23.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1210.5" cy="-23.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1030.5" cy="-23.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="850.5" cy="-23.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="670.5" cy="-23.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="490.5" cy="-23.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="310.5" cy="-23.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="130.5" cy="-23.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-107.9" cy="706.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-107.9" cy="526.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-107.9" cy="346.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-107.9" cy="166.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-81.3" cy="94.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="94.8" cy="81.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="222.0" cy="208.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="349.3" cy="335.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="476.9" cy="462.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="545.7" cy="489.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="725.7" cy="489.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="905.7" cy="489.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1085.7" cy="489.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1265.7" cy="489.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1328.4" cy="459.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1455.7" cy="332.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1534.7" cy="303.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1714.7" cy="303.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1894.7" cy="303.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2074.7" cy="303.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2254.7" cy="303.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2317.3" cy="273.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2444.6" cy="146.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1676.0" cy="-14.2" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-687.5" cy="-631.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-775.5" cy="-631.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-955.5" cy="-631.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1135.5" cy="-631.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1014.2" cy="-563.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-834.2" cy="-563.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-751.8" cy="-593.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-687.5" cy="-621.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-601.4" cy="-601.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1676.0" cy="-4.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-608.5" cy="-594.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-490.9" cy="-457.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-363.6" cy="-330.0" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-236.4" cy="-202.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-109.1" cy="-75.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="130.5" cy="4.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="310.5" cy="4.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="850.5" cy="4.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1676.0" cy="4.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-612.8" cy="210.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-556.8" cy="256.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-529.8" cy="293.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-349.8" cy="293.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-284.3" cy="270.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-157.0" cy="143.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-94.8" cy="81.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-2089.3" cy="-1033.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-2059.3" cy="-1116.0" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1932.0" cy="-1243.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1852.6" cy="-1280.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1672.6" cy="-1280.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1492.6" cy="-1280.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1312.6" cy="-1280.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1230.2" cy="-1250.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1102.9" cy="-1123.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-975.6" cy="-995.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-848.4" cy="-868.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-721.1" cy="-741.2" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-660.6" cy="-680.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1676.0" cy="14.2" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1006.1" cy="-1061.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1037.5" cy="-995.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1013.1" cy="-926.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-885.8" cy="-799.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-758.6" cy="-672.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-687.5" cy="-641.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-594.3" cy="-608.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1676.0" cy="23.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2248.1" cy="1309.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2220.5" cy="1232.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2146.8" cy="1197.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1786.8" cy="1197.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1246.8" cy="1197.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1170.3" cy="1170.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1043.0" cy="1043.0" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="915.7" cy="915.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="788.4" cy="788.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="661.1" cy="661.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="533.9" cy="533.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="469.9" cy="469.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-659.4" cy="1287.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-532.1" cy="1160.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-404.8" cy="1032.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-277.5" cy="905.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-150.3" cy="778.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-117.4" cy="706.4" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-653.9" cy="-687.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-674.5" cy="-744.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-714.4" cy="-830.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-841.6" cy="-958.2" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-968.9" cy="-1085.5" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1096.2" cy="-1212.8" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1223.5" cy="-1340.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1242.3" cy="-1395.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1242.3" cy="-1575.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1242.3" cy="-1755.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1242.3" cy="-1935.6" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="-1282.2" cy="-2021.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2238.6" cy="1309.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2213.8" cy="1239.2" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="2146.8" cy="1207.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1966.8" cy="1207.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1786.8" cy="1207.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1606.8" cy="1207.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1426.8" cy="1207.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1246.8" cy="1207.3" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="1036.3" cy="1049.7" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="781.7" cy="795.1" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<circle cx="462.8" cy="476.9" r="3.9" fill="#fff" stroke="#111" stroke-width="1.5"/>
+<text x="-46.5" y="4.5" font-size="22" font-weight="700" fill="#111" text-anchor="end" stroke="#fff" stroke-width="5" paint-order="stroke">Reading <tspan fill="#c2185b" font-size="15">14.2</tspan></text>
+<text x="132.5" y="-35.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 132.5 -35.8)"><tspan font-weight="500">Twyford</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">3.1</tspan></text>
+<text x="312.5" y="-35.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 312.5 -35.8)"><tspan font-weight="500">Maidenhead</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">3.1</tspan></text>
+<text x="492.5" y="-35.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 492.5 -35.8)"><tspan font-weight="500">Taplow</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="672.5" y="-35.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 672.5 -35.8)"><tspan font-weight="500">Burnham (Berks)</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="852.5" y="-35.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 852.5 -35.8)"><tspan font-weight="500">Slough</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">3.1</tspan></text>
+<text x="1032.5" y="-35.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1032.5 -35.8)"><tspan font-weight="500">Langley (Berks)</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="1212.5" y="-35.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1212.5 -35.8)"><tspan font-weight="500">West Drayton</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="1392.5" y="-35.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1392.5 -35.8)"><tspan font-weight="500">Hayes &amp; Harlington</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="1572.5" y="-35.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1572.5 -35.8)"><tspan font-weight="500">Southall</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="1637.6" y="-71.7" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1637.6 -71.7)"><tspan font-weight="500">Ealing Broadway</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="1771.9" y="-152.0" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Padtll</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="1899.1" y="-279.2" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Bondst</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="2026.4" y="-406.5" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Totctrd</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="2153.7" y="-533.8" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Frndxr</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="2281.0" y="-661.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Livstll</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="2408.3" y="-788.3" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Wchapxr</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="2535.5" y="-915.6" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Canwhrf</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="2662.8" y="-1042.9" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Custmhs</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="2790.1" y="-1170.2" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Wolwxr</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="2917.4" y="-1297.5" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Abwdxr</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.1</tspan></text>
+<text x="1667.0" y="48.8" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">London Paddington</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">5.3</tspan></text>
+<text x="-118.1" y="-50.5" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Tilehurst</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.1</tspan></text>
+<text x="-245.4" y="-177.8" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Pangbourne</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.1</tspan></text>
+<text x="-372.6" y="-305.0" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Goring &amp; Streatley</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.1</tspan></text>
+<text x="-499.9" y="-432.3" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Cholsey</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.1</tspan></text>
+<text x="-575.6" y="-634.2" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Didcot Parkway</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">3.1</tspan></text>
+<g><circle cx="-424.4" cy="-638.2" r="8.5" fill="#00a5b5"/><text x="-424.4" y="-635.0" font-size="10.2" font-weight="700" fill="#fff" text-anchor="middle">F</text></g>
+<text x="-644.9" y="-703.5" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Oxford</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="-662.5" y="-740.3" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Banbury</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-705.4" y="-846.9" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Leamington Spa</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-832.6" y="-974.2" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Coventry</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-959.9" y="-1101.5" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Birmingham International</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-1087.2" y="-1228.8" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Birmingham New Street</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-1214.5" y="-1356.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Wolverhampton</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-1230.3" y="-1391.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Stafford</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-1230.3" y="-1571.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Stoke-on-Trent</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-1230.3" y="-1751.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Macclesfield</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-1230.3" y="-1931.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Stockport</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-1273.2" y="-2037.7" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Manchester Piccadilly</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-689.5" y="-607.8" font-size="14.5" fill="#1a1a1a" text-anchor="end" transform="rotate(-90 -689.5 -607.8)"><tspan font-weight="500">Swindon</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">3.4</tspan></text>
+<text x="-753.8" y="-569.1" font-size="14.5" fill="#1a1a1a" text-anchor="end" transform="rotate(-90 -753.8 -569.1)"><tspan font-weight="500">Chippenham</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.2</tspan></text>
+<text x="-843.2" y="-538.1" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Bath Spa</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.2</tspan></text>
+<text x="-1016.2" y="-549.1" font-size="14.5" fill="#1a1a1a" text-anchor="end" transform="rotate(-45 -1016.2 -549.1)"><tspan font-weight="500">Bristol Temple Meads</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.2</tspan></text>
+<text x="-719.1" y="-753.2" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -719.1 -753.2)"><tspan font-weight="500">Hanborough</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-846.4" y="-880.5" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -846.4 -880.5)"><tspan font-weight="500">Charlbury</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-977.6" y="-981.8" font-size="14.5" fill="#1a1a1a" text-anchor="end" transform="rotate(-90 -977.6 -981.8)"><tspan font-weight="500">Kingham</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-1111.9" y="-1098.1" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Moreton-in-Marsh</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-1239.2" y="-1225.3" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Honeybourne</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-1310.6" y="-1292.3" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -1310.6 -1292.3)"><tspan font-weight="500">Evesham</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-1490.6" y="-1292.3" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -1490.6 -1292.3)"><tspan font-weight="500">Pershore</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-1670.6" y="-1292.3" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -1670.6 -1292.3)"><tspan font-weight="500">Worcphl</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-1850.6" y="-1292.3" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -1850.6 -1292.3)"><tspan font-weight="500">Worcester Shrub Hill</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-1923.0" y="-1218.3" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Worcester Foregate Street</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-2050.3" y="-1091.0" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Malvern Link</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="-2077.3" y="-1029.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Great Malvern</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.9</tspan></text>
+<text x="103.8" y="65.3" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Earley</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="231.0" y="192.6" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Winnersh Triangle</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="358.3" y="319.9" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Winnersh</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="485.6" y="447.2" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Wokingham</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">3.2</tspan></text>
+<text x="554.7" y="473.7" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Bracknell</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="727.7" y="477.7" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 727.7 477.7)"><tspan font-weight="500">Martins Heron</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="907.7" y="477.7" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 907.7 477.7)"><tspan font-weight="500">Ascot</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="1087.7" y="477.7" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1087.7 477.7)"><tspan font-weight="500">Sunningdale</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="1267.7" y="477.7" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1267.7 477.7)"><tspan font-weight="500">Longcross</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="1337.4" y="484.6" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Virginia Water</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="1464.7" y="357.3" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Egham</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="1536.7" y="291.7" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1536.7 291.7)"><tspan font-weight="500">Staines</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="1716.7" y="291.7" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1716.7 291.7)"><tspan font-weight="500">Feltham</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="1896.7" y="291.7" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1896.7 291.7)"><tspan font-weight="500">Twickenham</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="2076.7" y="291.7" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 2076.7 291.7)"><tspan font-weight="500">Richmond NLL</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="2256.7" y="291.7" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 2256.7 291.7)"><tspan font-weight="500">Clapham Junction</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="2326.3" y="298.7" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Vauxhall</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="2453.6" y="171.4" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">London Waterloo</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.7</tspan></text>
+<text x="518.1" y="565.6" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Crowthorne</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="670.1" y="645.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Sandhurst</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="797.4" y="772.4" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Blackwater</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.6</tspan></text>
+<text x="924.7" y="899.7" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Farnborough North</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="1052.0" y="1027.0" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">North Camp</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.6</tspan></text>
+<text x="1179.3" y="1154.3" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Ash</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="1248.8" y="1185.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1248.8 1185.8)"><tspan font-weight="500">Guildford</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.6</tspan></text>
+<text x="1428.8" y="1185.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1428.8 1185.8)"><tspan font-weight="500">Shalford (Surrey)</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="1608.8" y="1185.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1608.8 1185.8)"><tspan font-weight="500">Dorking West</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="1788.8" y="1185.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1788.8 1185.8)"><tspan font-weight="500">Dorking Deepdene</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.6</tspan></text>
+<text x="1968.8" y="1185.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 1968.8 1185.8)"><tspan font-weight="500">Betchworth</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="2148.8" y="1185.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 2148.8 1185.8)"><tspan font-weight="500">Reigate</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.6</tspan></text>
+<text x="2229.5" y="1216.5" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Redhill</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.6</tspan></text>
+<text x="2260.1" y="1313.6" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Gatwick Airport</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.6</tspan></text>
+<text x="-72.3" y="119.8" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Reading West</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.8</tspan></text>
+<text x="-95.9" y="170.9" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Redggpk</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.8</tspan></text>
+<text x="-95.9" y="350.9" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Mortimer</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.8</tspan></text>
+<text x="-95.9" y="530.9" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Bramley (Hants)</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.8</tspan></text>
+<text x="-95.9" y="710.9" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Basingstoke</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">2.6</tspan></text>
+<g><circle cx="33.1" cy="706.9" r="8.5" fill="#d62828"/><text x="33.1" y="710.1" font-size="10.2" font-weight="700" fill="#fff" text-anchor="middle">B</text></g>
+<text x="-166.0" y="127.5" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Theale</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-275.3" y="295.8" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Aldermaston</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-347.8" y="281.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -347.8 281.8)"><tspan font-weight="500">Midgham</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-527.8" y="281.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -527.8 281.8)"><tspan font-weight="500">Thatcham</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-568.8" y="261.3" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Newbury Park Station</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-610.8" y="198.8" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -610.8 198.8)"><tspan font-weight="500">Newbury</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1</tspan></text>
+<text x="-784.5" y="-606.3" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Bristol Parkway</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.3</tspan></text>
+<text x="-946.5" y="-647.3" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Newport (S Wales)</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.3</tspan></text>
+<text x="-1133.5" y="-643.3" font-size="14.5" fill="#1a1a1a" text-anchor="start" transform="rotate(-45 -1133.5 -643.3)"><tspan font-weight="500">Cardiff Central</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">1.3</tspan></text>
+<text x="-780.6" y="-667.8" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Kemble</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-894.8" y="-774.6" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Stroud (Glos)</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-1022.1" y="-901.8" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Stonehouse</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-1049.5" y="-991.3" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Gloucester</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-1038.1" y="-1057.3" font-size="14.5" fill="#1a1a1a" text-anchor="end"><tspan font-weight="500">Cheltenham Spa</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-141.3" y="803.3" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Winchester</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-268.5" y="930.5" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Southampton Airport Parkway</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-395.8" y="1057.8" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Southampton Central</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-523.1" y="1185.1" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Brockenhurst</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<text x="-650.4" y="1312.4" font-size="14.5" fill="#1a1a1a" text-anchor="start"><tspan font-weight="500">Bournemouth</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">0.8</tspan></text>
+<g><circle cx="2943.6" cy="-1324.1" r="9.5" fill="#0a6e3d"/><text x="2943.6" y="-1320.4" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">A</text></g>
+<g><circle cx="2469.7" cy="134.7" r="9.5" fill="#1b4f9c"/><text x="2469.7" y="138.3" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">C</text></g>
+<g><circle cx="1702.0" cy="-42.0" r="9.5" fill="#f28c00"/><text x="1702.0" y="-38.4" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">D</text></g>
+<g><circle cx="1702.0" cy="-21.0" r="9.5" fill="#7b4fa3"/><text x="1702.0" y="-17.4" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">E</text></g>
+<g><circle cx="1702.0" cy="0.0" r="9.5" fill="#00a5b5"/><text x="1702.0" y="3.6" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">F</text></g>
+<g><circle cx="1702.0" cy="21.0" r="9.5" fill="#8b5a2b"/><text x="1702.0" y="24.6" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">H</text></g>
+<g><circle cx="1702.0" cy="42.0" r="9.5" fill="#1d1d2b"/><text x="1702.0" y="45.6" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">I</text></g>
+<g><circle cx="-1610.5" cy="-822.0" r="9.5" fill="#f28c00"/><text x="-1610.5" y="-818.4" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">D</text></g>
+<g><circle cx="-1040.2" cy="-577.4" r="9.5" fill="#7b4fa3"/><text x="-1040.2" y="-573.7" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">E</text></g>
+<g><circle cx="-638.8" cy="220.3" r="9.5" fill="#c2185b"/><text x="-638.8" y="224.0" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">G</text></g>
+<g><circle cx="-2075.0" cy="-1007.6" r="9.5" fill="#8b5a2b"/><text x="-2075.0" y="-1004.0" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">H</text></g>
+<g><circle cx="-991.0" cy="-1083.6" r="9.5" fill="#1d1d2b"/><text x="-991.0" y="-1079.9" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">I</text></g>
+<g><circle cx="2258.6" cy="1335.1" r="9.5" fill="#9ccc3c"/><text x="2258.6" y="1338.7" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">J</text></g>
+<g><circle cx="2237.6" cy="1335.1" r="9.5" fill="#e6b800"/><text x="2237.6" y="1338.7" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">L</text></g>
+<g><circle cx="-677.8" cy="1305.8" r="9.5" fill="#5aa9e6"/><text x="-677.8" y="1309.4" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">K</text></g>
+<g><circle cx="-1317.3" cy="-2023.3" r="9.5" fill="#5aa9e6"/><text x="-1317.3" y="-2019.7" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">K</text></g>
+<text x="-2109.3" y="1407.6" font-size="22" font-weight="500" fill="#111">Routes</text>
+<text x="-1409.3" y="1407.6" font-size="13" fill="#777" text-anchor="end">tph each way</text>
+<line x1="-2105.3" y1="1434.6" x2="-2065.3" y2="1434.6" stroke="#0a6e3d" stroke-width="5.4"/>
+<g><circle cx="-2045.3" cy="1434.6" r="9.5" fill="#0a6e3d"/><text x="-2045.3" y="1438.2" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">A</text></g>
+<text x="-2025.3" y="1439.6" font-size="15" fill="#1a1a1a">Abwdxr – Reading <tspan fill="#888" font-size="12">XR</tspan></text>
+<text x="-1409.3" y="1439.6" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">2.1</text>
+<line x1="-2105.3" y1="1461.6" x2="-2065.3" y2="1461.6" stroke="#d62828" stroke-width="5.4"/>
+<g><circle cx="-2045.3" cy="1461.6" r="9.5" fill="#d62828"/><text x="-2045.3" y="1465.2" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">B</text></g>
+<text x="-2025.3" y="1466.6" font-size="15" fill="#1a1a1a">Basingstoke – Reading <tspan fill="#888" font-size="12">GW</tspan></text>
+<text x="-1409.3" y="1466.6" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">1.8</text>
+<line x1="-2105.3" y1="1488.6" x2="-2065.3" y2="1488.6" stroke="#1b4f9c" stroke-width="5.4"/>
+<g><circle cx="-2045.3" cy="1488.6" r="9.5" fill="#1b4f9c"/><text x="-2045.3" y="1492.2" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">C</text></g>
+<text x="-2025.3" y="1493.6" font-size="15" fill="#1a1a1a">London Waterloo – Reading <tspan fill="#888" font-size="12">SW</tspan></text>
+<text x="-1409.3" y="1493.6" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">1.7</text>
+<line x1="-2105.3" y1="1515.6" x2="-2065.3" y2="1515.6" stroke="#f28c00" stroke-width="5.4"/>
+<g><circle cx="-2045.3" cy="1515.6" r="9.5" fill="#f28c00"/><text x="-2045.3" y="1519.2" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">D</text></g>
+<text x="-2025.3" y="1520.6" font-size="15" fill="#1a1a1a">London Paddington – Cardiff Central <tspan fill="#888" font-size="12">GW</tspan></text>
+<text x="-1409.3" y="1520.6" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">1.3</text>
+<line x1="-2105.3" y1="1542.6" x2="-2065.3" y2="1542.6" stroke="#7b4fa3" stroke-width="5.4"/>
+<g><circle cx="-2045.3" cy="1542.6" r="9.5" fill="#7b4fa3"/><text x="-2045.3" y="1546.2" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">E</text></g>
+<text x="-2025.3" y="1547.6" font-size="15" fill="#1a1a1a">London Paddington – Bristol Temple Meads <tspan fill="#888" font-size="12">GW</tspan></text>
+<text x="-1409.3" y="1547.6" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">1.2</text>
+<line x1="-2105.3" y1="1569.6" x2="-2065.3" y2="1569.6" stroke="#00a5b5" stroke-width="5.4"/>
+<g><circle cx="-2045.3" cy="1569.6" r="9.5" fill="#00a5b5"/><text x="-2045.3" y="1573.2" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">F</text></g>
+<text x="-2025.3" y="1574.6" font-size="15" fill="#1a1a1a">Didcot Parkway – London Paddington <tspan fill="#888" font-size="12">GW</tspan></text>
+<text x="-1409.3" y="1574.6" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">1.1</text>
+<line x1="-2105.3" y1="1596.6" x2="-2065.3" y2="1596.6" stroke="#c2185b" stroke-width="5.4"/>
+<g><circle cx="-2045.3" cy="1596.6" r="9.5" fill="#c2185b"/><text x="-2045.3" y="1600.2" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">G</text></g>
+<text x="-2025.3" y="1601.6" font-size="15" fill="#1a1a1a">Newbury – Reading <tspan fill="#888" font-size="12">GW</tspan></text>
+<text x="-1409.3" y="1601.6" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">1.0</text>
+<line x1="-2105.3" y1="1623.6" x2="-2065.3" y2="1623.6" stroke="#8b5a2b" stroke-width="5.4"/>
+<g><circle cx="-2045.3" cy="1623.6" r="9.5" fill="#8b5a2b"/><text x="-2045.3" y="1627.2" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">H</text></g>
+<text x="-2025.3" y="1628.6" font-size="15" fill="#1a1a1a">Great Malvern – London Paddington <tspan fill="#888" font-size="12">GW</tspan></text>
+<text x="-1409.3" y="1628.6" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">0.9</text>
+<line x1="-2105.3" y1="1650.6" x2="-2065.3" y2="1650.6" stroke="#1d1d2b" stroke-width="5.4"/>
+<g><circle cx="-2045.3" cy="1650.6" r="9.5" fill="#1d1d2b"/><text x="-2045.3" y="1654.2" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">I</text></g>
+<text x="-2025.3" y="1655.6" font-size="15" fill="#1a1a1a">London Paddington – Cheltenham Spa <tspan fill="#888" font-size="12">GW</tspan></text>
+<text x="-1409.3" y="1655.6" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">0.8</text>
+<line x1="-2105.3" y1="1677.6" x2="-2065.3" y2="1677.6" stroke="#9ccc3c" stroke-width="5.4"/>
+<g><circle cx="-2045.3" cy="1677.6" r="9.5" fill="#9ccc3c"/><text x="-2045.3" y="1681.2" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">J</text></g>
+<text x="-2025.3" y="1682.6" font-size="15" fill="#1a1a1a">Gatwick Airport – Reading <tspan fill="#888" font-size="12">GW</tspan></text>
+<text x="-1409.3" y="1682.6" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">0.8</text>
+<line x1="-2105.3" y1="1704.6" x2="-2065.3" y2="1704.6" stroke="#5aa9e6" stroke-width="5.4"/>
+<g><circle cx="-2045.3" cy="1704.6" r="9.5" fill="#5aa9e6"/><text x="-2045.3" y="1708.2" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">K</text></g>
+<text x="-2025.3" y="1709.6" font-size="15" fill="#1a1a1a">Bournemouth – Manchester Piccadilly <tspan fill="#888" font-size="12">XC</tspan></text>
+<text x="-1409.3" y="1709.6" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">0.8</text>
+<line x1="-2105.3" y1="1731.6" x2="-2065.3" y2="1731.6" stroke="#e6b800" stroke-width="5.4"/>
+<g><circle cx="-2045.3" cy="1731.6" r="9.5" fill="#e6b800"/><text x="-2045.3" y="1735.2" font-size="11.4" font-weight="700" fill="#fff" text-anchor="middle">L</text></g>
+<text x="-2025.3" y="1736.6" font-size="15" fill="#1a1a1a">Reading – Gatwick Airport <tspan fill="#888" font-size="12">GW</tspan></text>
+<text x="-1409.3" y="1736.6" font-size="16" font-weight="700" fill="#c2185b" text-anchor="end">0.8</text>
+<!-- spacing 180 report {'routes': 12, 'dot_overlap': 0, 'label_collision': 4, 'crossings': 1, 'branch_overlap': 0, 'dot_on_line': 2, 'leader_lines': 65} -->
+</svg>
