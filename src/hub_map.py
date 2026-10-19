@@ -697,7 +697,8 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
 
 def hard(rep):
     """Rule failures that count fully (leader lines are only a mild charge)."""
-    return sum(rep[k] for k in ("dot_overlap", "label_collision", "crossings", "branch_overlap", "dot_on_line", "retrace"))
+    # a route turning back on itself is the defect that misleads most, so it counts double
+    return sum(rep[k] for k in ("dot_overlap", "label_collision", "crossings", "branch_overlap", "dot_on_line")) + 2 * rep["retrace"]
 
 
 def letters(routes):

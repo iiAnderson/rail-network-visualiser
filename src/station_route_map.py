@@ -451,7 +451,7 @@ def layout(routes, hub, data, loops=True):
                     dist_ = 44 + 2.5 * nl
                 else:
                     dist_ = SPACING
-                dist_ *= stretch.get((u, c), 1.0)
+                dist_ = min(dist_ * stretch.get((u, c), 1.0), max(dist_, MAX_EDGE, 2.5 * SPACING))
                 P[c] = (P[base][0] + math.cos(th) * dist_, P[base][1] + math.sin(th) * dist_)
                 edge_path[(u, c)] = [u] + ([base] if base != u else []) + [c]
                 in_theta[c] = th
@@ -466,7 +466,7 @@ def layout(routes, hub, data, loops=True):
         return P, junction, edge_path, in_theta, dirs, orders
 
     stretch, res = {}, {"plans": [], "need": False}
-    for _attempt in range(5):
+    for _attempt in range(8):
         P, junction, edge_path, in_theta, dirs, orders = run(stretch)
         res = bypass_loops(chord_edges, parent, children, P, edge_path, dirs, n_lanes, hub, hub_r, data,
                            stretch, routes)
@@ -526,7 +526,8 @@ def offset_polyline(pts, d):
     return out
 
 
-MAX_STRETCH = 4.0
+MAX_STRETCH = 14.0   # factor asked for; the length it produces is capped by MAX_EDGE
+MAX_EDGE = 420.0     # no stretched edge is longer than this (or 2.5 x the spacing, if that is more)
 MERGE_GAP = 40.0   # the bypass rejoins this far before the station it runs to
 MIN_STEP = 0.75    # bypass stations are at least this fraction of SPACING apart
 
@@ -724,7 +725,7 @@ def _bypass_one(S, u, v, by, main, parent, children, P, edge_path, dirs, n_lanes
     step = (total - s_start) / (m + 1)
     if step < MIN_STEP * SPACING:
         # stretch every main edge so the bypass has room for its stations
-        k = min(6.0, MIN_STEP * SPACING * (m + 1) / max(total - s_start, 1.0) * 1.05)
+        k = min(6.0, MIN_STEP * SPACING * (m + 1) / max(total - s_start, 1.0) * 1.2)  # a little over: the bypass does not grow in step with the main arm
         if k > 1.02:
             for e_ in tree_edges:
                 stretch[e_] = min(MAX_STRETCH, stretch.get(e_, 1.0) * k)
