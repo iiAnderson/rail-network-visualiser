@@ -40,7 +40,36 @@ def make_data(tmp):
 def test_toy_hub_map(tmp_path, monkeypatch):
     data = make_data(tmp_path)
     monkeypatch.setattr(hm, "SPACINGS", [80])
-    svg, routes, spacing, report = hm.build_map(data, None, "HUB", verbose=False)
+    monkeypatch.setattr(hm, "HUB_GAPS", [80])
+    monkeypatch.setattr(hm, "ALL_SPACINGS", [80])
+    monkeypatch.setattr(hm, "ALL_GAPS", [80])
+    svg, routes, spacing, report, omitted = hm.build_map(data, None, "HUB", verbose=False)
     assert svg.startswith("<svg") and "Hub Routes" in svg
-    assert len(routes) == 2
+    assert len(routes) == 2 and omitted == 0
     assert report["dot_overlap"] == 0 and report["crossings"] == 0 and report["branch_overlap"] == 0
+    assert report["retrace"] == 0
+    # the "all" view draws at least as many routes
+    svg_all, routes_all, _, _, _ = hm.build_map(data, None, "HUB", verbose=False, mode="all")
+    assert len(routes_all) >= len(routes)
+
+
+def test_loop_is_drawn_not_retraced(tmp_path, monkeypatch):
+    """Two ways between B and D (via C, or direct): the route that takes the quieter way must not run out
+    along C and back."""
+    import pandas as pd
+    rows = []
+    def add(toc, seq, n):
+        for i in range(n):
+            rows.append({"service_date": "20260901", "rid": "r%d%s" % (i, seq[0]), "train_id": "x", "toc": toc,
+                         "pattern": ",".join(seq), "times": ",".join("10:%02d:00" % (j * 5) for j in range(len(seq)))})
+    add("T", ["A", "B", "C", "D", "E"], 12)
+    add("T", ["A", "B", "X", "Y", "D", "E"], 6)
+    pd.DataFrame(rows).to_csv(tmp_path / "p.csv", index=False)
+    names = [{"TiplocCode": c, "CrsCode": c, "StationName": "Stn " + c, "easting": 1000 + 100 * i,
+              "northing": 1000 + 20 * (i % 2)} for i, c in enumerate("ABCXYDE")]
+    pd.DataFrame(names).to_csv(tmp_path / "t.csv", index=False)
+    data = base.Data(str(tmp_path / "p.csv"), str(tmp_path / "t.csv"))
+    monkeypatch.setattr(hm, "SPACINGS", [100])
+    monkeypatch.setattr(hm, "HUB_GAPS", [80])
+    svg, routes, spacing, report, omitted = hm.build_map(data, None, "A", verbose=False)
+    assert len(routes) == 2 and report["retrace"] == 0 and report["crossings"] == 0

@@ -35,7 +35,7 @@ MAX_ROUTES = 24      # upper bound (the palette size); in practice routes are ad
 CLEAN_MIN_TPH = 0.3   # the clean view only considers patterns at least this frequent
 MIN_ROUTES = 6       # the busiest routes are always drawn
 ROUTE_TOLERANCE = 1  # a further route may add at most this many rule failures
-PROBE_SPACINGS = ((130, 80), (64, 80), (130, 170), (64, 170))  # (spacing, hub gap)
+PROBE_SPACINGS = ((130, 80), (64, 170))  # (spacing, hub gap)
 HUB_GAPS = (80, 140, 200)
 LABEL_MAX = 30.0  # a label may start at most this far from its own station's dots
 MAJOR_TPH = 3.0   # an interchange capsule needs at least this many tph calling
@@ -277,8 +277,11 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
             if any({dr[i], dr[i + 1]} == set(ab) for i in range(len(dr) - 1)):
                 inside = [n for n in r["tree_nodes"] if n in members]
                 if inside:
-                    z = max(inside, key=lambda n: depth[n])
-                    users.append((pre[z], r["id"]))  # rule: lane order follows where each route goes next
+                    # rule: lane order follows where each route goes next. Compare the stations each route
+                    # visits (outward, left to right), so routes that part and rejoin are ordered by the
+                    # way they part, not by the station they both end at
+                    seq = inside if depth[inside[0]] <= depth[inside[-1]] else inside[::-1]
+                    users.append((tuple(pre[n] for n in seq), r["id"]))
         lanes[ab] = [rid for _, rid in sorted(users)]
 
     # lanes keep their absolute offset along a bundle (a route leaving just peels away; nothing
@@ -699,7 +702,8 @@ def probe(data, nr, hub, routes):
     trial = copy.deepcopy(routes)
     letters(trial)
     expand_via_pdf(trial, nr, data)
-    return min(hard(render(data, hub, trial, sp, hg, True)[1]) for sp, hg in PROBE_SPACINGS)
+    # each loop is judged later, so a trial gets the better of every loop drawn and none drawn
+    return min(hard(render(data, hub, trial, sp, hg, lp)[1]) for sp, hg in PROBE_SPACINGS for lp in (True, False))
 
 
 def choose_routes(data, nr, hub, every, verbose=False):
