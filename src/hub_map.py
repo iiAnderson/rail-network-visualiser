@@ -166,6 +166,26 @@ def path_geom(rid, nodes, off, P):
     return " ".join(d), pts
 
 
+def safe_buffers(pts, radius, chunk=10):
+    """Buffer a polyline in short pieces, splitting where it doubles back. GEOS can crash (not just
+    raise) on long lines that retrace themselves, which would take a whole worker process down."""
+    pieces, cur = [], [pts[0]]
+    for i in range(1, len(pts)):
+        cur.append(pts[i])
+        reverses = False
+        if i + 1 < len(pts):
+            a = (pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1])
+            b = (pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1])
+            na, nb = math.hypot(*a), math.hypot(*b)
+            reverses = na > 1e-9 and nb > 1e-9 and (a[0] * b[0] + a[1] * b[1]) / (na * nb) < -0.9
+        if reverses or len(cur) >= chunk:
+            pieces.append(cur)
+            cur = [pts[i]]
+    if len(cur) >= 2:
+        pieces.append(cur)
+    return [LineString(c).buffer(radius) for c in pieces if len(c) >= 2]
+
+
 def render(data, hub, routes, spacing):
     base.SPACING = float(spacing)
     L = layout(routes, hub, data)
@@ -299,7 +319,7 @@ def render(data, hub, routes, spacing):
     pill = Point(P[hub]).buffer(hub_r * 1.45)
     obstacles.append(pill)
     for _rid, _d, _pts in paths:  # labels must clear the real lines, not the whole bundle width
-        obstacles.append(LineString(_pts).buffer(LINE_W / 2 + 2.3))
+        obstacles.extend(safe_buffers(_pts, LINE_W / 2 + 2.3))
     caps = {}
     for n in interchange:
         th = L["dir"].get(n, 0.0)
