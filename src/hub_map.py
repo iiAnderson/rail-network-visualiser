@@ -201,15 +201,16 @@ def safe_buffers(pts, radius, chunk=10):
     return [LineString(c).buffer(radius) for c in pieces if len(c) >= 2]
 
 
-def render(data, hub, routes, spacing, hub_gap=80.0):
+def render(data, hub, routes, spacing, hub_gap=80.0, loops=True):
     base.SPACING = float(spacing)
     base.HUB_GAP = float(hub_gap)
-    L = layout(routes, hub, data)
+    L = layout(routes, hub, data, loops)
     parent, children, P = L["parent"], L["children"], L["P"]
+    chords = L["chords"]
     hub_r = L["hub_r"]
     for r in routes:
         tn = []
-        for n in route_tree_nodes(r["path"], parent):
+        for n in route_tree_nodes(r["path"], parent, chords):
             # an out-and-back detour is dropped only if the route does not stop at the station it visits
             if len(tn) >= 2 and tn[-2] == n and tn[-1] != hub and tn[-1] not in r["calls"]:
                 tn.pop()
@@ -217,7 +218,13 @@ def render(data, hub, routes, spacing, hub_gap=80.0):
                 tn.append(n)
         dn = [tn[0]]
         for a, b in zip(tn, tn[1:]):
-            seg = L["edge_path"][(a, b)] if parent.get(b) == a else L["edge_path"][(b, a)][::-1]
+            if parent.get(b) == a:
+                seg = L["edge_path"][(a, b)]
+            elif parent.get(a) == b:
+                seg = L["edge_path"][(b, a)][::-1]
+            else:  # a step along a drawn loop
+                info = chords[frozenset((a, b))]
+                seg = info["nodes"] if a == info["from"] else info["nodes"][::-1]
             dn += seg[1:]
         r["draw"], r["tree_nodes"] = dn, tn
 
@@ -236,7 +243,9 @@ def render(data, hub, routes, spacing, hub_gap=80.0):
     dfs(hub)
 
     canon, tree_of_draw = {}, {}
-    for (p, c), seq in L["edge_path"].items():
+    all_paths = [(c, seq) for (p, c), seq in L["edge_path"].items()]
+    all_paths += [(info["to"], info["nodes"]) for info in chords.values()]
+    for c, seq in all_paths:
         for a, b in zip(seq, seq[1:]):
             canon[(a, b)] = canon[(b, a)] = (a, b)
             tree_of_draw[(a, b)] = (a, c) if b == "j:" + a else (None, c)
@@ -255,7 +264,25 @@ def render(data, hub, routes, spacing, hub_gap=80.0):
 
     # lanes keep their absolute offset along a bundle (a route leaving just peels away; nothing
     # re-centres), so lines do not wiggle after a junction. Only the hub's edges are centred.
-    end_edge = {ab[1]: ab for ab in lanes}
+    # where a drawn loop rejoins, its lanes arrive on the side the bypass came from
+    chord_hops = set()
+    for key, info in chords.items():
+        nd = info["nodes"]
+        chord_hops |= {canon[(a, b)] for a, b in zip(nd[:-2], nd[1:-1])}
+        merge = canon[(nd[-2], nd[-1])]
+        first = canon[tuple(L["chord_first"][key])]
+        hop_in = canon[(nd[-3], nd[-2])]
+        if merge in lanes and hop_in in lanes and first in lanes:
+            mine = [rid for rid in lanes[first] if rid in lanes[hop_in]]
+            rest = [rid for rid in lanes[merge] if rid not in mine]
+            lanes[merge] = mine + rest if L["chord_side"][key] > 0 else rest + mine
+    end_edge = {}
+    for ab in lanes:  # a merge point is "reached" by the main line, not the bypass
+        if ab in chord_hops:
+            end_edge[ab[1]] = ab
+    for ab in lanes:
+        if ab not in chord_hops:
+            end_edge[ab[1]] = ab
     offs = {}
 
     def solve(ab):
@@ -537,7 +564,7 @@ def render(data, hub, routes, spacing, hub_gap=80.0):
     # lines of different routes running on top of each other (closer than a lane gap) for any real length
     branch_overlap = 0
     keep_out = [c.buffer(rad) for c, rad in centres]
-    thin = {rid: [ln.buffer(2.4) for ln in lns] for rid, lns in lines.items()}
+    thin = {rid: [g for ln in lns for g in safe_buffers(list(ln.coords), 2.4)] for rid, lns in lines.items()}
     for i, a_ in enumerate(ids):
         for b_ in ids[i + 1:]:
             area = 0.0
@@ -646,7 +673,7 @@ def probe(data, nr, hub, routes):
     trial = copy.deepcopy(routes)
     letters(trial)
     expand_via_pdf(trial, nr, data)
-    return min(hard(render(data, hub, trial, sp, hg)[1]) for sp, hg in PROBE_SPACINGS)
+    return min(hard(render(data, hub, trial, sp, hg, True)[1]) for sp, hg in PROBE_SPACINGS)
 
 
 def choose_routes(data, nr, hub, every, verbose=False):
@@ -665,6 +692,11 @@ def choose_routes(data, nr, hub, every, verbose=False):
     return chosen
 
 
+def render_has_chords(data, hub, routes):
+    parent, _ = base.build_tree(routes, hub)
+    return bool(base.find_chords(routes, parent))
+
+
 def build_map(data, nr, hub, verbose=True):
     base.K_STOPS = 999          # routes are drawn in full
     base.MAX_ROUTES = MAX_ROUTES
@@ -674,15 +706,26 @@ def build_map(data, nr, hub, verbose=True):
     routes = copy.deepcopy(choose_routes(data, nr, hub, every, verbose))
     letters(routes)
     expand_via_pdf(routes, nr, data)
-    results = []
-    for hg in HUB_GAPS:
-        for sp in SPACINGS:
-            svg, rep, fail = render(data, hub, routes, sp, hg)
-            results.append((sp, (hard(rep), fail), rep, svg, hg))
-            if verbose:
-                print("   spacing %3d gap %3d failures %d %s" % (sp, hg, fail, {k: v for k, v in rep.items() if k != "where"}))
-    best = min(r[1][0] for r in results)  # fewest hard failures first, then the tightest spacing
-    chosen = min((r for r in results if r[1][0] == best), key=lambda r: (r[1][1], r[0]))  # then fewest leaders
+    def search(loops):
+        out = []
+        for hg in HUB_GAPS:
+            for sp in SPACINGS:
+                svg, rep, fail = render(data, hub, routes, sp, hg, loops)
+                out.append((sp, (hard(rep), fail), rep, svg, hg))
+                if verbose:
+                    print("   loops %d spacing %3d gap %3d failures %d %s" % (
+                        loops, sp, hg, fail, {k: v for k, v in rep.items() if k != "where"}))
+        return out
+
+    def pick(rs):
+        best = min(r[1][0] for r in rs)  # fewest hard failures first, then the fewest leader lines, then tightest
+        return min((r for r in rs if r[1][0] == best), key=lambda r: (r[1][1], r[0]))
+
+    chosen = pick(search(True))
+    if chosen[1][0] > 0 and render_has_chords(data, hub, routes):  # compare with the old out-and-back drawing
+        other = pick(search(False))
+        if other[1] < chosen[1]:
+            chosen = other
     return chosen[3], routes, chosen[0], chosen[2]
 
 

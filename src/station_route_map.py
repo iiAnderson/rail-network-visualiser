@@ -314,7 +314,7 @@ def assign_ordered(kids, want, allowed, theta_in):
     return best[1]
 
 
-def layout(routes, hub, data):
+def layout(routes, hub, data, loops=True):
     parent, children = build_tree(routes, hub)
     xy = data.xy
     # the vector from a node to a *child's own subtree* (including the child)
@@ -376,47 +376,336 @@ def layout(routes, hub, data):
 
     assign(hub, None)
 
-    # geometry: station positions plus junction waypoints
-    P = {hub: (0.0, 0.0)}
-    junction = {}
-    draw_children = collections.defaultdict(list)  # draw node -> draw children (outward)
-    edge_path = {}  # tree edge (p, c) -> draw node list p..c
-    in_theta = {hub: None}
     n_lanes = lanes_per_tree_edge(routes, parent)
     hubn = max([n_lanes.get((hub, c), 1) for c in children[hub]] or [1])
     hub_r = hubn * PITCH / 2 + 10
+    chord_edges = find_chords(routes, parent) if loops else {}
 
-    def place(u):
-        th_in = in_theta[u]
-        kids = order.get(u, [])
-        base = u
-        pend = []
-        if u != hub and kids:
-            straight_only = len(kids) == 1 and abs(((dir_of[kids[0]] - th_in) + math.pi) % (2 * math.pi) - math.pi) < 1e-6
-            if not straight_only:
-                nl = max(n_lanes.get((parent[u], u), 1), 1)
-                J = 34 + 2.5 * nl
-                j = "j:" + u
-                P[j] = (P[u][0] + math.cos(th_in) * J, P[u][1] + math.sin(th_in) * J)
-                junction[u] = j
-                base = j
-        for c in kids:
-            th = dir_of[c]
-            nl = n_lanes.get((u, c), 1)
-            if u == hub:
-                dist_ = hub_r + HUB_GAP + 2 * nl
-            elif base != u:
-                dist_ = 44 + 2.5 * nl
+    def run(stretch):
+        """Place every station and junction waypoint; stretch[(p, c)] lengthens a tree edge."""
+        P = {hub: (0.0, 0.0)}
+        junction, edge_path, in_theta = {}, {}, {hub: None}
+        dirs = dict(dir_of)
+        orders = {u: list(v) for u, v in order.items()}
+
+        def place(u):
+            th_in = in_theta[u]
+            kids = orders.get(u, [])
+            base = u
+            if u != hub and kids:
+                straight_only = len(kids) == 1 and abs(((dirs[kids[0]] - th_in) + math.pi) % (2 * math.pi) - math.pi) < 1e-6
+                if not straight_only:
+                    nl = max(n_lanes.get((parent[u], u), 1), 1)
+                    J = 34 + 2.5 * nl
+                    j = "j:" + u
+                    P[j] = (P[u][0] + math.cos(th_in) * J, P[u][1] + math.sin(th_in) * J)
+                    junction[u] = j
+                    base = j
+            for c in kids:
+                th = dirs[c]
+                nl = n_lanes.get((u, c), 1)
+                if u == hub:
+                    dist_ = hub_r + HUB_GAP + 2 * nl
+                elif base != u:
+                    dist_ = 44 + 2.5 * nl
+                else:
+                    dist_ = SPACING
+                dist_ *= stretch.get((u, c), 1.0)
+                P[c] = (P[base][0] + math.cos(th) * dist_, P[base][1] + math.sin(th) * dist_)
+                edge_path[(u, c)] = [u] + ([base] if base != u else []) + [c]
+                in_theta[c] = th
+                place(c)
+
+        place(hub)
+        return P, junction, edge_path, in_theta, dirs, orders
+
+    stretch, done = {}, {}
+    for _attempt in range(8):
+        P, junction, edge_path, in_theta, dirs, orders = run(stretch)
+        done = bypass_loops(chord_edges, parent, children, P, junction, edge_path, in_theta, dirs, orders,
+                            n_lanes, hub, hub_r, data, stretch)
+        if not done.get("need"):
+            break
+    chords = done.get("paths", {})
+    return {"parent": parent, "children": children, "order": orders, "P": P, "dir": dirs,
+            "edge_path": edge_path, "junction": junction, "hub_r": hub_r, "chords": chords,
+            "chord_first": done.get("first", {}), "chord_side": done.get("side", {})}
+
+
+def find_chords(routes, parent):
+    """Steps of a route that are not tree edges: the quieter corridor of a loop."""
+    out = {}
+    for r in routes:
+        for a, b in zip(r["path"], r["path"][1:]):
+            if a != b and parent.get(a) != b and parent.get(b) != a:
+                out[frozenset((a, b))] = out.get(frozenset((a, b)), 0.0) + r["tph"]
+    return out
+
+
+def tree_arm(parent, top, x):
+    """Tree nodes from just below `top` down to x."""
+    chain = []
+    while x != top:
+        chain.append(x)
+        x = parent[x]
+    return chain[::-1]
+
+
+def tree_lca(parent, a, b):
+    anc = set()
+    x = a
+    while x is not None:
+        anc.add(x)
+        x = parent[x]
+    x = b
+    while x not in anc:
+        x = parent[x]
+    return x
+
+
+def offset_polyline(pts, d):
+    """Parallel polyline d to the left (SVG y down: left of travel is (ty, -tx)), mitred at the corners."""
+    ts = [unit(p, q) for p, q in zip(pts, pts[1:])]
+    ns = [(t[1], -t[0]) for t in ts]
+    out = [(pts[0][0] + ns[0][0] * d, pts[0][1] + ns[0][1] * d)]
+    for i in range(1, len(pts) - 1):
+        n1, n2 = ns[i - 1], ns[i]
+        k = 1 + n1[0] * n2[0] + n1[1] * n2[1]
+        mx, my = (n1[0] + n2[0]) / (k or 1e-9), (n1[1] + n2[1]) / (k or 1e-9)
+        out.append((pts[i][0] + mx * d, pts[i][1] + my * d))
+    out.append((pts[-1][0] + ns[-1][0] * d, pts[-1][1] + ns[-1][1] * d))
+    return out
+
+
+MAX_STRETCH = 14.0
+MERGE_GAP = 40.0   # the bypass rejoins this far before the station it runs to
+MIN_STEP = 0.75    # bypass stations are at least this fraction of SPACING apart
+
+
+def bypass_loops(chords, parent, children, P, junction, edge_path, in_theta, dirs, orders, n_lanes, hub, hub_r,
+                 data, stretch):
+    """Draw each loop as two paths that part at one station and meet again at another.
+
+    A chord (u, v) closes a loop with the tree path between u and v. The arm that is a plain chain
+    (no side branches) is re-placed as a bypass running beside the other arm: out at 45 degrees,
+    level with it, and back in at 45 degrees onto a merge point just before v. If a bypass would need
+    more room on the main arm, `stretch` is raised and the caller lays the tree out again."""
+    res = {"paths": {}, "first": {}, "side": {}, "need": False}
+    used = set()
+    ordered = sorted(chords, key=lambda e: len(tree_arm(parent, tree_lca(parent, *tuple(e)), tuple(e)[0]))
+                     + len(tree_arm(parent, tree_lca(parent, *tuple(e)), tuple(e)[1])))
+    for e in ordered:
+        x, y = tuple(e)
+        S = tree_lca(parent, x, y)
+        if S in (x, y):
+            continue
+        arms = {x: tree_arm(parent, S, x), y: tree_arm(parent, S, y)}
+        cands = []
+        for end, other in ((x, y), (y, x)):
+            by, main = arms[end], arms[other]
+            clean = all(len(children[n]) == 1 for n in by[:-1]) and not children[by[-1]]
+            if clean and not (set(by) | set(main)) & used:
+                cands.append((len(by), end, other))
+        if not cands:
+            continue
+        _, u, v = min(cands)
+        by, main = arms[u], arms[v]
+        if _bypass_one(S, u, v, by, main, parent, children, P, junction, edge_path, in_theta, dirs, orders,
+                       n_lanes, hub, hub_r, data, stretch, res):
+            used |= set(by)
+    return res
+
+
+def _why(k):
+    if DEBUG_LOOPS:
+        print('   loop rejected: reason', k)
+    return False
+
+
+DEBUG_LOOPS = False
+
+
+def _bypass_one(S, u, v, by, main, parent, children, P, junction, edge_path, in_theta, dirs, orders, n_lanes,
+                hub, hub_r, data, stretch, res):
+    # the main arm as drawn: nodes from S to v along its tree edges
+    nodes, tree_edges = [S], []
+    prev = S
+    for c in main:
+        nodes += edge_path[(prev, c)][1:]
+        tree_edges.append((prev, c))
+        prev = c
+    start = 1 if (len(nodes) > 1 and nodes[1].startswith("j:") and S != hub) else 0
+    pts = [P[n] for n in nodes[start:]]
+    if len(pts) < 2:
+        return _why(1)
+    # the merge point sits on the last stretch, MERGE_GAP before v
+    last_len = math.dist(pts[-2], pts[-1])
+    first_len = math.dist(pts[0], pts[1])
+    wm = max(n_lanes.get(e, 1) for e in tree_edges) * PITCH
+    prev2 = S
+    ws_n = 1
+    for c in by:
+        ws_n = max(ws_n, n_lanes.get((prev2, c), 1))
+        prev2 = c
+    d = (wm + ws_n * PITCH) / 2 + 26.0
+    # room: the diagonals need d along the first and last stretch of the main arm
+    need_last = d + MERGE_GAP + 12
+    ok = True
+    if last_len < need_last:
+        e_last = tree_edges[-1]
+        stretch[e_last] = max(stretch.get(e_last, 1.0), min(MAX_STRETCH, stretch.get(e_last, 1.0) * need_last / last_len))
+        ok = False
+    need_first = d + 12
+    if first_len < need_first and len(pts) > 2 or (len(pts) == 2 and first_len < need_first + MERGE_GAP):
+        e_first = tree_edges[0]
+        stretch[e_first] = max(stretch.get(e_first, 1.0), min(MAX_STRETCH, stretch.get(e_first, 1.0) * (need_first + MERGE_GAP) / first_len))
+        ok = False
+    if not ok:
+        res["need"] = True
+        if DEBUG_LOOPS:
+            print('   need room', S, u, v, 'first', round(first_len), 'last', round(last_len), 'd', round(d), stretch)
+        return _why(2)
+    t_last = unit(pts[-2], pts[-1])
+    J0 = (pts[-1][0] - t_last[0] * MERGE_GAP, pts[-1][1] - t_last[1] * MERGE_GAP)
+    mp = pts[:-1] + [J0]
+    # which side: fewest side branches on the main arm, then where the arm really lies
+    left_n = right_n = 0
+    chain_nodes = [S] + main
+    for i, n in enumerate(chain_nodes[:-1]):
+        nxt = chain_nodes[i + 1]
+        for c in children[n]:
+            if c == nxt or c in by[:1]:
+                continue
+            rel = ((dirs[c] - dirs[nxt] + math.pi) % (2 * math.pi)) - math.pi
+            if rel < 0:
+                left_n += 1
             else:
-                dist_ = SPACING
-            P[c] = (P[base][0] + math.cos(th) * dist_, P[base][1] + math.sin(th) * dist_)
-            edge_path[(u, c)] = [u] + ([base] if base != u else []) + [c]
-            in_theta[c] = th
-            place(c)
+                right_n += 1
+    geo = 0
+    if S in data.xy and u in data.xy and v in data.xy:
+        mv = (data.xy[v][0] - data.xy[S][0], data.xy[v][1] - data.xy[S][1])
+        uv = (data.xy[u][0] - data.xy[S][0], data.xy[u][1] - data.xy[S][1])
+        # real coordinates have y up: the arm is on the left of the main axis when the cross product is positive
+        geo = 1 if (mv[0] * uv[1] - mv[1] * uv[0]) > 0 else -1
+    sides = []
+    for sg in (1, -1):
+        sides.append(((left_n if sg == 1 else right_n) * 10 + (0 if sg == geo else 1), sg))
+    sigma = min(sides)[1]
+    t0 = unit(mp[0], mp[1])
+    n0 = (t0[1] * sigma, -t0[0] * sigma)
+    # the new direction of the bypass's first stretch must not collide with another branch of S
+    new_dir = math.atan2(t0[1] + n0[1], t0[0] + n0[0])
+    for c in children[S]:
+        if c not in (by[0], main[0]) and angdiff(dirs[c], new_dir) < math.pi / 6:
+            return _why(3)
+    d_full, d_min = d, (wm + ws_n * PITCH) / 2 + 9.0
+    bp = None
+    for frac in (1.0, 0.85, 0.7, 0.55, 0.4, 0.0):
+        d = max(d_min, d_full * frac) if frac else d_min
+        off = offset_polyline(mp, d * sigma)
+        n_last = (t_last[1] * sigma, -t_last[0] * sigma)
+        B0 = mp[0]
+        D1 = (B0[0] + (t0[0] + n0[0]) * d, B0[1] + (t0[1] + n0[1]) * d)
+        D2 = (J0[0] + (n_last[0] - t_last[0]) * d, J0[1] + (n_last[1] - t_last[1]) * d)
+        cand = [B0, D1] + off[1:-1] + [D2, J0]
+        # every offset stretch must still run forward (an inside corner can fold it back), with room for
+        # the diagonals at both ends
+        fwd = []
+        for i in range(len(mp) - 1):
+            t_i = unit(mp[i], mp[i + 1])
+            fwd.append((off[i + 1][0] - off[i][0]) * t_i[0] + (off[i + 1][1] - off[i][1]) * t_i[1])
+        room = [3.0] * len(fwd)
+        room[0] = max(room[0], d + 4)
+        room[-1] = max(room[-1], d + 4) if len(fwd) > 1 else room[-1]
+        if len(fwd) == 1:
+            room[0] = 2 * d + 8
+        if all(f_ >= r_ for f_, r_ in zip(fwd, room)) and LineString(cand).is_simple:
+            bp = cand
+            break
+    if bp is None:  # the main arm's corners are too tight: give it more room and lay the tree out again
+        for e_ in tree_edges:
+            stretch[e_] = min(MAX_STRETCH, stretch.get(e_, 1.0) * 1.35)
+        res["need"] = True
+        return _why(4)
+    if DEBUG_LOOPS:
+        print('   BYPASS', S, u, v, 'd', round(d), 'sigma', sigma)
+        print('     main', [(n, tuple(round(c) for c in P[n])) for n in nodes[start:]])
+        print('     mp', [tuple(round(c) for c in p) for p in mp])
+        print('     bp', [tuple(round(c) for c in p) for p in bp])
+    cum = [0.0]
+    for p, q in zip(bp, bp[1:]):
+        cum.append(cum[-1] + math.dist(p, q))
+    total = cum[-1]
+    s_start = (hub_r * 1.5 + 20) if S == hub else 34.0
+    m = len(by)
+    step = (total - s_start) / (m + 1)
+    if step < MIN_STEP * SPACING:
+        # stretch every main edge so the bypass has room for its stations
+        k = min(6.0, MIN_STEP * SPACING * (m + 1) / max(total - s_start, 1.0) * 1.05)
+        if k > 1.02:
+            for e_ in tree_edges:
+                stretch[e_] = min(MAX_STRETCH, stretch.get(e_, 1.0) * k)
+            res["need"] = True
+            if DEBUG_LOOPS:
+                print('   need stretch', S, u, v, 'm', m, 'total', round(total), 'step', round(step), 'k', round(k, 2), {e_: round(stretch[e_], 2) for e_ in tree_edges})
+            return _why(5)
+    ts = [s_start + (i + 1) * step for i in range(m)]
+    for i in range(len(ts)):  # keep stations off the corners
+        for sv in cum[1:-1]:
+            if abs(ts[i] - sv) < 15:
+                ts[i] = sv + (15 if ts[i] >= sv else -15)
+    if any(b_ <= a_ + 8 for a_, b_ in zip(ts, ts[1:])) or ts[-1] >= total - 8:
+        return _why(6)
 
-    place(hub)
-    return {"parent": parent, "children": children, "order": order, "P": P, "dir": dir_of,
-            "edge_path": edge_path, "junction": junction, "hub_r": hub_r}
+    def at(sv):
+        for i in range(len(cum) - 1):
+            if cum[i] <= sv <= cum[i + 1]:
+                r_ = (sv - cum[i]) / ((cum[i + 1] - cum[i]) or 1)
+                p, q = bp[i], bp[i + 1]
+                return (p[0] + (q[0] - p[0]) * r_, p[1] + (q[1] - p[1]) * r_), math.atan2(q[1] - p[1], q[0] - p[0])
+        return bp[-1], 0.0
+
+    # commit: stations, direction, waypoints
+    vertex_names = {}
+    for i in range(1, len(bp) - 1):
+        vertex_names[i] = "j:w%d:%s:%s" % (i, u, v)
+        P[vertex_names[i]] = bp[i]
+    prefix = [S] + ([nodes[1]] if start else [])
+    chain = [by[i] for i in range(m)]
+    seq_s = [None] + ts          # arclength of each node on the bypass: S/base first
+    for i, node in enumerate(chain):
+        P[node], dirs[node] = at(ts[i])
+        in_theta[node] = dirs[node]
+        junction.pop(node, None)
+        P.pop("j:" + node, None)
+    dirs[by[0]] = math.atan2(t0[1] + n0[1], t0[0] + n0[0])
+
+    def waypoints(a_s, b_s):
+        return [vertex_names[i] for i in range(1, len(bp) - 1) if a_s < cum[i] < b_s]
+
+    prev_node, prev_s = S, 0.0
+    for node, sv in zip(chain, ts):
+        mid = waypoints(prev_s, sv)
+        edge_path[(prev_node, node)] = (prefix if prev_node == S else [prev_node]) + mid + [node]
+        prev_node, prev_s = node, sv
+    jn = "j:m:%s:%s" % (u, v)
+    P[jn] = J0
+    res["paths"][frozenset((u, v))] = None
+    tail = waypoints(prev_s, total)
+    # the chord, oriented away from S: u -> ... -> merge point -> v
+    res["paths"][frozenset((u, v))] = {"nodes": [u] + tail + [jn, v], "from": u, "to": v}
+    last_edge = (parent[v], v)
+    seg = edge_path[last_edge]
+    edge_path[last_edge] = seg[:-1] + [jn, v]
+    res["first"][frozenset((u, v))] = edge_path[(S, by[0])][:2]
+    res["side"][frozenset((u, v))] = sigma
+    # lane order at the hub: the bypass sits next to the main arm, on its side
+    if S == hub:
+        orders[S] = sorted(children[S], key=lambda c: dirs[c] % (2 * math.pi))
+    else:
+        th = in_theta[S]
+        orders[S] = sorted(children[S], key=lambda c: -math.sin(-(dirs[c] - th)))
+    return True
 
 
 def lanes_per_tree_edge(routes, parent):
@@ -440,12 +729,17 @@ def tree_route(a, b, parent):
     return up_a[: up_a.index(meet) + 1] + up_b[:-1][::-1]
 
 
-def route_tree_nodes(path, parent):
+def route_tree_nodes(path, parent, chords=()):
+    """The tree nodes a route visits. A step along a drawn loop (a chord) goes straight across it;
+    any other step that is not a tree edge goes the long way round the tree."""
     out = [path[0]]
     for a, b in zip(path, path[1:]):
         if a == b:
             continue
-        out += tree_route(a, b, parent)[1:]
+        if frozenset((a, b)) in chords:
+            out.append(b)
+        else:
+            out += tree_route(a, b, parent)[1:]
     return out
 
 

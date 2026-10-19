@@ -76,6 +76,7 @@ def main():
     ap.add_argument("--min-tph", type=float, default=2.0, help="ignore stations with fewer calling trains/hour")
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 2))
     ap.add_argument("--stations", nargs="*", help="draw exactly these CRS codes instead of ranking")
+    ap.add_argument("--timeout", type=float, default=20, help="minutes before one station is given up on")
     ap.add_argument("--force", action="store_true", help="redraw maps that already exist")
     a = ap.parse_args()
 
@@ -100,20 +101,47 @@ def main():
 
     t0, done, failed = time.time(), 0, []
     ctx = mp.get_context("fork")
-    with ctx.Pool(a.workers, maxtasksperchild=6) as pool:
-        for crs, status, info, secs in pool.imap_unordered(work, todo):
-            done += 1
-            if status == "ok":
-                manifest[crs] = dict(info, name=DATA.names.get(crs, crs))
-                write_selector(manifest, tph)
-                print("[%d/%d] %s %-28s %5.0fs  spacing %s  %s" % (
-                    done, len(todo), crs, DATA.names.get(crs, crs)[:28], secs, info["spacing"],
-                    {k: v for k, v in info.items() if k in ("label_collision", "crossings", "dot_on_line", "branch_overlap")}),
-                    flush=True)
-            else:
+    queue = ctx.Queue()
+
+    def child(crs):
+        queue.put(work(crs))
+
+    pending, running = list(todo), {}   # crs -> (process, started)
+    while pending or running:
+        while pending and len(running) < a.workers:
+            crs = pending.pop(0)
+            p = ctx.Process(target=child, args=(crs,), daemon=True)
+            p.start()
+            running[crs] = (p, time.time())
+        try:
+            crs, status, info, secs = queue.get(timeout=5)
+            running.pop(crs)[0].join()
+        except Exception:  # nothing finished yet: look for crashed or runaway workers
+            for crs, (p, started) in list(running.items()):
+                if not p.is_alive() and queue.empty():
+                    status, info = "crashed (exit %s)" % p.exitcode, None
+                elif time.time() - started > a.timeout * 60:
+                    p.kill()
+                    status, info = "timed out", None
+                else:
+                    continue
+                running.pop(crs)
+                done += 1
                 failed.append((crs, status))
-                print("[%d/%d] %s %s%s" % (done, len(todo), crs, status, "" if status == "no routes" else "\n" + str(info)),
-                      flush=True)
+                print("[%d/%d] %s %s" % (done, len(todo), crs, status), flush=True)
+            continue
+        done += 1
+        if status == "ok":
+            manifest[crs] = dict(info, name=DATA.names.get(crs, crs))
+            write_selector(manifest, tph)
+            print("[%d/%d] %s %-28s %5.0fs  spacing %s  %s" % (
+                done, len(todo), crs, DATA.names.get(crs, crs)[:28], secs, info["spacing"],
+                {k: v for k, v in info.items() if k in ("label_collision", "crossings", "dot_on_line", "branch_overlap")}),
+                flush=True)
+        else:
+            failed.append((crs, status))
+            print("[%d/%d] %s %s%s" % (done, len(todo), crs, status, "" if status == "no routes" else "\n" + str(info)),
+                  flush=True)
     print("finished %d maps in %.0f min; %d skipped/failed: %s" % (
         done - len(failed), (time.time() - t0) / 60, len(failed), failed[:20]), flush=True)
 

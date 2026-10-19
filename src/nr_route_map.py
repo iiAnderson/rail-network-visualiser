@@ -105,6 +105,15 @@ class Network:
             pred = self.predict(data.xy[crs][0], -data.xy[crs][1])
         cands = self.exact(name)
         if not cands:
+            # interchange labels in the PDF run into their neighbours ("East Croydon East Croydon"):
+            # accept a label that contains the whole name, if it is where the station should be
+            k = " %s " % norm(re.sub(r"^london ", "", name, flags=re.I))
+            near = [n for n in self.node.values() if n["name"] and k in " %s " % norm(n["name"])]
+            if pred is not None:
+                near = [n for n in near if math.hypot(n["x"] - pred[0], n["y"] - pred[1]) < 60]
+            if pred is not None or len(near) == 1:
+                cands = near
+        if not cands:
             keys = list(self.index)
             for k in difflib.get_close_matches(norm(name), keys, n=3, cutoff=0.9):
                 cands += list(self.index[k].values())
