@@ -136,7 +136,7 @@ def main():
             write_selector(manifest, tph)
             print("[%d/%d] %s %-28s %5.0fs  spacing %s  %s" % (
                 done, len(todo), crs, DATA.names.get(crs, crs)[:28], secs, info["spacing"],
-                {k: v for k, v in info.items() if k in ("label_collision", "crossings", "dot_on_line", "branch_overlap")}),
+                {k: v for k, v in info.items() if k in ("label_collision", "crossings", "dot_on_line", "branch_overlap", "retrace")}),
                 flush=True)
         else:
             failed.append((crs, status))

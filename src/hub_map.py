@@ -227,6 +227,10 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True):
                 seg = info["nodes"] if a == info["from"] else info["nodes"][::-1]
             dn += seg[1:]
         r["draw"], r["tree_nodes"] = dn, tn
+    # a route that runs out along a branch and turns back on itself (instead of joining where the
+    # branches meet) is a drawing failure; ends of a route are fine
+    retrace = sum(1 for r in routes for i in range(1, len(r["tree_nodes"]) - 1)
+                  if r["tree_nodes"][i - 1] == r["tree_nodes"][i + 1])
 
     pre, subtree, depth = {}, {}, {hub: 0}
 
@@ -591,11 +595,11 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True):
             if ls.distance(Point(P[n])) < w - 1:
                 dot_on_line += 1
                 where["dots"].append((data.names.get(n, n), "on a line", ab))
-    report = {"routes": len(routes), "dot_overlap": dot_overlap, "label_collision": int(label_fail),
+    report = {"routes": len(routes), "loops": len(chords), "retrace": retrace, "dot_overlap": dot_overlap, "label_collision": int(label_fail),
               "crossings": crossings, "branch_overlap": branch_overlap, "dot_on_line": dot_on_line,
               "leader_lines": len(leaders)}
     # every rule failure counts fully; each leader line (a label that could not sit by its dots) counts a little
-    failures = dot_overlap + int(label_fail) + crossings + branch_overlap + dot_on_line + 0.15 * len(leaders)
+    failures = dot_overlap + int(label_fail) + crossings + branch_overlap + dot_on_line + retrace + 0.15 * len(leaders)
 
     # ---- svg
     xs = [p[0] for p in P.values()] + [q.bounds[0] for q in placed] + [q.bounds[2] for q in placed]
@@ -660,7 +664,7 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True):
 
 def hard(rep):
     """Rule failures that count fully (leader lines are only a mild charge)."""
-    return sum(rep[k] for k in ("dot_overlap", "label_collision", "crossings", "branch_overlap", "dot_on_line"))
+    return sum(rep[k] for k in ("dot_overlap", "label_collision", "crossings", "branch_overlap", "dot_on_line", "retrace"))
 
 
 def letters(routes):
@@ -722,10 +726,21 @@ def build_map(data, nr, hub, verbose=True):
         return min((r for r in rs if r[1][0] == best), key=lambda r: (r[1][1], r[0]))
 
     chosen = pick(search(True))
-    if chosen[1][0] > 0 and render_has_chords(data, hub, routes):  # compare with the old out-and-back drawing
-        other = pick(search(False))
-        if other[1] < chosen[1]:
-            chosen = other
+    parent, _ = base.build_tree(routes, hub)
+    chords = sorted(base.find_chords(routes, parent), key=sorted)
+    if chosen[1][0] > 0 and chords:
+        # a loop that does not help (or makes things worse) is dropped on its own, so trouble elsewhere
+        # on the map cannot decide it; each is judged at the layout already chosen
+        keep = set(chords)
+        for c in chords:
+            svg, rep, fail = render(data, hub, routes, chosen[0], chosen[4], keep - {c})
+            if (hard(rep), fail) < chosen[1]:
+                keep.discard(c)
+                chosen = (chosen[0], (hard(rep), fail), rep, svg, chosen[4])
+        if keep != set(chords) and not keep:  # every loop was dropped: the full search may find better
+            other = pick(search(False))
+            if other[1] < chosen[1]:
+                chosen = other
     return chosen[3], routes, chosen[0], chosen[2]
 
 

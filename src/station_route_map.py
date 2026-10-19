@@ -338,14 +338,17 @@ def layout(routes, hub, data, loops=True):
     dir_of = {}  # tree edge child -> direction angle (outward)
     order = {}   # node -> children left-to-right facing outward
 
-    def assign(u, theta_in):
+    def assign(u, theta_in, lo=-math.inf, hi=math.inf):
+        # lo..hi is the wedge this branch must stay inside: between the directions of its neighbours at
+        # every station further in, so a branch can fan out but never swings across a sibling
         kids = children[u]
         if not kids:
             return
         if theta_in is None:
             allowed = OCT[:]
         else:
-            allowed = [theta_in + k * math.pi / 4 for k in (-2, -1, 0, 1, 2)]
+            full = [theta_in + k * math.pi / 4 for k in (-2, -1, 0, 1, 2)]
+            allowed = [a for a in full if lo - 1e-9 <= a <= hi + 1e-9] or full
         want = {}
         for c in kids:
             v = sub_vec.get(c)
@@ -372,14 +375,27 @@ def layout(routes, hub, data, loops=True):
             # left first when facing theta_in (SVG y down: left normal is (dy,-dx))
             order[u] = sorted(kids, key=lambda c: -math.sin(-(dir_of[c] - theta_in)))
         for c in kids:
-            assign(c, dir_of[c])
+            a = dir_of[c]
+            lo_c, hi_c = lo, hi
+            for c2 in kids:
+                if c2 is c:
+                    continue
+                rel = ((dir_of[c2] - a + math.pi) % (2 * math.pi)) - math.pi
+                if rel < -1e-6:
+                    lo_c = max(lo_c, a + rel)
+                elif rel > 1e-6:
+                    hi_c = min(hi_c, a + rel)
+            assign(c, a, lo_c, hi_c)
 
     assign(hub, None)
 
     n_lanes = lanes_per_tree_edge(routes, parent)
     hubn = max([n_lanes.get((hub, c), 1) for c in children[hub]] or [1])
     hub_r = hubn * PITCH / 2 + 10
-    chord_edges = find_chords(routes, parent) if loops else {}
+    chord_edges = find_chords(routes, parent)
+    if loops is not True:  # False: draw no loops; a collection: only those chords
+        allowed = set(loops or ())
+        chord_edges = {e: t for e, t in chord_edges.items() if e in allowed}
 
     def run(stretch):
         """Place every station and junction waypoint; stretch[(p, c)] lengthens a tree edge."""
@@ -423,7 +439,7 @@ def layout(routes, hub, data, loops=True):
     for _attempt in range(8):
         P, junction, edge_path, in_theta, dirs, orders = run(stretch)
         done = bypass_loops(chord_edges, parent, children, P, junction, edge_path, in_theta, dirs, orders,
-                            n_lanes, hub, hub_r, data, stretch)
+                            n_lanes, hub, hub_r, data, stretch, routes)
         if not done.get("need"):
             break
     chords = done.get("paths", {})
@@ -483,7 +499,7 @@ MIN_STEP = 0.75    # bypass stations are at least this fraction of SPACING apart
 
 
 def bypass_loops(chords, parent, children, P, junction, edge_path, in_theta, dirs, orders, n_lanes, hub, hub_r,
-                 data, stretch):
+                 data, stretch, routes=()):
     """Draw each loop as two paths that part at one station and meet again at another.
 
     A chord (u, v) closes a loop with the tree path between u and v. The arm that is a plain chain
@@ -511,7 +527,7 @@ def bypass_loops(chords, parent, children, P, junction, edge_path, in_theta, dir
         _, u, v = min(cands)
         by, main = arms[u], arms[v]
         if _bypass_one(S, u, v, by, main, parent, children, P, junction, edge_path, in_theta, dirs, orders,
-                       n_lanes, hub, hub_r, data, stretch, res):
+                       n_lanes, hub, hub_r, data, stretch, res, routes):
             used |= set(by)
     return res
 
@@ -526,7 +542,7 @@ DEBUG_LOOPS = False
 
 
 def _bypass_one(S, u, v, by, main, parent, children, P, junction, edge_path, in_theta, dirs, orders, n_lanes,
-                hub, hub_r, data, stretch, res):
+                hub, hub_r, data, stretch, res, routes=()):
     # the main arm as drawn: nodes from S to v along its tree edges
     nodes, tree_edges = [S], []
     prev = S
@@ -572,11 +588,15 @@ def _bypass_one(S, u, v, by, main, parent, children, P, junction, edge_path, in_
     left_n = right_n = 0
     chain_nodes = [S] + main
     for i, n in enumerate(chain_nodes[:-1]):
+        if i == 0:
+            continue  # branches at S itself leave before the bypass has run alongside anything
         nxt = chain_nodes[i + 1]
         for c in children[n]:
-            if c == nxt or c in by[:1]:
+            if c == nxt:
                 continue
             rel = ((dirs[c] - dirs[nxt] + math.pi) % (2 * math.pi)) - math.pi
+            if abs(rel) > math.pi / 2 + 1e-6:
+                continue  # points back the way we came: cannot meet a parallel bypass
             if rel < 0:
                 left_n += 1
             else:
@@ -587,9 +607,22 @@ def _bypass_one(S, u, v, by, main, parent, children, P, junction, edge_path, in_
         uv = (data.xy[u][0] - data.xy[S][0], data.xy[u][1] - data.xy[S][1])
         # real coordinates have y up: the arm is on the left of the main axis when the cross product is positive
         geo = 1 if (mv[0] * uv[1] - mv[1] * uv[0]) > 0 else -1
+    # the side the routes on the bypass leave by after v: arriving on that side avoids a crossing
+    onward = 0.0
+    for r_ in routes:
+        pth = r_["path"]
+        for i in range(len(pth) - 1):
+            if {pth[i], pth[i + 1]} == {u, v}:
+                j = i + 2 if pth[i + 1] == v else i - 1
+                beyond = pth[j] if 0 <= j < len(pth) else None
+                if beyond is not None and parent.get(beyond) == v:
+                    rel = ((dirs[beyond] - dirs[v] + math.pi) % (2 * math.pi)) - math.pi
+                    onward += r_["tph"] * (1 if rel < -1e-6 else -1 if rel > 1e-6 else 0)
+    want = 1 if onward > 0 else -1 if onward < 0 else 0
     sides = []
     for sg in (1, -1):
-        sides.append(((left_n if sg == 1 else right_n) * 10 + (0 if sg == geo else 1), sg))
+        sides.append(((left_n if sg == 1 else right_n) * 10 + (0 if sg == geo else 1)
+                      + (6 if want and sg != want else 0), sg))
     sigma = min(sides)[1]
     t0 = unit(mp[0], mp[1])
     n0 = (t0[1] * sigma, -t0[0] * sigma)
