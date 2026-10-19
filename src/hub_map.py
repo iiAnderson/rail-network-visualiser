@@ -32,6 +32,7 @@ import nr_route_map as nrm
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPACINGS = [250, 180, 130, 100, 80, 64, 52, 47]
 MAX_ROUTES = 24      # upper bound (the palette size); in practice routes are added only while the map stays clean
+CLEAN_MIN_TPH = 0.3   # the clean view only considers patterns at least this frequent
 MIN_ROUTES = 6       # the busiest routes are always drawn
 ROUTE_TOLERANCE = 1  # a further route may add at most this many rule failures
 PROBE_SPACINGS = ((130, 80), (64, 80), (130, 170), (64, 170))  # (spacing, hub gap)
@@ -65,6 +66,18 @@ def load_network(path, data):
     return nr
 
 
+DETOUR_MAX = 2.5   # a path more than this many times the straight line (plus 120 units) is not trusted
+
+
+def detour(nr, p):
+    """How much longer a graph path is than the straight line between its ends, as a ratio to the allowed
+    length (above 1 means too long)."""
+    a, b = nr.node[p[0]], nr.node[p[-1]]
+    straight = math.hypot(a["x"] - b["x"], a["y"] - b["y"])
+    run = sum(nr.adj[x][y] for x, y in zip(p, p[1:]))
+    return run / (straight * 2.5 + 120) * DETOUR_MAX
+
+
 def expand_via_pdf(routes, nr, data):
     """Insert, between two consecutive stops, the shown stations the service passes (per the PDF)."""
     if nr is None:
@@ -85,6 +98,8 @@ def expand_via_pdf(routes, nr, data):
             a = out[-1]
             if a in node_of and c in node_of:
                 p = nr.path(node_of[a], node_of[c])
+                if p and detour(nr, p) > DETOUR_MAX:
+                    p = None  # the graph only links these two the long way round (e.g. via Tube lines)
                 if p and len(p) < 70:
                     for n in p[1:-1]:
                         cc = crs_of.get(n)
@@ -201,7 +216,7 @@ def safe_buffers(pts, radius, chunk=10):
     return [LineString(c).buffer(radius) for c in pieces if len(c) >= 2]
 
 
-def render(data, hub, routes, spacing, hub_gap=80.0, loops=True):
+def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
     base.SPACING = float(spacing)
     base.HUB_GAP = float(hub_gap)
     L = layout(routes, hub, data, loops)
@@ -605,7 +620,8 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True):
     xs = [p[0] for p in P.values()] + [q.bounds[0] for q in placed] + [q.bounds[2] for q in placed]
     ys = [p[1] for p in P.values()] + [q.bounds[1] for q in placed] + [q.bounds[3] for q in placed]
     x0, x1, y0, y1 = min(xs) - 60, max(xs) + 60, min(ys) - 60, max(ys) + 60
-    head, leg_h = 150, 70 + 27 * len(routes)
+    note = list(omitted[:14]) + (['and %d more' % (len(omitted) - 14)] if len(omitted) > 14 else [])
+    head, leg_h = 150, 70 + 27 * len(routes) + (40 + 19 * len(note) if note else 0)
     W = max(x1 - x0, 840)
     H = y1 - y0 + head + leg_h + 40
     o = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="%s %s %s %s" font-family="Helvetica Neue, '
@@ -656,6 +672,12 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True):
             sft = (j - (m - 1) / 2) * 21
             o.append(badge(colours[rid], rid, P[end][0] + ux * 26 - uy * sft, P[end][1] + uy * 26 + ux * sft, 9.5))
     o.append(legend(routes, colours, data, x0 + 30, y1 + 30))
+    if note:
+        ny = y1 + 30 + 70 + 27 * len(routes)
+        o.append('<text x="%s" y="%s" font-size="15" font-weight="500" fill="#555">Also stops here, not drawn (rarer or would '
+                 'overlap; the "all service patterns" view draws them):</text>' % (f(x0 + 30), f(ny)))
+        for i, line in enumerate(note):
+            o.append('<text x="%s" y="%s" font-size="13" fill="#777">%s</text>' % (f(x0 + 44), f(ny + 22 + 19 * i), esc(line)))
     o.append("<!-- spacing %s report %s -->" % (spacing, {k: v for k, v in report.items()}))
     o.append("</svg>")
     report["where"] = where
@@ -701,20 +723,43 @@ def render_has_chords(data, hub, routes):
     return bool(base.find_chords(routes, parent))
 
 
-def build_map(data, nr, hub, verbose=True):
+ALL_MIN_TPH = 0.1   # the "all service patterns" view draws every grouped pattern down to this frequency
+ALL_SPACINGS = (250, 130, 80, 52)
+ALL_GAPS = (80, 170)
+
+
+def build_map(data, nr, hub, verbose=True, mode="clean"):
+    """mode "clean": the routes that stay legible (busiest first, kept while they add at most one rule
+    failure), with the rest listed under the legend. mode "all": every grouped pattern, however crowded."""
     base.K_STOPS = 999          # routes are drawn in full
-    base.MAX_ROUTES = MAX_ROUTES
+    base.MAX_ROUTES = 40
+    base.MIN_TPH = ALL_MIN_TPH
     every = discover_routes(data, hub)
     if not every:
         return None
-    routes = copy.deepcopy(choose_routes(data, nr, hub, every, verbose))
+    clean_pool = [r for r in every if r["tph"] >= CLEAN_MIN_TPH][:MAX_ROUTES]
+    if mode == "all":
+        routes = copy.deepcopy(every)
+        omitted = ()
+    else:
+        if not clean_pool:
+            return None
+        picked = choose_routes(data, nr, hub, clean_pool, verbose)
+        keep = {(r["toc"], tuple(r["seq"])) for r in picked}
+        routes = copy.deepcopy(picked)
+        omitted = ["%s – %s (%s tph, %s)" % (data.names.get(r["true_ends"][0], r["true_ends"][0]),
+                                             data.names.get(r["true_ends"][1], r["true_ends"][1]),
+                                             fmt_tph(r["tph"]) if r["tph"] >= 0.1 else "<0.1", r["toc"])
+                   for r in every if (r["toc"], tuple(r["seq"])) not in keep]
     letters(routes)
     expand_via_pdf(routes, nr, data)
+    spacings, gaps = (ALL_SPACINGS, ALL_GAPS) if mode == "all" else (SPACINGS, HUB_GAPS)
+
     def search(loops):
         out = []
-        for hg in HUB_GAPS:
-            for sp in SPACINGS:
-                svg, rep, fail = render(data, hub, routes, sp, hg, loops)
+        for hg in gaps:
+            for sp in spacings:
+                svg, rep, fail = render(data, hub, routes, sp, hg, loops, omitted)
                 out.append((sp, (hard(rep), fail), rep, svg, hg))
                 if verbose:
                     print("   loops %d spacing %3d gap %3d failures %d %s" % (
@@ -733,15 +778,15 @@ def build_map(data, nr, hub, verbose=True):
         # on the map cannot decide it; each is judged at the layout already chosen
         keep = set(chords)
         for c in chords:
-            svg, rep, fail = render(data, hub, routes, chosen[0], chosen[4], keep - {c})
+            svg, rep, fail = render(data, hub, routes, chosen[0], chosen[4], keep - {c}, omitted)
             if (hard(rep), fail) < chosen[1]:
                 keep.discard(c)
                 chosen = (chosen[0], (hard(rep), fail), rep, svg, chosen[4])
-        if keep != set(chords) and not keep:  # every loop was dropped: the full search may find better
+        if not keep:  # every loop was dropped: the full search may find better without them
             other = pick(search(False))
             if other[1] < chosen[1]:
                 chosen = other
-    return chosen[3], routes, chosen[0], chosen[2]
+    return chosen[3], routes, chosen[0], chosen[2], len(omitted)
 
 
 def main():
@@ -751,18 +796,20 @@ def main():
     ap.add_argument("--tiplocs", required=True)
     ap.add_argument("--out", default=os.path.join(HERE, "..", "maps"))
     ap.add_argument("--network", default=None, help="nr_schematic.json from extract_nr_schematic.py (optional)")
+    ap.add_argument("--mode", choices=("clean", "all"), default="clean",
+                    help="clean: legible routes; all: every grouped service pattern")
     ap.add_argument("-v", action="store_true")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     data = Data(a.patterns, a.tiplocs)
     nr = load_network(a.network, data)
     for crs in a.stations:
-        res = build_map(data, nr, crs, verbose=a.v)
+        res = build_map(data, nr, crs, verbose=a.v, mode=a.mode)
         if res is None:
             print(crs, "no routes")
             continue
-        svg, routes, sp, rep = res
-        open(os.path.join(a.out, crs + ".svg"), "w").write(svg)
+        svg, routes, sp, rep = res[:4]
+        open(os.path.join(a.out, crs + ("_all" if a.mode == "all" else "") + ".svg"), "w").write(svg)
         print(crs, data.names.get(crs), "spacing", sp, {k: v for k, v in rep.items() if k != "where"})
         if a.v:
             print("   dots:", rep["where"]["dots"][:6])

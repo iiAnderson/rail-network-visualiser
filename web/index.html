@@ -15,6 +15,7 @@ img{display:block;max-width:100%;height:auto;margin:0 auto;background:#fff}
   <label for="q"><b>Station</b></label>
   <input id="q" type="search" placeholder="Search name or code" autocomplete="off">
   <select id="s" aria-label="Station"></select>
+  <label id="allw" style="display:none"><input id="all" type="checkbox"> Every service pattern <small id="alln"></small></label>
   <small id="n"></small>
 </header>
 <img id="m" alt="Route map">
@@ -35,7 +36,13 @@ function fill() {
   n.textContent = s.options.length + " of " + all.length + " stations";
   show();
 }
-function show() { if (s.value) { m.src = s.value + ".svg"; try { location.hash = s.value; } catch (e) {} } }
+function show() {
+  const r = all.find(x => x.crs === s.value), has = !!(r && r.all), box = document.getElementById("all");
+  document.getElementById("allw").style.display = has ? "" : "none";
+  if (has) document.getElementById("alln").textContent = "(" + r.all + " routes instead of " + r.routes + ")";
+  if (s.value) { m.src = s.value + (has && box.checked ? "_all" : "") + ".svg"; try { location.hash = s.value; } catch (e) {} }
+}
+document.getElementById("all").onchange = show;
 q.oninput = fill; s.onchange = show;
 const h = location.hash.slice(1); fill(); if (h && all.some(r => r.crs === h)) { s.value = h; show(); }
 </script></body></html>

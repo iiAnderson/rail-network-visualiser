@@ -43,11 +43,18 @@ def work(crs):
         res = hm.build_map(DATA, NR, crs, verbose=False)
         if res is None:
             return crs, "no routes", None, time.time() - started
-        svg, routes, spacing, report = res
+        svg, routes, spacing, report, omitted = res
         with open(os.path.join(OUT, crs + ".svg"), "w") as fh:
             fh.write(svg)
         report = {k: v for k, v in report.items() if k != "where"}
-        report.update(spacing=spacing, routes=len(routes))
+        report.update(spacing=spacing, routes=len(routes), omitted=omitted)
+        if omitted:  # some patterns were left off the clean map: draw the "all service patterns" view too
+            res = hm.build_map(DATA, NR, crs, verbose=False, mode="all")
+            svg2, routes2, spacing2, report2, _ = res
+            with open(os.path.join(OUT, crs + "_all.svg"), "w") as fh:
+                fh.write(svg2)
+            report["all"] = {k: v for k, v in report2.items() if k != "where"}
+            report["all"].update(spacing=spacing2, routes=len(routes2))
         return crs, "ok", report, time.time() - started
     except Exception:  # keep the batch going; the traceback is logged
         return crs, "error", traceback.format_exc(), time.time() - started
@@ -57,7 +64,8 @@ def write_selector(manifest, tph):
     rows = []
     for crs, m in manifest.items():
         rows.append({"crs": crs, "name": m["name"], "tph": round(tph.get(crs, 0), 1),
-                     "routes": m.get("routes"), "spacing": m.get("spacing")})
+                     "routes": m.get("routes"), "spacing": m.get("spacing"),
+                     "all": m.get("all", {}).get("routes") if m.get("omitted") else None})
     rows.sort(key=lambda r: -r["tph"])
     with open(os.path.join(OUT, "stations.js"), "w") as fh:
         fh.write("window.STATIONS = " + json.dumps(rows) + ";\n")
