@@ -1,6 +1,7 @@
 # Plan: a national route map (no central station)
 
-Status: **not started**. Written for an agent picking this up cold. Read `README.md` first, then
+Status: **step 1 in progress** (`src/national_edges.py` builds the edge/tph table; see the findings in
+section 9). Athena was not needed: `national_patterns.csv` is already local (cost $0). Written for an agent picking this up cold. Read `README.md` first, then
 `src/hub_map.py` (the per-station engine) and `src/nr_route_map.py` (`Network`, PDF graph helpers).
 
 ## 1. Goal
@@ -162,3 +163,19 @@ and tph there.
 1. Operator colours with merged lanes, or a distinct colour per route even if the map is huge?
 2. Acceptable to ship regional sheets + a zoomable viewer instead of one image?
 3. Include stations below 2 tph at national zoom (hidden until zoomed), or leave them out as now?
+
+## 9. Findings from step 1 (read before step 2)
+
+* Matching: PDF interchange labels run together ("East Croydon East Croydon", "Knightsbridge Gloucester
+  Road South Kensington"). `Network.match` now accepts a label containing the whole name near the predicted
+  position, `ALIASES` in `national_edges.py` covers Elizabeth line TIPLOCs and a few others, and a
+  nearest-unclaimed-node rescue fills the rest. 2,533 of 2,801 stations now match; ~78k hops (of ~1.5M)
+  still touch an unmatched station (Liverpool Street Low Level, Willesden Jn Low Level, Edinburgh Airport,
+  Cnnbell ...).
+* **The PDF graph also draws the Underground and is not faithful in London.** Plain Dijkstra sent
+  Victoria -> Clapham Jn via Earls Court (tube) and Waterloo -> Clapham Jn via Herne Hill/Balham. Edges
+  that no train uses between adjacent stops now cost x4 (`UNCONFIRMED`), which fixed some, not all. London
+  segment tph in the table is therefore unreliable (e.g. Wandsworth Common-Balham 41 tph is too high).
+  Outside London the busiest segments look right (Haymarket-Edinburgh ~26 tph).
+* 405 hops have no PDF path at all (Ryde Pier Head-Portsmouth Harbour, Darlington-North Road, Hexham-Haydon
+  Bridge, Oxford-Tackley).
