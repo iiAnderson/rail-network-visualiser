@@ -73,3 +73,29 @@ def test_loop_is_drawn_not_retraced(tmp_path, monkeypatch):
     monkeypatch.setattr(hm, "HUB_GAPS", [80])
     svg, routes, spacing, report, omitted = hm.build_map(data, None, "A", verbose=False)
     assert len(routes) == 2 and report["retrace"] == 0 and report["crossings"] == 0
+
+
+def test_typical_day_ignores_closure_days():
+    """A pattern that ran on only a few of the sampled days (a diversion) is not part of the normal day;
+    one that ran on most days is, with the median number of trains per day."""
+    rows, sets = [], []
+    days = ["202609%02d" % d for d in range(1, 11)]
+
+    def add(pat, times, on):
+        stops = tuple(pat.split(","))
+        rows.append(("T", pat, stops, tuple(times.split(","))))
+        sets.append(set(on))
+
+    add("A,B,C", "10:00:00,10:10:00,10:20:00", days)                  # runs every day
+    add("A,X,C", "11:00:00,11:10:00,11:20:00", days[:2])             # diversion on 2 of 10 days
+    add("A,D,C", "12:00:00,12:10:00,12:20:00", days[:6])             # runs on 6 of 10 days: normal
+    add("E,F", "09:00:00,09:10:00", days)                            # two trains a day
+    add("E,F", "09:30:00,09:40:00", days)
+    add("G,H", "08:00:00,08:10:00", days[:5])                        # variant 1 of a split service
+    add("G,H", "08:01:00,08:11:00", days[5:])                        # the same train retimed: kept once
+    out = base.typical_day(rows, sets)
+    pats = sorted(",".join(s) for _t, s, _tm in out)
+    assert "A,X,C" not in pats
+    assert pats.count("A,B,C") == 1 and pats.count("A,D,C") == 1
+    assert pats.count("E,F") == 2
+    assert pats.count("G,H") == 1

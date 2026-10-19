@@ -63,9 +63,11 @@ class Data:
                 self.names[self.crs_of.get(tp, tp)] = nm
             return
         d = pd.read_csv(patterns_csv, dtype=str).dropna(subset=["pattern"])
-        self.days = d.service_date.nunique()
+        grouped = "days" in d.columns and "service_date" not in d.columns
+        self.days = 1 if grouped else d.service_date.nunique()
         self.services = []
-        for toc, pat, tm in zip(d.toc, d.pattern, d["times"]):
+        rows = []
+        for i, (toc, pat, tm) in enumerate(zip(d.toc, d.pattern, d["times"])):
             stops, times = [], []
             for tp, tt in zip(pat.split(","), tm.split(",")):
                 c = self.crs_of.get(tp, tp)
@@ -74,11 +76,50 @@ class Data:
                     times.append(tt)
                     if c not in self.names:
                         self.names[c] = EXTRA_NAMES.get(tp, tp.title())
-            self.services.append((toc, tuple(stops), tuple(times)))
+            rows.append((toc, pat, tuple(stops), tuple(times)))
+        if grouped:
+            self.services = typical_day(rows, [set(x.split(",")) for x in d["days"]])
+        else:
+            self.services = [(toc, stops, times) for toc, _pat, stops, times in rows]
         for tp, nm in EXTRA_NAMES.items():
             self.names[self.crs_of.get(tp, tp)] = nm
         import pickle
         pickle.dump((self.days, self.services, {k: v for k, v in self.names.items()}), open(cache, "wb"))
+
+
+MIN_PRESENT = 0.4   # a pattern must run on at least this share of the sampled days to be "normal"
+
+
+def typical_day(rows, day_sets):
+    """Services of a normal day from many sampled days: `rows` are distinct timetabled trains
+    (toc, pattern, stops, times) and `day_sets` the days each ran. For every operator + calling pattern,
+    take the median number of trains per day over the days it ran, drop it if it ran on fewer than
+    MIN_PRESENT of all days (engineering diversions, one-off workings), and use the real timings from a
+    day whose count matches. A closure on a few of the days therefore does not change the result."""
+    import numpy as np
+    all_days = sorted(set().union(*day_sets))
+    index = {dd: i for i, dd in enumerate(all_days)}
+    n = len(all_days)
+    groups = collections.defaultdict(list)  # (toc, pattern) -> [(stops, times, day indices)]
+    for (toc, pat, stops, times), ds in zip(rows, day_sets):
+        groups[(toc, pat)].append((stops, times, np.array([index[x] for x in ds], dtype=int)))
+    out = []
+    for (toc, _pat), members in groups.items():
+        counts = np.zeros(n, dtype=int)
+        for _s, _t, idx in members:
+            counts[idx] += 1
+        ran = counts > 0
+        if ran.sum() < MIN_PRESENT * n:
+            continue
+        m = int(round(float(np.median(counts[ran]))))
+        hits = np.flatnonzero(counts == m)
+        if not len(hits):
+            hits = np.flatnonzero(ran)
+        day = int(hits[len(hits) // 2])
+        for stops, times, idx in members:
+            if day in idx:
+                out.append((toc, stops, times))
+    return out
 
 
 # ------------------------------------------------------------------------ routes

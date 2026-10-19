@@ -9,7 +9,9 @@ and the **trains per hour (tph)** on every station and route.
 More examples: [Doncaster](docs/examples/DON.svg) · [Reading](docs/examples/RDG.svg)
 
 The maps are built from real timetables (the "normal" service: Tuesday–Thursday, 09:00–16:00, so no
-peaks and no early/late workings) and laid out automatically. They are schematic: distances are
+peaks and no early/late workings). The normal day is the **median over many sampled days** (every
+Tue–Thu from June to mid-October 2026), so engineering works and diversions on a few days do not change it.
+The maps are laid out automatically. They are schematic: distances are
 not to scale, but the order of stations along every route is real.
 
 ## How it works
@@ -66,11 +68,11 @@ python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
 python -m pytest tests            # smoke test on an invented network, no data needed
 
 # one station (CRS code), then open maps/BRI.svg
-python src/hub_map.py BRI --patterns data/national_patterns.csv --tiplocs data/tiplocs.csv \
+python src/hub_map.py BRI --patterns data/national_patterns_days.csv --tiplocs data/tiplocs.csv \
     --network data/nr_schematic.json
 
 # many stations, in parallel, resumable; also writes maps/index.html (a station selector)
-python src/generate_all.py --patterns data/national_patterns.csv --tiplocs data/tiplocs.csv \
+python src/generate_all.py --patterns data/national_patterns_days.csv --tiplocs data/tiplocs.csv \
     --network data/nr_schematic.json --top 300 --workers 6
 open maps/index.html
 ```
@@ -81,6 +83,12 @@ runs several at once.
 ## Inputs
 
 `data/` is git-ignored: nothing in it is committed.
+
+**Two input formats.** Either `national_patterns.csv` (one row per service that ran, a few days) or, better,
+`national_patterns_days.csv` (one row per distinct timetabled train, with the days it ran; use many days).
+The second is turned into a normal day: for every operator + calling pattern, the median number of trains
+per day over the days it ran, dropped if it ran on fewer than 40% of the days, with real timings taken from
+a day that matches. A line that was closed on a few of the sampled days therefore keeps its normal service.
 
 **`national_patterns.csv`**: one row per passenger service that ran, with these columns:
 
@@ -95,10 +103,15 @@ runs several at once.
 CRS code is what you pass on the command line; coordinates are used to point each branch the right
 way. Stations missing here still work, but get their TIPLOC as a name and no bearing.
 
-[`sql/national_patterns.sql`](sql/national_patterns.sql) and [`sql/tiplocs.sql`](sql/tiplocs.sql)
-produce both from the `normalised_v1` and `tiplocs` tables of the
+**`national_patterns_days.csv`**: `toc, pattern, times, days` (the TIPLOC calling points, their times, and a
+comma-separated list of the `YYYYMMDD` dates the train ran).
+
+[`sql/national_patterns_grouped.sql`](sql/national_patterns_grouped.sql) (many days) or
+[`sql/national_patterns.sql`](sql/national_patterns.sql) (a few days), and [`sql/tiplocs.sql`](sql/tiplocs.sql),
+produce these from the `normalised_v1` and `tiplocs` tables of the
 author's `darwin-storage` pipeline (National Rail Darwin feed, on AWS Athena);
-[`tools/fetch_athena.sh`](tools/fetch_athena.sh) runs them. Any source with the same columns works.
+[`tools/fetch_athena_weeks.sh`](tools/fetch_athena_weeks.sh) (all Tue–Thu between two dates; about
+370 MB scanned for 60 days) or [`tools/fetch_athena.sh`](tools/fetch_athena.sh) runs them. Any source with the same columns works.
 Choose typical midweek days from a month with no big disruption.
 
 **`nr_schematic.json`** (optional): the line network read from the National Rail "All Stations Route
@@ -141,7 +154,7 @@ Everything is a constant at the top of `src/hub_map.py` / `src/station_route_map
 - Very dense areas (Reading–Swindon–Gloucester, London) can still end with a few label clashes or
   one crossing; the report says how many. Stations where the report lists failures are best checked by eye.
 - Stations not in `tiplocs.csv` (e.g. the Elizabeth line) show a TIPLOC as their name.
-- One day-type only (midweek daytime). tph is an average over those hours, so it is fractional
+- One day-type only (midweek daytime). tph is an average over those hours of the normal day, so it is fractional
   (1.3 tph, not "2"); it is not a timetable promise.
 
 ## Data and licensing
