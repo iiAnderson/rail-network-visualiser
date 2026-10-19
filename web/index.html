@@ -4,12 +4,25 @@
 <style>
 :root{--bg:#fff;--fg:#1a1a1a;--mut:#666;--line:#8884}
 @media (prefers-color-scheme:dark){:root{--bg:#161618;--fg:#eee;--mut:#aaa}}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:Helvetica Neue,Helvetica,Arial,sans-serif}
+html,body{height:100%}
+body{margin:0;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font-family:Helvetica Neue,Helvetica,Arial,sans-serif}
 header{position:sticky;top:0;z-index:2;background:var(--bg);padding:10px 16px;border-bottom:1px solid var(--line);
   display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 input,select{font-size:16px;padding:6px 10px;max-width:100%}
 small{color:var(--mut)}
-img{display:block;max-width:100%;height:auto;margin:0 auto;background:#fff}
+#stage{position:relative;flex:1;min-height:0;overflow:hidden;background:#fff;touch-action:pan-y;cursor:grab;user-select:none}
+#stage.zoomed{touch-action:none}
+#stage.drag{cursor:grabbing}
+#m{position:absolute;left:0;top:0;height:auto;max-width:none;background:#fff;-webkit-user-drag:none;pointer-events:none}
+#ctl{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px;z-index:1}
+#ctl button,#ctl a{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font:20px/1 Helvetica,Arial,sans-serif;
+  color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;cursor:pointer;text-decoration:none;box-shadow:0 1px 4px #0003}
+#ctl button:hover,#ctl a:hover{background:#8882}
+#hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);max-width:90%;padding:6px 12px;border-radius:16px;font-size:13px;
+  background:#000b;color:#fff;pointer-events:none;opacity:0;transition:opacity .4s;text-align:center}
+#hint.on{opacity:1}
+body.embed header{display:none}
+body.embed #ctl{top:8px;right:8px}
 </style></head><body>
 <header>
   <label for="q"><b>Station</b></label>
@@ -18,7 +31,17 @@ img{display:block;max-width:100%;height:auto;margin:0 auto;background:#fff}
   <label id="allw" style="display:none"><input id="all" type="checkbox"> Every service pattern <small id="alln"></small></label>
   <small id="n"></small>
 </header>
-<img id="m" alt="Route map">
+<div id="stage" tabindex="0" aria-label="Route map. Drag to pan, scroll or pinch to zoom, plus and minus keys to zoom.">
+  <img id="m" alt="Route map" draggable="false">
+  <div id="ctl">
+    <button id="zi" title="Zoom in" aria-label="Zoom in">+</button>
+    <button id="zo" title="Zoom out" aria-label="Zoom out">&minus;</button>
+    <button id="zf" title="Fit to window" aria-label="Fit to window">&#x2922;</button>
+    <button id="fs" title="Full screen" aria-label="Full screen">&#x26F6;</button>
+    <a id="ext" href="#" target="_blank" rel="noopener" title="Open full size in a new tab" aria-label="Open full size in a new tab" style="display:none">&#x2197;</a>
+  </div>
+  <div id="hint"></div>
+</div>
 <script src="stations.js"></script>
 <script>
 const all = window.STATIONS || [], q = document.getElementById("q"), s = document.getElementById("s"),
@@ -45,4 +68,89 @@ function show() {
 document.getElementById("all").onchange = show;
 q.oninput = fill; s.onchange = show;
 const h = location.hash.slice(1); fill(); if (h && all.some(r => r.crs === h)) { s.value = h; show(); }
+
+// ---- pan / zoom: the image is resized (not CSS-scaled) so the SVG stays sharp at any zoom ----
+const embed = /[?&]embed=1\b/.test(location.search), stage = document.getElementById("stage"), hint = document.getElementById("hint");
+if (embed) {
+  document.body.classList.add("embed");
+  const x = document.getElementById("ext"); x.style.display = "";
+  const open = () => { x.href = location.pathname + (s.value ? "#" + s.value : ""); }; open(); addEventListener("hashchange", open);
+}
+let k = 1, ox = 0, oy = 0, ratio = 0, sw = 0, sh = 0, fitW = 0, ht;   // k: zoom over fit; ox/oy: image top-left in stage px
+const MAXK = 12, W = () => fitW * k, H = () => fitW * k * ratio;
+function say(t) { hint.textContent = t; hint.classList.add("on"); clearTimeout(ht); ht = setTimeout(() => hint.classList.remove("on"), 2600); }
+function clamp() {
+  const w = W(), h = H(), pad = 40;
+  ox = w <= sw ? (sw - w) / 2 : Math.min(pad, Math.max(sw - w - pad, ox));
+  oy = h <= sh ? (sh - h) / 2 : Math.min(pad, Math.max(sh - h - pad, oy));
+}
+function apply() {
+  clamp(); m.style.width = W() + "px"; m.style.left = ox + "px"; m.style.top = oy + "px";
+  stage.classList.toggle("zoomed", k > 1.001);
+}
+function fit() {
+  sw = stage.clientWidth; sh = stage.clientHeight;
+  if (!ratio) return;
+  fitW = Math.min(sw, sh / ratio); k = 1; apply();
+}
+function zoomAt(f, cx, cy) {
+  const nk = Math.min(MAXK, Math.max(1, k * f)); f = nk / k; if (f === 1) return;
+  ox = cx - (cx - ox) * f; oy = cy - (cy - oy) * f; k = nk; apply();
+}
+const mid = () => [stage.clientWidth / 2, stage.clientHeight / 2];
+m.onload = () => {
+  m.style.width = "100px"; ratio = m.offsetHeight / m.offsetWidth || 1; fit();
+  if (!sessionStorageSeen()) say(embed ? "Drag to pan \u00b7 Ctrl + scroll or pinch to zoom \u00b7 double-click to zoom in" : "Scroll or pinch to zoom \u00b7 drag to pan \u00b7 double-click to zoom in");
+};
+function sessionStorageSeen() { try { if (sessionStorage.hint) return true; sessionStorage.hint = 1; } catch (e) {} return false; }
+addEventListener("resize", fit);
+stage.addEventListener("wheel", e => {
+  if (embed && !(e.ctrlKey || e.metaKey)) { if (k <= 1.001) say("Use Ctrl + scroll to zoom"); else e.preventDefault(), ox -= e.deltaX, oy -= e.deltaY, apply(); return; }
+  e.preventDefault();
+  const r = stage.getBoundingClientRect();
+  zoomAt(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.002)), e.clientX - r.left, e.clientY - r.top);
+}, { passive: false });
+const ptr = new Map(); let pd = 0, moved = 0;
+stage.addEventListener("pointerdown", e => {
+  if (e.target.closest("#ctl")) return;
+  stage.setPointerCapture(e.pointerId); ptr.set(e.pointerId, [e.clientX, e.clientY]); moved = 0;
+  pd = ptr.size === 2 ? Math.hypot(...[...ptr.values()].reduce((a, b) => [a[0] - b[0], a[1] - b[1]])) : 0;
+  stage.classList.add("drag");
+});
+stage.addEventListener("pointermove", e => {
+  const p = ptr.get(e.pointerId); if (!p) return;
+  const r = stage.getBoundingClientRect();
+  if (ptr.size === 2) {
+    const o = [...ptr.entries()].find(([id]) => id !== e.pointerId)[1], d = Math.hypot(e.clientX - o[0], e.clientY - o[1]);
+    if (pd) zoomAt(d / pd, (e.clientX + o[0]) / 2 - r.left, (e.clientY + o[1]) / 2 - r.top);
+    pd = d;
+  } else { ox += e.clientX - p[0]; oy += e.clientY - p[1]; apply(); }
+  moved += Math.abs(e.clientX - p[0]) + Math.abs(e.clientY - p[1]);
+  ptr.set(e.pointerId, [e.clientX, e.clientY]);
+});
+const up = e => { ptr.delete(e.pointerId); pd = 0; if (!ptr.size) stage.classList.remove("drag"); };
+stage.addEventListener("pointerup", up); stage.addEventListener("pointercancel", up);
+stage.addEventListener("dblclick", e => {
+  if (e.target.closest("#ctl")) return;
+  const r = stage.getBoundingClientRect(); zoomAt(e.shiftKey ? 0.5 : 2, e.clientX - r.left, e.clientY - r.top);
+});
+stage.addEventListener("keydown", e => {
+  const [cx, cy] = mid();
+  if (e.key === "+" || e.key === "=") zoomAt(1.4, cx, cy);
+  else if (e.key === "-") zoomAt(1 / 1.4, cx, cy);
+  else if (e.key === "0") fit();
+  else if (e.key.startsWith("Arrow")) { const d = 60; ox += e.key === "ArrowLeft" ? d : e.key === "ArrowRight" ? -d : 0; oy += e.key === "ArrowUp" ? d : e.key === "ArrowDown" ? -d : 0; apply(); }
+  else return;
+  e.preventDefault();
+});
+document.getElementById("zi").onclick = () => zoomAt(1.5, ...mid());
+document.getElementById("zo").onclick = () => zoomAt(1 / 1.5, ...mid());
+document.getElementById("zf").onclick = fit;
+const fsb = document.getElementById("fs"), fsEl = document.documentElement;
+if (!(fsEl.requestFullscreen || fsEl.webkitRequestFullscreen)) fsb.style.display = "none";
+fsb.onclick = () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else (fsEl.requestFullscreen || fsEl.webkitRequestFullscreen).call(fsEl);
+};
+document.addEventListener("fullscreenchange", () => setTimeout(fit, 50));
 </script></body></html>

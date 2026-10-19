@@ -644,8 +644,7 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
          '<text x="%s" y="%s" font-size="19" fill="#444">Normal daytime service pattern: average trains per hour '
          '(tph) each way, Tuesday&#8211;Thursday %02d:00&#8211;%02d:00, September 2026</text>'
          % (f(x0 + 32), f(y0 - head + 102), WINDOW[0], WINDOW[1]),
-         '<text x="%s" y="%s" font-size="14" fill="#777">Source: National Rail Darwin Push Port, services that ran. '
-         'Routes are drawn to their termini; stations no route here stops at are left out.</text>'
+         '<text x="%s" y="%s" font-size="14" fill="#777">Source: National Rail Darwin Push Port</text>'
          % (f(x0 + 32), f(y0 - head + 126)),
          '<text x="%s" y="%s" font-size="14" fill="#777">Number beside a station: tph calling. White dot: the route '
          'stops. Capsule: major interchange between routes going different ways.</text>'

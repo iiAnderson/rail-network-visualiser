@@ -2,7 +2,7 @@
 <rect x="-2048.8" y="-2361.1" width="3536.0" height="3836.8" fill="#fff"/>
 <text x="-2018.8" y="-2291.1" font-size="56" font-weight="300" fill="#c2185b">Doncaster Routes</text>
 <text x="-2016.8" y="-2259.1" font-size="19" fill="#444">Normal daytime service pattern: average trains per hour (tph) each way, Tuesday&#8211;Thursday 09:00&#8211;16:00, September 2026</text>
-<text x="-2016.8" y="-2235.1" font-size="14" fill="#777">Source: National Rail Darwin Push Port, services that ran. Routes are drawn to their termini; stations no route here stops at are left out.</text>
+<text x="-2016.8" y="-2235.1" font-size="14" fill="#777">Source: National Rail Darwin Push Port</text>
 <text x="-2016.8" y="-2216.1" font-size="14" fill="#777">Number beside a station: tph calling. White dot: the route stops. Capsule: major interchange between routes going different ways.</text>
 <path d="M-6.7 6.7 L-1335.0 -1321.6" fill="none" stroke="#0a6e3d" stroke-width="5.4" stroke-linejoin="round"/>
 <path d="M681.0 966.3 L681.0 665.4 Q681.0 647.4 668.3 634.7 L16.8 -16.8" fill="none" stroke="#d62828" stroke-width="5.4" stroke-linejoin="round"/>

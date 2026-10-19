@@ -2,7 +2,7 @@
 <rect x="-2139.3" y="-2260.7" width="5190.7" height="4072.3" fill="#fff"/>
 <text x="-2109.3" y="-2190.7" font-size="56" font-weight="300" fill="#c2185b">Reading Routes</text>
 <text x="-2107.3" y="-2158.7" font-size="19" fill="#444">Normal daytime service pattern: average trains per hour (tph) each way, Tuesday&#8211;Thursday 09:00&#8211;16:00, September 2026</text>
-<text x="-2107.3" y="-2134.7" font-size="14" fill="#777">Source: National Rail Darwin Push Port, services that ran. Routes are drawn to their termini; stations no route here stops at are left out.</text>
+<text x="-2107.3" y="-2134.7" font-size="14" fill="#777">Source: National Rail Darwin Push Port</text>
 <text x="-2107.3" y="-2115.7" font-size="14" fill="#777">Number beside a station: tph calling. White dot: the route stops. Capsule: major interchange between routes going different ways.</text>
 <path d="M2908.4 -1322.5 L1622.4 -36.5 Q1609.7 -23.8 1591.7 -23.8 L0.0 -23.8" fill="none" stroke="#0a6e3d" stroke-width="5.4" stroke-linejoin="round"/>
 <path d="M-107.9 706.4 L-107.9 139.3 Q-107.9 121.3 -95.2 108.6 L6.7 6.7" fill="none" stroke="#d62828" stroke-width="5.4" stroke-linejoin="round"/>

@@ -2,7 +2,7 @@
 <rect x="-830.8" y="-1977.4" width="1763.9" height="3554.0" fill="#fff"/>
 <text x="-800.8" y="-1907.4" font-size="56" font-weight="300" fill="#c2185b">Bristol Temple Meads Routes</text>
 <text x="-798.8" y="-1875.4" font-size="19" fill="#444">Normal daytime service pattern: average trains per hour (tph) each way, Tuesday&#8211;Thursday 09:00&#8211;16:00, September 2026</text>
-<text x="-798.8" y="-1851.4" font-size="14" fill="#777">Source: National Rail Darwin Push Port, services that ran. Routes are drawn to their termini; stations no route here stops at are left out.</text>
+<text x="-798.8" y="-1851.4" font-size="14" fill="#777">Source: National Rail Darwin Push Port</text>
 <text x="-798.8" y="-1832.4" font-size="14" fill="#777">Number beside a station: tph calling. White dot: the route stops. Capsule: major interchange between routes going different ways.</text>
 <path d="M-403.2 -407.1 L-237.5 -241.5 Q-224.8 -228.8 -206.8 -228.8 L-51.3 -228.8 Q-33.3 -228.8 -33.3 -210.8 L-33.2 0.0" fill="none" stroke="#0a6e3d" stroke-width="5.4" stroke-linejoin="round"/>
 <path d="M10.1 10.1 L-153.9 174.1 Q-166.6 186.8 -184.6 186.8 L-246.6 186.8 Q-264.6 186.8 -277.4 199.5 L-434.4 356.6" fill="none" stroke="#0a6e3d" stroke-width="5.4" stroke-linejoin="round"/>

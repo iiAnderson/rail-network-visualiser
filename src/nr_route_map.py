@@ -762,10 +762,8 @@ def compose_svg(scene, s, data, colours, paths, dots, labels, end_leaf, end_labe
     out.append('<text x="%s" y="%s" font-size="19" fill="#444">Normal daytime service pattern: average '
                'trains per hour (tph) each way, Tuesday&#8211;Thursday %02d:00&#8211;%02d:00, September 2026</text>'
                % (f(x0 + 32), f(y0 - head + 102), WINDOW[0], WINDOW[1]))
-    out.append('<text x="%s" y="%s" font-size="14" fill="#777">Source: National Rail Darwin Push Port, services '
-               'that ran. Lines follow the National Rail route map; up to %d calling points each side of %s. '
-               'Number beside a station: tph calling; white dot: the route stops.</text>'
-               % (f(x0 + 32), f(y0 - head + 126), base.K_STOPS, esc(hubname)))
+    out.append('<text x="%s" y="%s" font-size="14" fill="#777">Source: National Rail Darwin Push Port</text>'
+               % (f(x0 + 32), f(y0 - head + 126)))
     for rid, pc in paths:
         # a thin white edge under each line makes any crossing read as over/under
         out.append('<path d="M%s" fill="none" stroke="#fff" stroke-width="%s" stroke-linejoin="round" '
