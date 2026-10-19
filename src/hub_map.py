@@ -20,6 +20,8 @@ import copy
 import math
 import os
 
+import numpy as np
+import shapely
 from shapely.geometry import LineString, Point, Polygon, box
 from shapely.ops import nearest_points
 from shapely.strtree import STRtree
@@ -36,7 +38,7 @@ CLEAN_MIN_TPH = 0.3   # the clean view only considers patterns at least this fre
 MIN_ROUTES = 6       # the busiest routes are always drawn
 ROUTE_TOLERANCE = 1  # a further route may add at most this many rule failures
 PROBE_SPACINGS = ((130, 80), (64, 170))  # (spacing, hub gap)
-HUB_GAPS = (80, 140, 200)
+HUB_GAPS = (80, 170)
 LABEL_MAX = 30.0  # a label may start at most this far from its own station's dots
 MAJOR_TPH = 3.0   # an interchange capsule needs at least this many tph calling
 DOT_R = 3.9
@@ -455,8 +457,10 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
     stations = sorted((n for n in P if not n.startswith("j:") and n != hub and tph.get(n)),
                       key=lambda n: -bundle[n])
     tree = STRtree(obstacles)
+    obst_arr = np.array(obstacles, dtype=object)
     dot_tree = STRtree([pt for _, pt in all_dots])
     dot_owner = [m for m, _ in all_dots]
+    dot_arr = np.array([pt for _, pt in all_dots], dtype=object)
 
     cand_cache = {}
 
@@ -481,16 +485,17 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
                                           (math.cos(th_n), math.sin(th_n)))
             # fixed part of the cost: lines, dots and ownership do not depend on other labels
             scored = []
-            own_pts = dot_pts.get(n, [])
+            own = np.array(dot_pts.get(n, []), dtype=object)
             for pref, (mode, poly, tx, ty, anchor, rot) in enumerate(out):
                 cost = pref * 2.0
-                for i in tree.query(poly, predicate="intersects"):
-                    cost += 1000 + obstacles[i].intersection(poly).area
-                d_own = min((poly.distance(pt) for pt in own_pts), default=0.0)
+                hit = tree.query(poly, predicate="intersects")
+                if len(hit):
+                    cost += 1000 * len(hit) + float(shapely.area(shapely.intersection(poly, obst_arr[hit])).sum())
+                d_own = float(shapely.distance(poly, own).min()) if len(own) else 0.0
                 d_other = 1e9
-                for i in dot_tree.query(poly.buffer(d_own + 4)):
-                    if dot_owner[i] != n:
-                        d_other = min(d_other, poly.distance(all_dots[i][1]))
+                near = [i for i in dot_tree.query(poly.buffer(d_own + 4)) if dot_owner[i] != n]
+                if near:
+                    d_other = float(shapely.distance(poly, dot_arr[near]).min())
                 if d_own > LABEL_MAX:
                     cost += 1000
                 if d_other < d_own + 3:
@@ -532,11 +537,14 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
 
     order = list(stations)
     best_run = None
+    stale = 0
     for _ in range(10):  # re-place with the labels that clashed first, until none do (or no progress)
         res, bad = run(order)
         if best_run is None or len(bad) < len(best_run[1]):
-            best_run = (res, bad)
-        if not bad:
+            best_run, stale = (res, bad), 0
+        else:
+            stale += 1
+        if not bad or stale >= 2:
             break
         order = [n for n in order if n in bad] + [n for n in order if n not in bad]
     res, bad = best_run
@@ -581,8 +589,9 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
                               [g for g in getattr(x, "geoms", []) if g.geom_type == "Point"]):
                         if all(p.distance(c) > rad for c, rad in centres):
                             crossings += 1
-                            nn = min((n for n in P if not n.startswith("j:")), key=lambda n: p.distance(Point(P[n])))
-                            where["cross"].append((a, b, data.names.get(nn, nn), round(p.distance(Point(P[nn]))), round(p.x), round(p.y)))
+                            if len(where["cross"]) < 40:
+                                nn = min((n for n in P if not n.startswith("j:")), key=lambda n: p.distance(Point(P[n])))
+                                where["cross"].append((a, b, data.names.get(nn, nn), round(p.distance(Point(P[nn]))), round(p.x), round(p.y)))
     # lines of different routes running on top of each other (closer than a lane gap) for any real length
     branch_overlap = 0
     keep_out = [c.buffer(rad) for c, rad in centres]
@@ -703,7 +712,9 @@ def probe(data, nr, hub, routes):
     letters(trial)
     expand_via_pdf(trial, nr, data)
     # each loop is judged later, so a trial gets the better of every loop drawn and none drawn
-    return min(hard(render(data, hub, trial, sp, hg, lp)[1]) for sp, hg in PROBE_SPACINGS for lp in (True, False))
+    parent, _ = base.build_tree(trial, hub)
+    modes = (True, False) if base.find_chords(trial, parent) else (True,)
+    return min(hard(render(data, hub, trial, sp, hg, lp)[1]) for sp, hg in PROBE_SPACINGS for lp in modes)
 
 
 def choose_routes(data, nr, hub, every, verbose=False):

@@ -466,7 +466,7 @@ def layout(routes, hub, data, loops=True):
         return P, junction, edge_path, in_theta, dirs, orders
 
     stretch, res = {}, {"plans": [], "need": False}
-    for _attempt in range(8):
+    for _attempt in range(5):
         P, junction, edge_path, in_theta, dirs, orders = run(stretch)
         res = bypass_loops(chord_edges, parent, children, P, edge_path, dirs, n_lanes, hub, hub_r, data,
                            stretch, routes)
