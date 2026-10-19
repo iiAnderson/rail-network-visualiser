@@ -16,11 +16,13 @@ service passes between two stops.
 """
 import argparse
 import collections
+import copy
 import math
 import os
 
-from shapely.geometry import LineString, Point, Polygon
+from shapely.geometry import LineString, Point, Polygon, box
 from shapely.ops import nearest_points
+from shapely.strtree import STRtree
 
 import station_route_map as base
 from station_route_map import (PALETTE, FONT, LINE_W, WINDOW, Data, add, badge, discover_routes, esc, f,
@@ -29,13 +31,26 @@ import nr_route_map as nrm
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPACINGS = [250, 180, 130, 100, 80, 64, 52, 47]
-MAX_ROUTES = 12
+MAX_ROUTES = 24      # upper bound (the palette size); in practice routes are added only while the map stays clean
+MIN_ROUTES = 6       # the busiest routes are always drawn
+ROUTE_TOLERANCE = 1  # a further route may add at most this many rule failures
+PROBE_SPACINGS = ((130, 80), (64, 80), (130, 170), (64, 170))  # (spacing, hub gap)
+HUB_GAPS = (80, 140, 200)
 LABEL_MAX = 30.0  # a label may start at most this far from its own station's dots
 MAJOR_TPH = 3.0   # an interchange capsule needs at least this many tph calling
 DOT_R = 3.9
 DOT_GAP = 8.4
 base.PITCH = 9.5
 PITCH = base.PITCH
+
+
+NARROW, WIDE = set("iljtfrI.,'-() "), set("mwMW")
+
+
+def text_w(txt, size, bold=False):
+    """Estimated rendered width of a Helvetica-like string (a little generous, never short)."""
+    w = sum(0.32 if c in NARROW else 0.88 if c in WIDE else 0.66 if c.isupper() else 0.58 for c in txt)
+    return w * size * (1.07 if bold else 1.0) + 3
 
 
 # ------------------------------------------------------------------ topology from the PDF
@@ -186,8 +201,9 @@ def safe_buffers(pts, radius, chunk=10):
     return [LineString(c).buffer(radius) for c in pieces if len(c) >= 2]
 
 
-def render(data, hub, routes, spacing):
+def render(data, hub, routes, spacing, hub_gap=80.0):
     base.SPACING = float(spacing)
+    base.HUB_GAP = float(hub_gap)
     L = layout(routes, hub, data)
     parent, children, P = L["parent"], L["children"], L["P"]
     hub_r = L["hub_r"]
@@ -361,78 +377,132 @@ def render(data, hub, routes, spacing):
     for _rid, _n, _pt in dots:
         dot_pts[_n].append(Point(_pt))
     all_dots = [(_n, pt) for _n, pts in dot_pts.items() for pt in pts]
-    stations = sorted((n for n in P if not n.startswith("j:") and n != hub and tph.get(n)),
-                      key=lambda n: -bundle[n])
-    for n in stations:
-        x, y = P[n]
-        name = data.names.get(n, n)
-        tw = 7.4 * (len(name) + len(fmt_tph(tph[n])) + 1) + 22 * len(end_label.get(n, []))
-        half = bundle[n] + 12
-        best = None
-        th_n = L["dir"].get(n, 0.0)
-        cand_list = []
-        ab_n = end_edge.get(n)
-        anchors = [(x, y)]
-        if ab_n and ab_n in ext:
-            dn_ = unit(P[ab_n[0]], P[ab_n[1]])
-            mn_, mx_ = ext[ab_n]
-            anchors = [(x + dn_[1] * mx_, y - dn_[0] * mx_)]
-            if mx_ - mn_ > 1e-6:
-                anchors.append((x + dn_[1] * mn_, y - dn_[0] * mn_))
-        for extra in (0, 10, 20):
-            for ax, ay in anchors:
-                cand_list += nrm.candidates(ax, ay, 12 + extra, tw, (math.cos(th_n), math.sin(th_n)))
-        for pref, (mode, poly, tx, ty, anchor, rot) in enumerate(cand_list):
-            cost = pref * 2.0
-            for ob in obstacles:
-                if ob.intersects(poly):
-                    cost += 1000 + ob.intersection(poly).area
-            for pl in placed:
-                if pl.intersects(poly):
-                    cost += 1000 + pl.intersection(poly).area
-            own = [poly.distance(pt) for pt in dot_pts.get(n, [])]
-            d_own = min(own) if own else 0.0
-            d_other = min((poly.distance(pt) for m, pt in all_dots if m != n), default=1e9)
-            if d_own > LABEL_MAX:      # too far from its own station
-                cost += 1000
-            if d_other < d_own + 3:    # as close to another station: ambiguous
-                cost += 1000
-            if best is None or cost < best[0]:
-                best = (cost, poly, tx, ty, anchor, rot)
-        cost, poly, tx, ty, anchor, rot = best
-        own_pts = dot_pts.get(n, [])
-        if own_pts:  # a label that had to sit away from its dots gets a leader line to them
-            dd, pt_ = min(((poly.distance(pt), pt) for pt in own_pts), key=lambda z: z[0])
-            if dd > 12:
-                q = nearest_points(poly, pt_)[0]
-                leaders.append((q.x, q.y, pt_.x, pt_.y))
-                cost = max(0.0, cost - 1000 * ((dd > LABEL_MAX) + 0))
-        label_fail += cost >= 1000
-        placed.append(poly)
-        labels.append((n, tx, ty, anchor, rot, name, fmt_tph(tph[n])))
     hname = data.names.get(hub, hub)
-    hw_ = 13.5 * (len(hname) + 5) * 0.8
-    hbest = None
+    htxt = fmt_tph(sum(r["tph"] for r in routes))
+    hw_ = text_w(hname, 22, True) + 6 + text_w(htxt, 15, True)
     hx, hy = P[hub]
-    for pref, mode in enumerate(("R", "L", "U", "D")):
-        mode, poly, tx, ty, anchor, rot = label_candidate(mode, hx, hy, hub_r + 8, hw_, 24.0)
-        if rot:
-            continue
-        cost = pref
+    hbest = None
+    cands = []
+    for extra in (0, 12, 26, 44):
+        r0 = hub_r + 8 + extra
+        cands += [("A", hx, hy - r0 - 4, "middle", box(hx - hw_ / 2, hy - r0 - 22, hx + hw_ / 2, hy - r0 + 2)),
+                  ("B", hx, hy + r0 + 18, "middle", box(hx - hw_ / 2, hy + r0 - 2, hx + hw_ / 2, hy + r0 + 22)),
+                  ("R", hx + r0, hy + 8, "start", box(hx + r0 - 2, hy - 12, hx + r0 + hw_, hy + 14)),
+                  ("L", hx - r0, hy + 8, "end", box(hx - r0 - hw_, hy - 12, hx - r0 + 2, hy + 14)),
+                  ("AR", hx + 4, hy - r0 - 4, "start", box(hx + 2, hy - r0 - 22, hx + hw_, hy - r0 + 2)),
+                  ("AL", hx - 4, hy - r0 - 4, "end", box(hx - hw_, hy - r0 - 22, hx - 2, hy - r0 + 2)),
+                  ("BR", hx + 4, hy + r0 + 18, "start", box(hx + 2, hy + r0 - 2, hx + hw_, hy + r0 + 22)),
+                  ("BL", hx - 4, hy + r0 + 18, "end", box(hx - hw_, hy + r0 - 2, hx - 2, hy + r0 + 22))]
+    for pref, (_m, tx, ty, anchor, poly) in enumerate(cands):
+        cost = pref * 0.5
         for ob in obstacles:
             if ob is not pill and ob.intersects(poly):
                 cost += 1000 + ob.intersection(poly).area
-        for pl in placed:
-            if pl.intersects(poly):
-                cost += 1000 + pl.intersection(poly).area
         if hbest is None or cost < hbest[0]:
             hbest = (cost, tx, ty, anchor, poly)
+    label_fail += hbest[0] >= 1000
     placed.append(hbest[4])
 
+    stations = sorted((n for n in P if not n.startswith("j:") and n != hub and tph.get(n)),
+                      key=lambda n: -bundle[n])
+    tree = STRtree(obstacles)
+    dot_tree = STRtree([pt for _, pt in all_dots])
+    dot_owner = [m for m, _ in all_dots]
+
+    cand_cache = {}
+
+    def candidates_for(n):
+        if n not in cand_cache:
+            x, y = P[n]
+            name = data.names.get(n, n)
+            tw = text_w(name, FONT) + 6 + text_w(fmt_tph(tph[n]), 12, True) + 24 * len(end_label.get(n, []))
+            th_n = L["dir"].get(n, 0.0)
+            ab_n = end_edge.get(n)
+            anchors = [(x, y)]
+            if ab_n and ab_n in ext:
+                dn_ = unit(P[ab_n[0]], P[ab_n[1]])
+                mn_, mx_ = ext[ab_n]
+                anchors = [(x + dn_[1] * mx_, y - dn_[0] * mx_)]
+                if mx_ - mn_ > 1e-6:
+                    anchors.append((x + dn_[1] * mn_, y - dn_[0] * mn_))
+            out = []
+            for extra in (0, 10, 20, 34, 50):
+                for ax, ay in anchors:
+                    out += nrm.candidates(ax, ay, 12 + extra, tw,
+                                          (math.cos(th_n), math.sin(th_n)))
+            # fixed part of the cost: lines, dots and ownership do not depend on other labels
+            scored = []
+            own_pts = dot_pts.get(n, [])
+            for pref, (mode, poly, tx, ty, anchor, rot) in enumerate(out):
+                cost = pref * 2.0
+                for i in tree.query(poly, predicate="intersects"):
+                    cost += 1000 + obstacles[i].intersection(poly).area
+                d_own = min((poly.distance(pt) for pt in own_pts), default=0.0)
+                d_other = 1e9
+                for i in dot_tree.query(poly.buffer(d_own + 4)):
+                    if dot_owner[i] != n:
+                        d_other = min(d_other, poly.distance(all_dots[i][1]))
+                if d_own > LABEL_MAX:
+                    cost += 1000
+                if d_other < d_own + 3:
+                    cost += 1000
+                scored.append((cost, poly, tx, ty, anchor, rot, d_own))
+            cand_cache[n] = scored
+        return cand_cache[n]
+
+    def run(order):
+        res, bad = {}, set()
+        taken = [hbest[4]]
+        for n in order:
+            best = None
+            for cost, poly, tx, ty, anchor, rot, d_own in candidates_for(n):
+                if best is not None and cost >= best[0]:
+                    continue
+                for pl in taken:
+                    if pl.intersects(poly):
+                        cost += 1000 + pl.intersection(poly).area
+                        if best is not None and cost >= best[0]:
+                            break
+                if best is None or cost < best[0]:
+                    best = (cost, poly, tx, ty, anchor, rot, d_own)
+            cost, poly, tx, ty, anchor, rot, d_own = best
+            line = None
+            own_pts = dot_pts.get(n, [])
+            if own_pts:
+                dd, pt_ = min(((poly.distance(pt), pt) for pt in own_pts), key=lambda z: z[0])
+                if dd > 12:  # a label that had to sit away from its dots gets a leader line to them
+                    q = nearest_points(poly, pt_)[0]
+                    line = (q.x, q.y, pt_.x, pt_.y)
+                    cost = max(0.0, cost - 1000 * (dd > LABEL_MAX))
+                    taken.append(LineString([(q.x, q.y), (pt_.x, pt_.y)]).buffer(0.8))
+            if cost >= 1000:
+                bad.add(n)
+            taken.append(poly)
+            res[n] = (poly, tx, ty, anchor, rot, line)
+        return res, bad
+
+    order = list(stations)
+    best_run = None
+    for _ in range(10):  # re-place with the labels that clashed first, until none do (or no progress)
+        res, bad = run(order)
+        if best_run is None or len(bad) < len(best_run[1]):
+            best_run = (res, bad)
+        if not bad:
+            break
+        order = [n for n in order if n in bad] + [n for n in order if n not in bad]
+    res, bad = best_run
+    label_fail += len(bad)
+    bad_names = sorted(data.names.get(n, n) for n in bad) + (([hname] if hbest[0] >= 1000 else []))
+    for n in stations:
+        poly, tx, ty, anchor, rot, line = res[n]
+        placed.append(poly)
+        labels.append((n, tx, ty, anchor, rot, data.names.get(n, n), fmt_tph(tph[n])))
+        if line:
+            leaders.append(line)
     # ---- rule report
     pts_all = [(d[1], d[2]) for d in dots]
     dot_overlap = 0
-    where = {"dots": [], "cross": []}
+    where = {"dots": [], "cross": [], "labels": bad_names}
     for i, a in enumerate(pts_all):
         for b in pts_all[i + 1:]:
             if math.hypot(a[1][0] - b[1][0], a[1][1] - b[1][1]) < DOT_GAP:
@@ -537,14 +607,14 @@ def render(data, hub, routes, spacing):
     _, htx, hty, hanchor, _ = hbest
     o.append('<text x="%s" y="%s" font-size="22" font-weight="700" fill="#111" text-anchor="%s" stroke="#fff" '
              'stroke-width="5" paint-order="stroke">%s <tspan fill="#c2185b" font-size="15">%s</tspan></text>'
-             % (f(htx), f(hty), hanchor, esc(hname), fmt_tph(sum(r["tph"] for r in routes))))
+             % (f(htx), f(hty), hanchor, esc(hname), htxt))
     for n, tx, ty, anchor, rot, name, t in labels:
         tr = ' transform="rotate(%d %s %s)"' % (rot, f(tx), f(ty)) if rot else ""
         o.append('<text x="%s" y="%s" font-size="%s" fill="#1a1a1a" text-anchor="%s"%s><tspan font-weight="500">%s'
                  '</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">%s</tspan></text>'
                  % (f(tx), f(ty), FONT, anchor, tr, esc(name), t))
         for j, rid in enumerate(end_label.get(n, [])):
-            w = 7.4 * (len(name) + len(t) + 1) + 18 + 20 * j
+            w = text_w(name, FONT) + 6 + text_w(t, 12, True) + 14 + 20 * j
             a = math.radians(rot)
             sg = 1 if anchor == "start" else -1
             o.append(badge(colours[rid], rid, tx + sg * w * math.cos(a), ty + sg * w * math.sin(a) - 4, 8.5))
@@ -561,23 +631,58 @@ def render(data, hub, routes, spacing):
     return "\n".join(o), report, failures
 
 
+def hard(rep):
+    """Rule failures that count fully (leader lines are only a mild charge)."""
+    return sum(rep[k] for k in ("dot_overlap", "label_collision", "crossings", "branch_overlap", "dot_on_line"))
+
+
+def letters(routes):
+    for i, r in enumerate(routes):
+        r["id"] = chr(65 + i) if i < 26 else str(i)
+
+
+def probe(data, nr, hub, routes):
+    """Fewest hard rule failures of this route set over a few spacings (a cheap stand-in for the full search)."""
+    trial = copy.deepcopy(routes)
+    letters(trial)
+    expand_via_pdf(trial, nr, data)
+    return min(hard(render(data, hub, trial, sp, hg)[1]) for sp, hg in PROBE_SPACINGS)
+
+
+def choose_routes(data, nr, hub, every, verbose=False):
+    """Busiest routes first; a further route is kept only if drawing it adds at most ROUTE_TOLERANCE rule
+    failures. Routes that tangle the map are skipped, so a hub shows as many of its routes as stay clean."""
+    chosen = list(every[:MIN_ROUTES])
+    cur = probe(data, nr, hub, chosen)
+    for r in every[MIN_ROUTES:MAX_ROUTES]:
+        f = probe(data, nr, hub, chosen + [r])
+        if verbose:
+            print("   + route %-4s %.1f tph  failures %d -> %d  %s" % (
+                r["toc"], r["tph"], cur, f, "kept" if f <= cur + ROUTE_TOLERANCE else "skipped"))
+        if f <= cur + ROUTE_TOLERANCE:
+            chosen.append(r)
+            cur = f
+    return chosen
+
+
 def build_map(data, nr, hub, verbose=True):
     base.K_STOPS = 999          # routes are drawn in full
     base.MAX_ROUTES = MAX_ROUTES
-    routes = discover_routes(data, hub)
-    if not routes:
+    every = discover_routes(data, hub)
+    if not every:
         return None
+    routes = copy.deepcopy(choose_routes(data, nr, hub, every, verbose))
+    letters(routes)
     expand_via_pdf(routes, nr, data)
     results = []
-    for sp in SPACINGS:
-        svg, rep, fail = render(data, hub, routes, sp)
-        results.append((sp, fail, rep, svg))
-        if verbose:
-            print("   spacing %3d failures %d %s" % (sp, fail, {k: v for k, v in rep.items() if k != "where"}))
-    def hard(r):  # rule failures, ignoring the small leader-line charge
-        return int(r[1])
-    best = min(hard(r) for r in results)  # fewest hard failures first, then the tightest spacing
-    chosen = min((r for r in results if hard(r) == best), key=lambda r: r[0])
+    for hg in HUB_GAPS:
+        for sp in SPACINGS:
+            svg, rep, fail = render(data, hub, routes, sp, hg)
+            results.append((sp, (hard(rep), fail), rep, svg, hg))
+            if verbose:
+                print("   spacing %3d gap %3d failures %d %s" % (sp, hg, fail, {k: v for k, v in rep.items() if k != "where"}))
+    best = min(r[1][0] for r in results)  # fewest hard failures first, then the tightest spacing
+    chosen = min((r for r in results if r[1][0] == best), key=lambda r: (r[1][1], r[0]))  # then fewest leaders
     return chosen[3], routes, chosen[0], chosen[2]
 
 

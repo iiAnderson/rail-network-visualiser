@@ -10,6 +10,7 @@ routes diverge) -> greedy label placement -> SVG.
 """
 import argparse
 import collections
+import itertools
 import heapq
 import json
 import math
@@ -21,6 +22,7 @@ from shapely.geometry import LineString, Point, Polygon, box
 
 WINDOW = (9, 16)        # local hour at the hub; avoids peaks and early/late services
 K_STOPS = 10            # keep this many calling points either side of the hub
+HUB_GAP = 80.0          # first station of every branch sits this far outside the hub
 MIN_TPH = 0.3           # drop routes rarer than this (trains per hour each way)
 MAX_ROUTES = 24
 MIN_ON_ROUTE = 0.8      # share of a service's stops that must lie on a route to join it
@@ -287,6 +289,31 @@ def angdiff(a, b):
     return abs(d)
 
 
+def assign_ordered(kids, want, allowed, theta_in):
+    """Directions for branches that keep their true angular order (so branches never swap sides and cross),
+    with the least total deviation from where each really goes. None if there are too few directions."""
+    k, n = len(kids), len(allowed)
+    if k > n:
+        return None
+    cyclic = theta_in is None
+
+    def wrap(a):
+        return (a + math.pi) % (2 * math.pi) - math.pi
+
+    key = (lambda c: want[c] % (2 * math.pi)) if cyclic else (lambda c: wrap(want[c] - theta_in))
+    ks = sorted(kids, key=key)
+    best = None
+    for combo in itertools.combinations(range(n), k):
+        for r in (range(k) if cyclic else (0,)):
+            cost = 0.0
+            for i, c in enumerate(ks):
+                a = allowed[combo[(i + r) % k]]
+                cost += angdiff(want[c], a) + (0.0 if cyclic else 0.25 * angdiff(a, theta_in))
+            if best is None or cost < best[0]:
+                best = (cost, {c: allowed[combo[(i + r) % k]] for i, c in enumerate(ks)})
+    return best[1]
+
+
 def layout(routes, hub, data):
     parent, children = build_tree(routes, hub)
     xy = data.xy
@@ -323,15 +350,17 @@ def layout(routes, hub, data):
         for c in kids:
             v = sub_vec.get(c)
             want[c] = ang(v) if v else (theta_in if theta_in is not None else 0.0)
+        taken = assign_ordered(kids, want, allowed, theta_in)
         free = list(allowed)
-        taken = {}
         pairs = sorted(((angdiff(want[c], a) + (0.25 * angdiff(a, theta_in) if theta_in is not None else 0), c, a)
                         for c in kids for a in allowed))
-        for _, c, a in pairs:
-            if c in taken or a not in free:
-                continue
-            taken[c] = a
-            free.remove(a)
+        if taken is None:  # more branches than directions: greedy, some share a direction
+            taken = {}
+            for _, c, a in pairs:
+                if c in taken or a not in free:
+                    continue
+                taken[c] = a
+                free.remove(a)
         for c in kids:  # more children than directions: share the closest
             if c not in taken:
                 taken[c] = min(allowed, key=lambda a: angdiff(want[c], a))
@@ -375,7 +404,7 @@ def layout(routes, hub, data):
             th = dir_of[c]
             nl = n_lanes.get((u, c), 1)
             if u == hub:
-                dist_ = hub_r + 80 + 2 * nl
+                dist_ = hub_r + HUB_GAP + 2 * nl
             elif base != u:
                 dist_ = 44 + 2.5 * nl
             else:

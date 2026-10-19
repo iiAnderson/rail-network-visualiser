@@ -24,13 +24,16 @@ services (CSV)  ──►  routes  ──►  station graph  ──►  tree lay
 1. **Routes** (`station_route_map.discover_routes`). Every service that calls at the hub inside the
    window is grouped by operator and stopping pattern. Patterns that mostly overlap are merged, so a
    short working counts towards the route it is part of. tph is trains per hour *each way*. At most
-   12 routes (the busiest) are drawn, and rarer ones (< 0.3 tph) are dropped.
+   24 routes are considered, and rarer ones (< 0.3 tph) are dropped. The busiest 6 are always drawn; each
+   further route is test-rendered and kept only if it adds at most one rule failure, so a hub shows as
+   many of its routes as stay clean (routes that would force a loop are the usual casualties).
 2. **Stations a fast train passes.** Only stations that some drawn route stops at appear. Between two
    stops of a route, the stations it passes (and another route stops at) are found from the
    National Rail route map network, and from a "flat triangle" rule when that is unavailable.
 3. **Layout** (`station_route_map.layout`). The graph becomes a spanning tree that keeps the most
    traffic (the busier of two parallel corridors stays straight; the quieter one hangs off it as a
-   spur). Each branch leaves the hub in the 45° direction closest to its real compass bearing.
+   spur). Branches leave the hub in 45° directions that keep their true angular order (so two branches
+   never swap sides and cross), as close as possible to their real compass bearings.
 4. **Lanes.** Routes sharing track run as parallel lanes. Lane order follows where each route goes
    *next*, so lines only change side where they diverge. A lane keeps its offset along a bundle, so
    nothing wiggles after a junction.
@@ -38,8 +41,8 @@ services (CSV)  ──►  routes  ──►  station graph  ──►  tree lay
    closer to them than to any other station's dots; a thin leader line is drawn when that is not
    possible.
 6. **Spacing search** (`hub_map.build_map`). The map is laid out at a series of spacings (250 px down
-   to 47 px between stations). Each is checked against the rules below; the tightest spacing with
-   the fewest hard failures wins.
+   to 47 px between stations) and hub gaps (80/140/200 px). Each is checked against the rules below;
+   the fewest hard failures wins, then the fewest leader lines, then the tightest spacing.
 
 ### The rules (all measured, and printed for every map)
 
@@ -49,8 +52,8 @@ services (CSV)  ──►  routes  ──►  station graph  ──►  tree lay
 | Interchange marks only at major stations | a capsule needs ≥ 3 tph calling **and** routes that both stop there going different ways. A station merely served by many routes is not marked, and routes that do not stop get no mark |
 | No line hidden under another | lines of different routes never run within a lane gap of each other |
 | No crossings | none outside the hub and interchange capsules |
-| No overlapping text | labels clear of lines, dots and each other, and tied to their own station |
-| Routes drawn in full | to the real terminus; at most 12 routes |
+| No overlapping text | labels (including the hub's) clear of lines, dots and each other, and tied to their own station. Text widths are estimated per character; labels that clash are re-placed first until none do |
+| Routes drawn in full | to the real terminus; up to 24 routes, as many as stay clean |
 
 The per-map report looks like
 `{'dot_overlap': 0, 'label_collision': 0, 'crossings': 0, 'branch_overlap': 0, 'dot_on_line': 2, 'leader_lines': 49}`.
@@ -128,13 +131,13 @@ spacing. It is kept for its helper code; the maps were clearer on the evenly spa
 ## Tuning
 
 Everything is a constant at the top of `src/hub_map.py` / `src/station_route_map.py`:
-`WINDOW` (hours), `MAX_ROUTES`, `MIN_TPH`, `SPACINGS`, `MAJOR_TPH`, `LABEL_MAX`, `PITCH` (lane gap).
+`WINDOW` (hours), `MAX_ROUTES`, `MIN_ROUTES`, `ROUTE_TOLERANCE`, `MIN_TPH`, `HUB_GAPS`, `SPACINGS`, `MAJOR_TPH`, `LABEL_MAX`, `PITCH` (lane gap).
 
 ## Known limitations
 
 - Where two corridors join the same places (Doncaster–Sheffield via Rotherham or via Meadowhall) the
-  diagram has no loops: the quieter corridor becomes a spur and a route using it runs out to the
-  end and back along the same lane.
+  diagram has no loops: the quieter corridor becomes a spur. Routes that need such a loop are
+  left out rather than drawn badly, so Sheffield shows 8 of its 15 routes.
 - Very dense areas (Reading–Swindon–Gloucester, London) can still end with a few label clashes or
   one crossing; the report says how many. Stations where the report lists failures are best checked by eye.
 - Stations not in `tiplocs.csv` (e.g. the Elizabeth line) show a TIPLOC as their name.
