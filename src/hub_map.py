@@ -642,7 +642,7 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
          '<text x="%s" y="%s" font-size="56" font-weight="300" fill="#c2185b">%s Routes</text>'
          % (f(x0 + 30), f(y0 - head + 70), esc(hname)),
          '<text x="%s" y="%s" font-size="19" fill="#444">Normal daytime service pattern: average trains per hour '
-         '(tph) each way, Tuesday&#8211;Thursday %02d:00&#8211;%02d:00, September 2026</text>'
+         '(tph) each way, Tue&#8211;Thu %02d:00&#8211;%02d:00, median of Jun&#8211;Oct 2026</text>'
          % (f(x0 + 32), f(y0 - head + 102), WINDOW[0], WINDOW[1]),
          '<text x="%s" y="%s" font-size="14" fill="#777">Source: National Rail Darwin Push Port</text>'
          % (f(x0 + 32), f(y0 - head + 126)),
@@ -717,17 +717,33 @@ def probe(data, nr, hub, routes):
     return min(hard(render(data, hub, trial, sp, hg, lp)[1]) for sp, hg in PROBE_SPACINGS for lp in modes)
 
 
+CORRIDOR_TOLERANCE = 6  # the first route to each far terminus may add this many failures: a destination is never dropped lightly
+
+
+def corridor_order(hub, every):
+    """Busiest first, but the busiest route to each distinct far terminus comes before the repeats, so
+    short suburban variants never crowd out Glasgow, Brighton or Portsmouth."""
+    seen, first, rest = set(), [], []
+    for r in every:
+        key = frozenset(e for e in r["true_ends"] if e != hub)
+        (rest if key in seen else first).append(r)
+        seen.add(key)
+    return first + rest, {id(r) for r in first}
+
+
 def choose_routes(data, nr, hub, every, verbose=False):
     """Busiest routes first; a further route is kept only if drawing it adds at most ROUTE_TOLERANCE rule
     failures. Routes that tangle the map are skipped, so a hub shows as many of its routes as stay clean."""
+    every, firsts = corridor_order(hub, every)
     chosen = list(every[:MIN_ROUTES])
     cur = probe(data, nr, hub, chosen)
     for r in every[MIN_ROUTES:MAX_ROUTES]:
+        tol = CORRIDOR_TOLERANCE if id(r) in firsts else ROUTE_TOLERANCE
         f = probe(data, nr, hub, chosen + [r])
         if verbose:
             print("   + route %-4s %.1f tph  failures %d -> %d  %s" % (
-                r["toc"], r["tph"], cur, f, "kept" if f <= cur + ROUTE_TOLERANCE else "skipped"))
-        if f <= cur + ROUTE_TOLERANCE:
+                r["toc"], r["tph"], cur, f, "kept" if f <= cur + tol else "skipped"))
+        if f <= cur + tol:
             chosen.append(r)
             cur = f
     return chosen
