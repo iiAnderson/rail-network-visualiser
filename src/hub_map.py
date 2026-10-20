@@ -706,7 +706,7 @@ def letters(routes):
         r["id"] = chr(65 + i) if i < 26 else str(i)
 
 
-def probe(data, nr, hub, routes):
+def probe(data, nr, hub, routes, spacings=None):
     """Fewest hard rule failures of this route set over a few spacings (a cheap stand-in for the full search)."""
     trial = copy.deepcopy(routes)
     letters(trial)
@@ -714,9 +714,10 @@ def probe(data, nr, hub, routes):
     # each loop is judged later, so a trial gets the better of every loop drawn and none drawn
     parent, _ = base.build_tree(trial, hub)
     modes = (True, False) if base.find_chords(trial, parent) else (True,)
-    return min(hard(render(data, hub, trial, sp, hg, lp)[1]) for sp, hg in PROBE_SPACINGS for lp in modes)
+    return min(hard(render(data, hub, trial, sp, hg, lp)[1]) for sp, hg in (spacings or PROBE_SPACINGS) for lp in modes)
 
 
+BIG_HUB_ROUTES = 14     # more candidate routes than this: probe at one spacing only
 CORRIDOR_TOLERANCE = 6  # the first route to each far terminus may add this many failures: a destination is never dropped lightly
 
 
@@ -735,11 +736,12 @@ def choose_routes(data, nr, hub, every, verbose=False):
     """Busiest routes first; a further route is kept only if drawing it adds at most ROUTE_TOLERANCE rule
     failures. Routes that tangle the map are skipped, so a hub shows as many of its routes as stay clean."""
     every, firsts = corridor_order(hub, every)
+    sp = PROBE_SPACINGS[:1] if len(every) > BIG_HUB_ROUTES else None   # big hubs: one probe spacing, or the search takes hours
     chosen = list(every[:MIN_ROUTES])
-    cur = probe(data, nr, hub, chosen)
+    cur = probe(data, nr, hub, chosen, sp)
     for r in every[MIN_ROUTES:MAX_ROUTES]:
         tol = CORRIDOR_TOLERANCE if id(r) in firsts else ROUTE_TOLERANCE
-        f = probe(data, nr, hub, chosen + [r])
+        f = probe(data, nr, hub, chosen + [r], sp)
         if verbose:
             print("   + route %-4s %.1f tph  failures %d -> %d  %s" % (
                 r["toc"], r["tph"], cur, f, "kept" if f <= cur + tol else "skipped"))
