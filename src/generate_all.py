@@ -40,21 +40,17 @@ def rank_stations(data):
 def work(crs):
     started = time.time()
     try:
-        res = hm.build_map(DATA, NR, crs, verbose=False)
-        if res is None:
+        pages = hm.build_pages(DATA, NR, crs, verbose=False)
+        if not pages:
             return crs, "no routes", None, time.time() - started
-        svg, routes, spacing, report, omitted = res
-        with open(os.path.join(OUT, crs + ".svg"), "w") as fh:
-            fh.write(svg)
+        for k, (svg, routes, spacing, report, omitted) in enumerate(pages):
+            with open(os.path.join(OUT, crs + ("" if k == 0 else "_%d" % (k + 1)) + ".svg"), "w") as fh:
+                fh.write(svg)
+        svg, routes, spacing, report, omitted = pages[0]
         report = {k: v for k, v in report.items() if k != "where"}
-        report.update(spacing=spacing, routes=len(routes), omitted=omitted)
-        if omitted:  # some patterns were left off the clean map: draw the "all service patterns" view too
-            res = hm.build_map(DATA, NR, crs, verbose=False, mode="all")
-            svg2, routes2, spacing2, report2, _ = res
-            with open(os.path.join(OUT, crs + "_all.svg"), "w") as fh:
-                fh.write(svg2)
-            report["all"] = {k: v for k, v in report2.items() if k != "where"}
-            report["all"].update(spacing=spacing2, routes=len(routes2))
+        report.update(spacing=spacing, routes=len(routes), omitted=omitted, pages=len(pages),
+                      page_routes=[len(p[1]) for p in pages],
+                      page_reports=[{k: v for k, v in p[3].items() if k != "where"} for p in pages])
         return crs, "ok", report, time.time() - started
     except Exception:  # keep the batch going; the traceback is logged
         return crs, "error", traceback.format_exc(), time.time() - started
@@ -65,7 +61,7 @@ def write_selector(manifest, tph):
     for crs, m in manifest.items():
         rows.append({"crs": crs, "name": m["name"], "tph": round(tph.get(crs, 0), 1),
                      "routes": m.get("routes"), "spacing": m.get("spacing"),
-                     "all": m.get("all", {}).get("routes") if m.get("omitted") else None})
+                     "pages": m.get("pages", 1), "page_routes": m.get("page_routes")})
     rows.sort(key=lambda r: -r["tph"])
     with open(os.path.join(OUT, "stations.js"), "w") as fh:
         fh.write("window.STATIONS = " + json.dumps(rows) + ";\n")

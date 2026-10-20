@@ -302,7 +302,28 @@ def build_tree(routes, hub):
     for v, p in parent.items():
         if p is not None:
             children[p].append(v)
+    follow_tree(routes, parent)
     return parent, children
+
+
+def follow_tree(routes, parent):
+    """A step from a station to one of its tree ancestors (or back) is a train passing the stations in
+    between, which are already drawn: make the route run along them instead of leaving a chord."""
+    for r in routes:
+        path, out = r["path"], [r["path"][0]]
+        for a, b in zip(path, path[1:]):
+            if a != b and parent.get(a) != b and parent.get(b) != a:
+                for lo, hi in ((a, b), (b, a)):   # hi is the descendant when lo is its ancestor
+                    chain, x = [], hi
+                    while x is not None and x != lo:
+                        chain.append(x)
+                        x = parent.get(x)
+                    if x == lo and len(chain) > 1:
+                        mid = chain[::-1][:-1] if hi == b else chain[1:]
+                        out += mid
+                        break
+            out.append(b)
+        r["path"] = out
 
 
 def bearing_vec(u, kids_of, xy, node, depth=4):

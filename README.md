@@ -27,8 +27,10 @@ services (CSV)  ──►  routes  ──►  station graph  ──►  tree lay
    window is grouped by operator and stopping pattern. Patterns that mostly overlap are merged, so a
    short working counts towards the route it is part of. tph is trains per hour *each way*. At most
    24 routes are considered, and rarer ones (< 0.3 tph) are dropped. The busiest 6 are always drawn; each
-   further route is test-rendered and kept only if it adds at most one rule failure, so a hub shows as
-   many of its routes as stay clean (routes that would force a loop are the usual casualties).
+   further route is test-rendered and kept only if it adds at most one rule failure (the busiest route to
+   each distinct far terminus is allowed more, so a destination is not dropped lightly). Routes that
+   would tangle the map go to **further pages**: the same hub drawn again with the services the previous
+   page left out, until every grouped pattern (down to 0.1 tph) is on some page (at most 4).
 2. **Stations a fast train passes.** Only stations that some drawn route stops at appear. Between two
    stops of a route, the stations it passes (and another route stops at) are found from the
    National Rail route map network, and from a "flat triangle" rule when that is unavailable.

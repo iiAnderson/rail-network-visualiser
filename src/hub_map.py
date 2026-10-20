@@ -218,6 +218,9 @@ def safe_buffers(pts, radius, chunk=10):
     return [LineString(c).buffer(radius) for c in pieces if len(c) >= 2]
 
 
+PAGE = ""   # " (page 2 of 3)" while a later page of a station is drawn
+
+
 def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
     base.SPACING = float(spacing)
     base.HUB_GAP = float(hub_gap)
@@ -248,6 +251,11 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
     # branches meet) is a drawing failure; ends of a route are fine
     retrace = sum(1 for r in routes for i in range(1, len(r["tree_nodes"]) - 1)
                   if r["tree_nodes"][i - 1] == r["tree_nodes"][i + 1])
+    if base.DEBUG_LOOPS:
+        for r in routes:
+            for i in range(1, len(r["tree_nodes"]) - 1):
+                if r["tree_nodes"][i - 1] == r["tree_nodes"][i + 1]:
+                    print("   retrace", r["id"], r["toc"], r["tree_nodes"][i - 1:i + 2], "path", [x for x in r["path"] if x in r["tree_nodes"][i - 1:i + 2]])
 
     pre, subtree, depth = {}, {}, {hub: 0}
 
@@ -639,8 +647,8 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
     o = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="%s %s %s %s" font-family="Helvetica Neue, '
          'Helvetica, Arial, sans-serif">' % (f(x0), f(y0 - head), f(W), f(H)),
          '<rect x="%s" y="%s" width="%s" height="%s" fill="#fff"/>' % (f(x0), f(y0 - head), f(W), f(H)),
-         '<text x="%s" y="%s" font-size="56" font-weight="300" fill="#c2185b">%s Routes</text>'
-         % (f(x0 + 30), f(y0 - head + 70), esc(hname)),
+         '<text x="%s" y="%s" font-size="56" font-weight="300" fill="#c2185b">%s Routes%s</text>'
+         % (f(x0 + 30), f(y0 - head + 70), esc(hname), PAGE),
          '<text x="%s" y="%s" font-size="19" fill="#444">Normal daytime service pattern: average trains per hour '
          '(tph) each way, Tue&#8211;Thu %02d:00&#8211;%02d:00, median of Jun&#8211;Oct 2026</text>'
          % (f(x0 + 32), f(y0 - head + 102), WINDOW[0], WINDOW[1]),
@@ -686,7 +694,7 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
     if note:
         ny = y1 + 30 + 70 + 27 * len(routes)
         o.append('<text x="%s" y="%s" font-size="15" font-weight="500" fill="#555">Also stops here, not drawn (rarer or would '
-                 'overlap; the "all service patterns" view draws them):</text>' % (f(x0 + 30), f(ny)))
+                 'overlap):</text>' % (f(x0 + 30), f(ny)))
         for i, line in enumerate(note):
             o.append('<text x="%s" y="%s" font-size="13" fill="#777">%s</text>' % (f(x0 + 44), f(ny + 22 + 19 * i), esc(line)))
     o.append("<!-- spacing %s report %s -->" % (spacing, {k: v for k, v in report.items()}))
@@ -761,6 +769,49 @@ ALL_SPACINGS = (250, 130, 80, 52)
 ALL_GAPS = (80, 170)
 
 
+def _omitted_text(data, every, covered):
+    return ["%s – %s (%s tph, %s)" % (data.names.get(r["true_ends"][0], r["true_ends"][0]),
+                                      data.names.get(r["true_ends"][1], r["true_ends"][1]),
+                                      fmt_tph(r["tph"]) if r["tph"] >= 0.1 else "<0.1", r["toc"])
+            for r in every if (r["toc"], tuple(r["seq"])) not in covered]
+
+
+MAX_PAGES = 4
+
+
+def build_pages(data, nr, hub, verbose=True):
+    """The clean map first, then further maps for the services it left out, until every grouped pattern
+    (at least ALL_MIN_TPH) is on some page. Each page is chosen and laid out like a clean map, so
+    nothing is crowded. Returns a list of build_map results, one per page."""
+    base.K_STOPS = 999
+    base.MAX_ROUTES = 40
+    base.MIN_TPH = ALL_MIN_TPH
+    every = discover_routes(data, hub)
+    if not every:
+        return []
+    key = lambda r: (r["toc"], tuple(r["seq"]))
+    pool = [r for r in every if r["tph"] >= CLEAN_MIN_TPH][:MAX_ROUTES]
+    if not pool:
+        return []
+    picks, covered, remaining = [], set(), list(every)
+    while remaining and len(picks) < MAX_PAGES:
+        picked = choose_routes(data, nr, hub, pool, verbose)
+        picks.append(picked)
+        covered |= {key(r) for r in picked}
+        remaining = [r for r in every if key(r) not in covered]
+        pool = remaining[:MAX_ROUTES]
+    global PAGE
+    out = []
+    try:
+        for k, picked in enumerate(picks):
+            PAGE = " (page %d of %d)" % (k + 1, len(picks)) if len(picks) > 1 else ""
+            out.append(_render_best(data, nr, hub, copy.deepcopy(picked), _omitted_text(data, every, covered),
+                                    "clean", verbose))
+    finally:
+        PAGE = ""
+    return out
+
+
 def build_map(data, nr, hub, verbose=True, mode="clean"):
     """mode "clean": the routes that stay legible (busiest first, kept while they add at most one rule
     failure), with the rest listed under the legend. mode "all": every grouped pattern, however crowded."""
@@ -780,10 +831,11 @@ def build_map(data, nr, hub, verbose=True, mode="clean"):
         picked = choose_routes(data, nr, hub, clean_pool, verbose)
         keep = {(r["toc"], tuple(r["seq"])) for r in picked}
         routes = copy.deepcopy(picked)
-        omitted = ["%s – %s (%s tph, %s)" % (data.names.get(r["true_ends"][0], r["true_ends"][0]),
-                                             data.names.get(r["true_ends"][1], r["true_ends"][1]),
-                                             fmt_tph(r["tph"]) if r["tph"] >= 0.1 else "<0.1", r["toc"])
-                   for r in every if (r["toc"], tuple(r["seq"])) not in keep]
+        omitted = _omitted_text(data, every, keep)
+    return _render_best(data, nr, hub, routes, omitted, mode, verbose)
+
+
+def _render_best(data, nr, hub, routes, omitted, mode, verbose):
     letters(routes)
     expand_via_pdf(routes, nr, data)
     spacings, gaps = (ALL_SPACINGS, ALL_GAPS) if mode == "all" else (SPACINGS, HUB_GAPS)
