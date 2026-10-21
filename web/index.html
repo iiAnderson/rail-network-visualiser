@@ -28,6 +28,8 @@ body.embed #ctl{top:8px;right:8px}
   <label for="q"><b>Station</b></label>
   <input id="q" type="search" placeholder="Search name or code" autocomplete="off">
   <select id="s" aria-label="Station"></select>
+  <label id="mdw" style="display:none"><b>Model</b> <select id="md" aria-label="Layout model">
+    <option value="tree">Tree (hub-centred)</option><option value="loom">Network (graph layout)</option></select></label>
   <label id="pgw" style="display:none"><b>Services</b> <select id="pg" aria-label="Page of services"></select></label>
   <small id="n"></small>
 </header>
@@ -59,8 +61,15 @@ function fill() {
   n.textContent = s.options.length + " of " + all.length + " stations";
   show();
 }
+const md = document.getElementById("md"), hasLoom = all.some(r => r.loom);
+document.getElementById("mdw").style.display = hasLoom ? "" : "none";
 function show(ev) {
-  const r = all.find(x => x.crs === s.value), pg = document.getElementById("pg"), n = (r && r.pages) || 1;
+  const r = all.find(x => x.crs === s.value), pg = document.getElementById("pg");
+  let n = (r && r.pages) || 1;
+  const loom = md.value === "loom" && r && r.loom;
+  if (md.value === "loom" && r && !r.loom) say("No network map for this station: showing the tree map");
+  MAXK = loom ? 80 : 12;   // the network maps are large: allow much deeper zoom
+  if (loom) n = 1;
   if (!ev || ev.target !== pg) {  // a new station: rebuild the page list
     pg.innerHTML = "";
     for (let i = 1; i <= n; i++) {
@@ -71,11 +80,16 @@ function show(ev) {
   }
   document.getElementById("pgw").style.display = n > 1 ? "" : "none";
   const k = parseInt(pg.value || "1", 10);
-  if (s.value) { m.src = s.value + (k > 1 ? "_" + k : "") + ".svg"; try { location.hash = s.value; } catch (e) {} }
+  if (s.value) {
+    m.src = loom ? "loom/" + s.value + ".svg" : s.value + (k > 1 ? "_" + k : "") + ".svg";
+    try { location.hash = s.value + (md.value === "loom" ? "~loom" : ""); } catch (e) {}
+  }
 }
+md.onchange = show;
 document.getElementById("pg").onchange = show;
 q.oninput = fill; s.onchange = show;
-const h = location.hash.slice(1); fill(); if (h && all.some(r => r.crs === h)) { s.value = h; show(); }
+const hh = location.hash.slice(1).split("~"), h = hh[0]; if (hh[1] === "loom") md.value = "loom";
+setTimeout(() => { fill(); if (h && all.some(r => r.crs === h)) { s.value = h; show(); } }, 0);   // after the declarations below
 
 // ---- pan / zoom: the image is resized (not CSS-scaled) so the SVG stays sharp at any zoom ----
 const embed = /[?&]embed=1\b/.test(location.search), stage = document.getElementById("stage"), hint = document.getElementById("hint");
@@ -85,7 +99,7 @@ if (embed) {
   const open = () => { x.href = location.pathname + (s.value ? "#" + s.value : ""); }; open(); addEventListener("hashchange", open);
 }
 let k = 1, ox = 0, oy = 0, ratio = 0, sw = 0, sh = 0, fitW = 0, ht;   // k: zoom over fit; ox/oy: image top-left in stage px
-const MAXK = 12, W = () => fitW * k, H = () => fitW * k * ratio;
+let MAXK = 12; const W = () => fitW * k, H = () => fitW * k * ratio;
 function say(t) { hint.textContent = t; hint.classList.add("on"); clearTimeout(ht); ht = setTimeout(() => hint.classList.remove("on"), 2600); }
 function clamp() {
   const w = W(), h = H(), pad = 40;

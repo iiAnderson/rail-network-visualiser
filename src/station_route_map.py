@@ -283,7 +283,7 @@ def build_tree(routes, hub):
         return x
 
     keep = collections.defaultdict(set)
-    for e in sorted(traffic, key=lambda e: -traffic[e]):
+    for e in sorted(traffic, key=lambda e: (-traffic[e], sorted(e))):
         a, b = tuple(e)
         ra, rb = find(a), find(b)
         if ra != rb:
@@ -294,7 +294,7 @@ def build_tree(routes, hub):
     q = collections.deque([hub])
     while q:
         u = q.popleft()
-        for v in sorted(keep[u], key=lambda v: -traffic[frozenset((u, v))]):
+        for v in sorted(keep[u], key=lambda v: (-traffic[frozenset((u, v))], v)):
             if v not in parent:
                 parent[v] = u
                 q.append(v)

@@ -23,6 +23,7 @@ import station_route_map as base
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = NR = None  # set before the pool is created so forked workers inherit them
 OUT = None
+SINGLE = False
 
 
 def rank_stations(data):
@@ -40,7 +41,11 @@ def rank_stations(data):
 def work(crs):
     started = time.time()
     try:
-        pages = hm.build_pages(DATA, NR, crs, verbose=False)
+        if SINGLE:   # every grouped pattern on one page
+            res = hm.build_map(DATA, NR, crs, verbose=False, mode="all")
+            pages = [res] if res else []
+        else:
+            pages = hm.build_pages(DATA, NR, crs, verbose=False)
         if not pages:
             return crs, "no routes", None, time.time() - started
         for k, (svg, routes, spacing, report, omitted) in enumerate(pages):
@@ -70,7 +75,7 @@ def write_selector(manifest, tph):
 
 
 def main():
-    global DATA, NR, OUT
+    global DATA, NR, OUT, SINGLE
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--patterns", required=True)
     ap.add_argument("--tiplocs", required=True)
@@ -82,8 +87,13 @@ def main():
     ap.add_argument("--stations", nargs="*", help="draw exactly these CRS codes instead of ranking")
     ap.add_argument("--timeout", type=float, default=20, help="minutes before one station is given up on")
     ap.add_argument("--force", action="store_true", help="redraw maps that already exist")
+    ap.add_argument("--engine", choices=[e[0] for e in hm.ENGINES], default="old",
+                    help="evidence: take stations between two stops from other services' calling patterns, then the PDF")
+    ap.add_argument("--single", action="store_true", help="one page per station with every service pattern on it")
     a = ap.parse_args()
 
+    SINGLE = a.single
+    hm.PDF_FILTER = [e for e in hm.ENGINES if e[0] == a.engine][0][1]
     OUT = os.path.abspath(a.out)
     os.makedirs(OUT, exist_ok=True)
     shutil.copy(os.path.join(HERE, "..", "web", "index.html"), os.path.join(OUT, "index.html"))

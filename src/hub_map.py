@@ -80,6 +80,39 @@ def detour(nr, p):
     return run / (straight * 2.5 + 120) * DETOUR_MAX
 
 
+PDF_FILTER = False    # insert stations other routes call at between two stops, else the PDF's, dropping those well off the straight line
+OFF_LINE_RATIO = 0.22  # (a station is off the line by more than this share of the hop ...
+OFF_LINE_MIN = 900.0   # ... and by more than this many metres)
+
+
+def evidence_chain(routes, pos, k, a, c):
+    """The stations between a and c that another route's timetable calls at, if any (the longest such
+    chain): real calling patterns are better evidence of the line a train takes than the PDF graph."""
+    best = None
+    for j, other in enumerate(routes):
+        if j == k or a not in pos[j] or c not in pos[j] or len(pos[j]) != len(other["seq"]):
+            continue   # (a route that calls at a station twice is a loop: its stretches are not a corridor)
+        i, m = pos[j][a], pos[j][c]
+        if abs(i - m) < 2:
+            continue
+        seq = other["seq"]
+        sub = seq[i:m + 1] if i < m else seq[m:i + 1][::-1]
+        if len(set(sub)) == len(sub) and (best is None or len(sub) > len(best)):
+            best = sub
+    return best
+
+
+def off_line(xy, a, c, b):
+    """True if b, inserted between a and c, lies far to the side of the line from a to c: the PDF graph can
+    link two stations the long way round (Clapham Junction to Vauxhall via Balham) and the train does not
+    pass the stations on that detour. Stations without coordinates are kept."""
+    if a not in xy or c not in xy or b not in xy:
+        return False
+    L = math.hypot(xy[c][0] - xy[a][0], xy[c][1] - xy[a][1]) or 1.0
+    perp = abs((xy[b][0] - xy[a][0]) * (xy[c][1] - xy[a][1]) - (xy[b][1] - xy[a][1]) * (xy[c][0] - xy[a][0])) / L
+    return perp > OFF_LINE_MIN and perp > OFF_LINE_RATIO * L
+
+
 def expand_via_pdf(routes, nr, data):
     """Insert, between two consecutive stops, the shown stations the service passes (per the PDF)."""
     if nr is None:
@@ -93,19 +126,23 @@ def expand_via_pdf(routes, nr, data):
         n = nr.match(c, data.names.get(c, c), data)
         if n is not None and n not in crs_of:
             node_of[c], crs_of[n] = n, c
-    for r in routes:
+    pos = [{c: i for i, c in reversed(list(enumerate(r["seq"])))} for r in routes]
+    for k, r in enumerate(routes):
         seq = r["seq"]
         out = [seq[0]]
         for c in seq[1:]:
             a = out[-1]
-            if a in node_of and c in node_of:
+            chain = evidence_chain(routes, pos, k, a, c) if PDF_FILTER else None
+            if chain:   # another service really calls at these stations between a and c
+                out += [cc for cc in chain[1:-1] if cc not in out and cc != c and cc != seq[-1] and not off_line(data.xy, a, c, cc)]
+            elif a in node_of and c in node_of:
                 p = nr.path(node_of[a], node_of[c])
                 if p and detour(nr, p) > DETOUR_MAX:
                     p = None  # the graph only links these two the long way round (e.g. via Tube lines)
                 if p and len(p) < 70:
                     for n in p[1:-1]:
                         cc = crs_of.get(n)
-                        if cc and cc not in out and cc != c and cc != seq[-1]:
+                        if cc and cc not in out and cc != c and cc != seq[-1] and not (PDF_FILTER and off_line(data.xy, a, c, cc)):
                             out.append(cc)
             out.append(c)
         r["path"] = out
@@ -630,11 +667,12 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
             if ls.distance(Point(P[n])) < w - 1:
                 dot_on_line += 1
                 where["dots"].append((data.names.get(n, n), "on a line", ab))
-    report = {"routes": len(routes), "loops": len(chords), "retrace": retrace, "dot_overlap": dot_overlap, "label_collision": int(label_fail),
+    stubs = fold_stubs(routes, P)
+    report = {"routes": len(routes), "loops": len(chords), "retrace": retrace, "stubs": stubs, "dot_overlap": dot_overlap, "label_collision": int(label_fail),
               "crossings": crossings, "branch_overlap": branch_overlap, "dot_on_line": dot_on_line,
               "leader_lines": len(leaders)}
     # every rule failure counts fully; each leader line (a label that could not sit by its dots) counts a little
-    failures = dot_overlap + int(label_fail) + crossings + branch_overlap + dot_on_line + retrace + 0.15 * len(leaders)
+    failures = dot_overlap + int(label_fail) + crossings + branch_overlap + dot_on_line + retrace + 0.15 * len(leaders) + (stubs if STUB_METRIC else 0)
 
     # ---- svg
     xs = [p[0] for p in P.values()] + [q.bounds[0] for q in placed] + [q.bounds[2] for q in placed]
@@ -704,10 +742,33 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
     return "\n".join(o), report, failures
 
 
+STUB_METRIC = False   # count stubs (see fold_stubs) as hard failures
+STUB_WEIGHT = 6       # a station that looks like a terminus misleads more than any single clash
+
+
+def fold_stubs(routes, P):
+    """Calls where a route's drawn line doubles back on itself at a station it does not end at: the line runs
+    into the station and leaves the way it came, so the station looks like a terminus (or the route like two)."""
+    n = 0
+    for r in routes:
+        dn = r["draw"]
+        for i in range(1, len(dn) - 1):
+            b = dn[i]
+            if b not in r["calls"] or b.startswith("j:") or dn[i - 1] not in P or b not in P or dn[i + 1] not in P:
+                continue
+            v1 = (P[b][0] - P[dn[i - 1]][0], P[b][1] - P[dn[i - 1]][1])
+            v2 = (P[dn[i + 1]][0] - P[b][0], P[dn[i + 1]][1] - P[b][1])
+            l1, l2 = math.hypot(*v1), math.hypot(*v2)
+            if l1 > 1 and l2 > 1 and (v1[0] * v2[0] + v1[1] * v2[1]) / (l1 * l2) < -0.85:
+                n += 1
+    return n
+
+
 def hard(rep):
     """Rule failures that count fully (leader lines are only a mild charge)."""
     # a route turning back on itself is the defect that misleads most, so it counts double
-    return sum(rep[k] for k in ("dot_overlap", "label_collision", "crossings", "branch_overlap", "dot_on_line")) + 2 * rep["retrace"]
+    return (sum(rep[k] for k in ("dot_overlap", "label_collision", "crossings", "branch_overlap", "dot_on_line"))
+            + 2 * rep["retrace"] + (STUB_WEIGHT * rep.get("stubs", 0) if STUB_METRIC else 0))
 
 
 def letters(routes):
@@ -811,6 +872,41 @@ def build_pages(data, nr, hub, verbose=True):
     finally:
         PAGE = ""
     return out
+
+
+# An engine is a named set of module settings; build_map_best draws a station with each and keeps the best.
+# name, PDF evidence + filter. (A new layout would add its own fields here.)
+ENGINES = [("old", False),
+           ("evidence", True)]
+
+
+def with_engine(cfg, fn):
+    """Run fn() with the given engine settings, restoring the module settings afterwards."""
+    global PDF_FILTER, STUB_METRIC
+    _name, pdf = cfg
+    saved = (PDF_FILTER, STUB_METRIC)
+    PDF_FILTER, STUB_METRIC = pdf, True
+    try:
+        return fn()
+    finally:
+        PDF_FILTER, STUB_METRIC = saved
+
+
+def build_map_best(data, nr, hub, verbose=False, mode="all"):
+    """Draw the station with each engine setting and keep the one with the fewest hard failures (stubs
+    included), so no station is ever drawn worse than the old engine would have drawn it."""
+    best = None
+    for cfg in ENGINES:
+        res = with_engine(cfg, lambda: build_map(data, nr, hub, verbose=False, mode=mode))
+        if res is None:
+            return None
+        res[3]["engine"] = cfg[0]
+        score = (with_engine(cfg, lambda: hard(res[3])), res[3]["leader_lines"])
+        if verbose:
+            print("   engine %-18s hard %d" % (cfg[0], score[0]))
+        if best is None or score < best[0]:
+            best = (score, res)
+    return best[1]
 
 
 def build_map(data, nr, hub, verbose=True, mode="clean"):
