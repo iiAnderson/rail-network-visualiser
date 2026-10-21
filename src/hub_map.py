@@ -676,7 +676,8 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
              % (f(htx), f(hty), hanchor, esc(hname), htxt))
     for n, tx, ty, anchor, rot, name, t in labels:
         tr = ' transform="rotate(%d %s %s)"' % (rot, f(tx), f(ty)) if rot else ""
-        o.append('<text x="%s" y="%s" font-size="%s" fill="#1a1a1a" text-anchor="%s"%s><tspan font-weight="500">%s'
+        o.append('<text x="%s" y="%s" font-size="%s" fill="#1a1a1a" text-anchor="%s" stroke="#fff" stroke-width="4" '
+                 'stroke-linejoin="round" paint-order="stroke"%s><tspan font-weight="500">%s'
                  '</tspan><tspan dx="6" font-size="12" fill="#c2185b" font-weight="700">%s</tspan></text>'
                  % (f(tx), f(ty), FONT, anchor, tr, esc(name), t))
         for j, rid in enumerate(end_label.get(n, [])):
