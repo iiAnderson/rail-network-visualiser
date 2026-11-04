@@ -81,25 +81,42 @@ def detour(nr, p):
 
 
 PDF_FILTER = False    # insert stations other routes call at between two stops, else the PDF's, dropping those well off the straight line
+EVIDENCE_DETOUR = 1.45  # an evidence chain longer than this times the straight line is another line (see evidence_chain)
+EVIDENCE_PASSES = 4     # passes of refine_by_evidence (a stretch filled in from another route can fill in a third)
+MERGE_SLACK = 0.03      # two stopping patterns between the same stations are one line if merged they are this close to as direct
 OFF_LINE_RATIO = 0.22  # (a station is off the line by more than this share of the hop ...
 OFF_LINE_MIN = 900.0   # ... and by more than this many metres)
 
 
-def evidence_chain(routes, pos, k, a, c):
-    """The stations between a and c that another route's timetable calls at, if any (the longest such
-    chain): real calling patterns are better evidence of the line a train takes than the PDF graph."""
-    best = None
-    for j, other in enumerate(routes):
-        if j == k or a not in pos[j] or c not in pos[j] or len(pos[j]) != len(other["seq"]):
+def evidence_chain(seqs, pos, k, a, c, xy=None):
+    """The stations between a and c that another route's timetable calls at, if any: real calling patterns are
+    better evidence of the line a train takes than the PDF graph. A chain is judged whole by how direct it is
+    (its length over the straight line, chain_ratio): one longer than EVIDENCE_DETOUR is another line that also
+    links a and c (Leeds-York via Harrogate) and is not used. Of the rest the one with the most stations wins
+    (a short chain is always nearly straight, so directness alone would pick it), then the more direct.
+    seqs[j]: the stations of route j (its stops, or later its whole path); pos[j]: station -> index in seqs[j]."""
+    cands = []
+    for j, seq in enumerate(seqs):
+        if j == k or a not in pos[j] or c not in pos[j] or len(pos[j]) != len(seq):
             continue   # (a route that calls at a station twice is a loop: its stretches are not a corridor)
         i, m = pos[j][a], pos[j][c]
         if abs(i - m) < 2:
             continue
-        seq = other["seq"]
         sub = seq[i:m + 1] if i < m else seq[m:i + 1][::-1]
-        if len(set(sub)) == len(sub) and (best is None or len(sub) > len(best)):
-            best = sub
-    return best
+        if len(set(sub)) == len(sub):
+            cands.append((chain_ratio(xy, sub) if xy else 1.0, sub))
+    cands = [(q, sub) for q, sub in cands if q <= EVIDENCE_DETOUR]
+    return max(cands, key=lambda t: (len(t[1]), -t[0]))[1] if cands else None
+
+
+def chain_ratio(xy, chain):
+    """Length of a chain of stations over the straight line between its ends (stations without coordinates are
+    skipped; 1.0 when too few have them)."""
+    pts = [xy[s] for s in chain if s in xy]
+    if len(pts) < 2:
+        return 1.0
+    run = sum(math.hypot(q[0] - p[0], q[1] - p[1]) for p, q in zip(pts, pts[1:]))
+    return run / (math.hypot(pts[-1][0] - pts[0][0], pts[-1][1] - pts[0][1]) or 1.0)
 
 
 def off_line(xy, a, c, b):
@@ -132,9 +149,12 @@ def expand_via_pdf(routes, nr, data):
         out = [seq[0]]
         for c in seq[1:]:
             a = out[-1]
-            chain = evidence_chain(routes, pos, k, a, c) if PDF_FILTER else None
-            if chain:   # another service really calls at these stations between a and c
-                out += [cc for cc in chain[1:-1] if cc not in out and cc != c and cc != seq[-1] and not off_line(data.xy, a, c, cc)]
+            chain = evidence_chain([o["seq"] for o in routes], pos, k, a, c, data.xy) if PDF_FILTER else None
+            if chain:   # another service really calls at these stations between a and c: take them all (dropping
+                # some would join the ones kept by a line that is not there). A loop service (one that calls
+                # somewhere twice) really does pass some stations twice, so it takes the chain whole.
+                loop = len(set(seq)) != len(seq)
+                out += [cc for cc in chain[1:-1] if loop or (cc not in out and cc != c and cc != seq[-1])]
             elif a in node_of and c in node_of:
                 p = nr.path(node_of[a], node_of[c])
                 if p and detour(nr, p) > DETOUR_MAX:
@@ -146,7 +166,84 @@ def expand_via_pdf(routes, nr, data):
                             out.append(cc)
             out.append(c)
         r["path"] = out
+    if PDF_FILTER:
+        refine_by_evidence(routes, data.xy)
     close_triangles(routes, data)
+
+
+def refine_by_evidence(routes, xy):
+    """Fill in each route's path from the other routes' paths, until nothing changes. The first pass takes
+    chains from other routes' stops; a route that itself runs non-stop leaves a gap in such a chain (Gatwick
+    Express given Purley, East Croydon, Clapham Junction from a semi-fast that does not stop at Balham), and
+    drawn as it is the gap is a line that is not there (East Croydon-Clapham Junction, beside the real one).
+    Here a gap between two consecutive path stations is filled from another path that has stations between
+    them, judged by evidence_chain; a chain that would repeat a station already on the path is not used, except
+    by a loop service (one whose stops repeat a station: Waterloo-Kingston-Waterloo passes Vauxhall both ways)."""
+    for _ in range(EVIDENCE_PASSES):
+        seqs = [r["path"] for r in routes]
+        pos = [{c: i for i, c in reversed(list(enumerate(p)))} for p in seqs]
+        changed = False
+        for k, r in enumerate(routes):
+            path = r["path"]
+            loop = len(set(r["seq"])) != len(r["seq"])
+            out = [path[0]]
+            for c in path[1:]:
+                a = out[-1]
+                chain = evidence_chain(seqs, pos, k, a, c, xy)
+                if chain and (loop or not set(chain[1:-1]) & set(path)):
+                    out += chain[1:-1]
+                    changed = True
+                out.append(c)
+            r["path"] = out
+        if merge_stopping_patterns(routes, xy):
+            changed = True
+        if not changed:
+            break
+
+
+def merge_stopping_patterns(routes, xy, limit=500):
+    """merge_one_stopping_pattern until none is left. Returns True if any path changed."""
+    n = 0
+    while n < limit and merge_one_stopping_pattern(routes, xy):
+        n += 1
+    return n > 0
+
+
+def merge_one_stopping_pattern(routes, xy):
+    """Two routes that both run from a to c with no station in common between them, each calling at stations the
+    other passes, are one line with two stopping patterns (Garforth-East Garforth-Micklefield-York and
+    Garforth-Church Fenton-York: both pass all four), unless a and c are joined by two lines. Merged in order
+    along a->c, one line is about as direct as the more roundabout of the two, while two lines zig-zag between
+    them; so the stretches are merged (in both routes) when the merged chain is within MERGE_SLACK of the less
+    direct one and under EVIDENCE_DETOUR. Merges one stretch; returns True if it did."""
+    for x in routes:
+        for y in routes:
+            if x is y:
+                continue
+            px, py = x["path"], y["path"]
+            if len(set(px)) != len(px) or len(set(py)) != len(py):
+                continue   # a route that calls somewhere twice is a loop, not a corridor
+            ipy = {c: i for i, c in enumerate(py)}
+            shared = [(i, c) for i, c in enumerate(px) if c in ipy]
+            for (i, a), (k, c) in zip(shared, shared[1:]):
+                ja, jc = ipy[a], ipy[c]
+                if k - i < 2 or abs(jc - ja) < 2:
+                    continue   # one of the two runs a-c without stopping: refine_by_evidence fills that in
+                sx = px[i:k + 1]
+                sy = py[ja:jc + 1] if ja < jc else py[jc:ja + 1][::-1]
+                inner = set(sx[1:-1]) | set(sy[1:-1])
+                if set(sx[1:-1]) & set(sy[1:-1]) or not all(s in xy for s in inner | {a, c}):
+                    continue
+                ax, ay = xy[a]
+                dx, dy = xy[c][0] - ax, xy[c][1] - ay
+                merged = [a] + sorted(inner, key=lambda s: (xy[s][0] - ax) * dx + (xy[s][1] - ay) * dy) + [c]
+                q = chain_ratio(xy, merged)
+                if q > EVIDENCE_DETOUR or q > max(chain_ratio(xy, sx), chain_ratio(xy, sy)) + MERGE_SLACK:
+                    continue
+                x["path"] = px[:i] + merged + px[k + 1:]
+                y["path"] = (py[:ja] + merged + py[jc + 1:]) if ja < jc else (py[:jc] + merged[::-1] + py[ja + 1:])
+                return True   # paths changed under the loops: the caller starts again
+    return False
 
 
 def close_triangles(routes, data):
@@ -199,11 +296,14 @@ def quad(p0, p1, p2, t):
 
 
 def path_geom(rid, nodes, off, P):
-    """SVG path data plus a polyline sample of it (for crossing checks)."""
-    d, pts = [], []
+    """SVG path data plus a polyline sample of it (for crossing checks). Turns are collected first, then drawn:
+    two corners that fall on one point and cancel out (a jog of zero length) are dropped, and a corner's radius
+    shrinks to fit a short segment, so neither draws a zig-zag. (Blocks engine only for now: the tree engine's
+    output stays as it was.)"""
+    tidy = LAYOUT == "blocks"
     first = add(P[nodes[0]], off(rid, nodes[0], nodes[1]))
-    d.append("M%s %s" % (f(first[0]), f(first[1])))
-    pts.append(first)
+    end = add(P[nodes[-1]], off(rid, nodes[-2], nodes[-1]))
+    ops = []      # ("L", point) | ("T", p1, c1, c2, e) | ("C", c, t1, t2)
     for i in range(1, len(nodes) - 1):
         a, v, b = nodes[i - 1], nodes[i], nodes[i + 1]
         o1, o2 = off(rid, a, v), off(rid, v, b)
@@ -212,24 +312,56 @@ def path_geom(rid, nodes, off, P):
         cross = t1[0] * t2[1] - t1[1] * t2[0]
         if abs(cross) < 1e-6 and t1[0] * t2[0] + t1[1] * t2[1] < 0:
             # the route turns round here (out to a spur's end station and back): go all the way out
-            d.append("L%s %s" % (f(p1[0]), f(p1[1])))
-            pts.append(p1)
+            ops.append(("L", p1))
             continue
         if abs(cross) < 1e-6:
             if abs(o1[0] - o2[0]) < 1e-6 and abs(o1[1] - o2[1]) < 1e-6:
                 continue
             T = base.TRANSITION
             e = add(p2, t2, T)
-            c1, c2 = add(p1, t1, T * 0.55), add(e, t2, -T * 0.55)
+            ops.append(("T", p1, add(p1, t1, T * 0.55), add(e, t2, -T * 0.55), e))
+        else:
+            ops.append(("C", base.intersect(p1, t1, p2, t2), t1, t2))
+    # a jog that collapsed: two corners on one point, the second undoing the first
+    k = 0
+    while tidy and k + 1 < len(ops):
+        x, y = ops[k], ops[k + 1]
+        if x[0] == "C" and y[0] == "C" and math.dist(x[1], y[1]) < 0.5:
+            if abs(x[2][0] - y[3][0]) < 1e-6 and abs(x[2][1] - y[3][1]) < 1e-6:
+                del ops[k:k + 2]
+            else:
+                ops[k:k + 2] = [("C", x[1], x[2], y[3])]
+            continue
+        k += 1
+
+    def exit_pt(o):
+        return o[1] if o[0] in ("L", "C") else o[4]
+
+    def entry_pt(o):
+        return o[1]
+
+    d = ["M%s %s" % (f(first[0]), f(first[1]))]
+    pts = [first]
+    for k, o in enumerate(ops):
+        if o[0] == "L":
+            d.append("L%s %s" % (f(o[1][0]), f(o[1][1])))
+            pts.append(o[1])
+        elif o[0] == "T":
+            _, p1, c1, c2, e = o
             d.append("L%s %s C%s %s %s %s %s %s" % (f(p1[0]), f(p1[1]), f(c1[0]), f(c1[1]), f(c2[0]), f(c2[1]),
                                                    f(e[0]), f(e[1])))
-            pts += [cubic(p1, c1, c2, e, k / 8) for k in range(9)]
+            pts += [cubic(p1, c1, c2, e, j / 8) for j in range(9)]
         else:
-            c = base.intersect(p1, t1, p2, t2)
-            s, e = add(c, t1, -base.CORNER_R), add(c, t2, base.CORNER_R)
-            d.append("L%s %s Q%s %s %s %s" % (f(s[0]), f(s[1]), f(c[0]), f(c[1]), f(e[0]), f(e[1])))
-            pts += [quad(s, c, e, k / 6) for k in range(7)]
-    end = add(P[nodes[-1]], off(rid, nodes[-2], nodes[-1]))
+            _, c, t1, t2 = o
+            prev = exit_pt(ops[k - 1]) if k else first
+            nxt = entry_pt(ops[k + 1]) if k + 1 < len(ops) else end
+            # half a segment shared with another corner, all of one that runs straight to an end or transition
+            r_in = math.dist(prev, c) * (0.5 if k and ops[k - 1][0] == "C" else 1.0)
+            r_out = math.dist(c, nxt) * (0.5 if k + 1 < len(ops) and ops[k + 1][0] == "C" else 1.0)
+            r = min(base.CORNER_R, r_in, r_out) if tidy else base.CORNER_R
+            s_, e_ = add(c, t1, -r), add(c, t2, r)
+            d.append("L%s %s Q%s %s %s %s" % (f(s_[0]), f(s_[1]), f(c[0]), f(c[1]), f(e_[0]), f(e_[1])))
+            pts += [quad(s_, c, e_, j / 6) for j in range(7)]
     d.append("L%s %s" % (f(end[0]), f(end[1])))
     pts.append(end)
     return " ".join(d), pts
@@ -862,8 +994,10 @@ def render_has_chords(data, hub, routes):
 
 
 ALL_MIN_TPH = 0.1   # the "all service patterns" view draws every grouped pattern down to this frequency
-ALL_SPACINGS = (250, 130, 80, 52)
+ALL_SPACINGS = (250, 160, 130, 115, 100, 80, 52)
 ALL_GAPS = (80, 170)
+COMPACT_SLACK = 2.0    # blocks engine: a spacing within this many hard failures of the best ...
+COMPACT_RATIO = 0.05   # ... or this share of the best, counts as good enough, and the tightest such spacing wins
 
 
 def _omitted_text(data, every, covered):
@@ -994,6 +1128,10 @@ def _render_best(data, nr, hub, routes, omitted, mode, verbose):
 
     def pick(rs):
         best = min(r[1][0] for r in rs)  # fewest hard failures first, then the fewest leader lines, then tightest
+        if LAYOUT == "blocks":
+            # a few more failures are worth a much smaller map: within the margin, the tightest spacing wins
+            ok = [r for r in rs if r[1][0] <= best + max(COMPACT_SLACK, COMPACT_RATIO * best)]
+            return min(ok, key=lambda r: (r[0], r[1][0], r[1][1]))
         return min((r for r in rs if r[1][0] == best), key=lambda r: (r[1][1], r[0]))
 
     chosen = pick(search(True))

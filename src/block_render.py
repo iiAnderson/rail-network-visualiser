@@ -29,12 +29,27 @@ def _ends(key):
     return key[0] <= END_KEY + 1e6
 
 
-def consistent_order(rs, future, past):
+def _before(ka, kb):
+    """True if key ka orders its route left of kb's, False if right, None if neither: equal, or they first
+    differ where one of the two routes has ended (it is free to sit either side there)."""
+    for x, y in zip(ka, kb):
+        if x == y:
+            continue
+        if x <= END_KEY + 1e6 or y <= END_KEY + 1e6:
+            return None
+        return x < y
+    return None
+
+
+def consistent_order(rs, future, past, stops=None):
     """Left-to-right order of the routes on a corridor. Where routes go after the far junction orders them;
     where they came from before the near junction orders them too, as far as that agrees. A route that ends
     inside the corridor is unconstrained at the far end (and one that starts inside, at the near end); two
     such routes keep the order of their end points. A past constraint that contradicts the future ones is
-    dropped: the crossing then sits at the near junction, as it must."""
+    dropped: the crossing then sits at the near junction, as it must. stops[r] (optional): the stations r calls
+    at inside the corridor; a route left free by an end is then moved next to routes that stop where it does, so
+    a station's dots sit side by side under one label (Streatham Common: the two stopping trains, not the two
+    outer lanes of a bundle of fast ones)."""
     adj = {r: set() for r in rs}
 
     def constraints(key):
@@ -42,7 +57,7 @@ def consistent_order(rs, future, past):
         out = []
         for a in rs:
             for b in rs:
-                if a != b and not _ends(key[a]) and not _ends(key[b]) and key[a] < key[b]:
+                if a != b and not _ends(key[a]) and not _ends(key[b]) and _before(key[a], key[b]):
                     out.append((a, b))
         return out
 
@@ -76,7 +91,35 @@ def consistent_order(rs, future, past):
             indeg[b] -= 1
             if indeg[b] == 0:
                 avail.append(b)
-    return out + sorted(r for r in rs if r not in out)
+    out = out + sorted(r for r in rs if r not in out)
+    if stops:
+        out = _group_stoppers(out, adj, stops, reaches)
+    return out
+
+
+def _group_stoppers(out, adj, stops, reaches):
+    """Move each route to the allowed position (no ordering constraint broken) next to the most routes that stop
+    at the same stations on this corridor, when that is more than it has now."""
+    def score(order, i):
+        r = order[i]
+        return sum(1 for j in (i - 1, i + 1) if 0 <= j < len(order) and stops.get(order[j]) == stops[r])
+
+    for r in list(out):
+        if not stops.get(r):
+            continue
+        i = out.index(r)
+        best, best_s = None, score(out, i)
+        rest = out[:i] + out[i + 1:]
+        for k in range(len(rest) + 1):
+            if any(reaches(r, x) for x in rest[:k]) or any(reaches(y, r) for y in rest[k:]):
+                continue
+            trial = rest[:k] + [r] + rest[k:]
+            sc = score(trial, k)
+            if sc > best_s:
+                best, best_s = trial, sc
+        if best is not None:
+            out = best
+    return out
 
 
 def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
@@ -164,6 +207,7 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
             w0, w1 = (i0, i1) if fwd else (len(path) - 1 - i1, len(path) - 1 - i0)
             uses[cid][r["id"]] = (w0, w1, walk)
     keys = {}
+    calls = {r["id"]: set(r["calls"]) for r in routes}
     for cid, rs in uses.items():
         st = ost[cid]
         for rid, (w0, w1, walk) in rs.items():
@@ -178,8 +222,10 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
             else:
                 past = (END_KEY + (len(st) - st.index(walk[w0])),)
             keys[(cid, rid)] = (future, past)
+        inner = set(st[1:-1])
+        stops = {rid: frozenset(inner & calls[rid]) for rid in rs}
         order[cid] = consistent_order(list(rs), {rid: keys[(cid, rid)][0] for rid in rs},
-                                      {rid: keys[(cid, rid)][1] for rid in rs})
+                                      {rid: keys[(cid, rid)][1] for rid in rs}, stops)
 
     # ---- offsets: per corridor, inherited from the corridor every route on it arrives by, so a route keeps its
     # lateral position through a junction (the hub's corridors are centred, as in the tree layout). The offset
@@ -200,6 +246,37 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
             p = None                    # a balloon: no single direction to carry on from
         pred[cid] = (p, 1.0 if (p is not None and ost[p][-1] == st[0]) else -1.0) if p is not None else None
 
+    def arrival(cid, p):
+        """Direction (unit vector) the routes of pred corridor p arrive at cid's first station in."""
+        v, pst = ost[cid][0], ost[p[0]]
+        if p[1] > 0 and pst[-1] == v and len(pst) > 1:
+            a = step_path(pst[-2], v)[-2]
+        elif p[1] < 0 and pst[0] == v and len(pst) > 1:
+            a = step_path(v, pst[1])[1]
+        else:
+            return None
+        return unit(P[a], P[v])
+
+    def jog_shift(cid, p):
+        """Sideways distance from the line the routes arrive on (through the junction) to the first segment of
+        cid's corridor polyline that runs parallel to it, if that segment comes within two segments of the
+        junction; None otherwise."""
+        poly = G["corridor_poly"].get(cid)
+        d = arrival(cid, p)
+        if not poly or d is None or len(poly) < 3:
+            return None
+        v = ost[cid][0]
+        if math.dist(poly[0], P[v]) > 0.5:
+            poly = poly[::-1]
+        if math.dist(poly[0], P[v]) > 0.5:
+            return None
+        nrm = (d[1], -d[0])
+        for q0, q1 in list(zip(poly, poly[1:]))[1:3]:
+            u = unit(q0, q1)
+            if abs(u[0] - d[0]) < 1e-6 and abs(u[1] - d[1]) < 1e-6:
+                return nrm[0] * (q0[0] - P[v][0]) + nrm[1] * (q0[1] - P[v][1])
+        return None
+
     def solve(cid, stack=()):
         if cid in offs:
             return offs[cid]
@@ -210,14 +287,44 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
             po = solve(p[0], stack + (cid,))
             # keep the inherited offsets only while the bundle stays about as compact as a centred one: the
             # layout kept corridors apart by their own lane counts, so a lone route cannot ride 20 px off its axis
-            if all(rid in po for rid in rs) and max(abs(po[rid]) for rid in rs) <= (n - 1) / 2 * PITCH + PITCH + 1e-6:
+            st = ost[cid]
+            # ... except straight on through a plain station where a side branch leaves (its first drawn step has
+            # no waypoint): re-centred there, the routes going on would jog sideways across the branch's lanes
+            straight_on = st[0] not in G["junctions"] and st[0] != hub and len(st) > 1 and len(step_path(st[0], st[1])) == 2
+            if all(rid in po for rid in rs) and (straight_on or max(abs(po[rid]) for rid in rs) <= (n - 1) / 2 * PITCH + PITCH + 1e-6):
                 offs[cid] = {rid: p[1] * po[rid] for rid in rs}
                 return offs[cid]
+            if all(rid in po for rid in rs):
+                # a corridor that leaves the junction by a short jog onto a line parallel to the one its routes
+                # arrive on (Streatham Hill beside Streatham Common at Balham): measured from that parallel line,
+                # the routes' arriving lanes may already be compact, so they keep them and run straight on
+                D = jog_shift(cid, p)
+                if D is not None:
+                    shifted = {rid: p[1] * po[rid] - D for rid in rs}
+                    if max(abs(v) for v in shifted.values()) <= (n - 1) / 2 * PITCH + PITCH + 1e-6:
+                        offs[cid] = shifted
+                        return offs[cid]
+                # re-centred, but in the order the routes arrive in, so they do not swap sides at the junction
+                rs = sorted(rs, key=lambda rid: -p[1] * po[rid])
         offs[cid] = {rid: ((n - 1) / 2 - i) * PITCH for i, rid in enumerate(rs)}
         return offs[cid]
 
     for cid in order:
         solve(cid)
+    # a side branch off a spoke leaves from a waypoint just beyond its station, straight on from the line it came
+    # by: on that stub its routes keep the lanes they arrived in, and move to the branch's own lanes only as it
+    # turns away (re-centred on the stub, they would cut across the routes going straight on, which keep theirs)
+    stub = collections.defaultdict(dict)
+    for cid, st in ost.items():
+        p = pred.get(cid)
+        if p is None or p[0] not in offs or cid not in offs or len(st) < 2:
+            continue
+        seq = step_path(st[0], st[1])
+        if len(seq) != 3 or seq[1] != "j:" + str(st[0]):
+            continue   # only the straight stub a spoke's side branch leaves by (not a corridor's own bend points)
+        po = offs[p[0]]
+        if all(rid in po for rid in offs[cid]):
+            stub[canon[(seq[0], seq[1])]].update({rid: p[1] * po[rid] for rid in offs[cid]})
     # drawn edges: lanes and offsets; an edge shared by several corridors (a junction stub) takes them all
     lanes, eoffs = {}, {}
     for ab, cids in cors_of_edge.items():
@@ -248,6 +355,11 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
                 here = {rid: ((n - 1) / 2 - i) * PITCH for i, rid in enumerate(rs)}
         lanes[ab] = sorted(here, key=lambda rid: -here[rid])
         eoffs[ab] = here
+    for ab, here in stub.items():
+        vals = sorted(here.values())
+        if set(here) == set(eoffs.get(ab, {})) and all(b - a >= PITCH - 1e-6 for a, b in zip(vals, vals[1:])):
+            eoffs[ab] = here
+            lanes[ab] = sorted(here, key=lambda rid: -here[rid])
     ext = {ab: (min(o.values()), max(o.values())) for ab, o in eoffs.items() if o}
 
     def off(rid, a, b):
@@ -275,6 +387,15 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
         bundle_r[n] = w + PITCH + 10
     # two wide bundles leaving the hub 45 degrees apart cross just outside the pill: allowed there, but reported
     bundle_r[hub] = max(bundle_r[hub] * 2.2, G["hub_r"] * 1.5 + PITCH)
+    # a junction's dots and capsule lie across its busiest line (York: across the main line, not the Harrogate
+    # line that happened to place it first)
+    for n in G["junctions"]:
+        if n == hub:
+            continue
+        busiest = max(((len(o), str(ab), ab) for ab, o in eoffs.items() if n in ab and o), default=None)
+        if busiest:
+            a, b = busiest[2]
+            G["tangent"][n] = math.atan2(P[b][1] - P[a][1], P[b][0] - P[a][0])
     scene = {"P": P, "hub_r": G["hub_r"], "off": off, "ext": ext, "lanes": lanes, "end_edge": end_edge,
              "is_leaf": lambda n: n in G["leaf"], "dirs": G["tangent"], "retrace": retrace,
              "n_loops": sum(1 for c in sk.corridors if c["block"] is not None),

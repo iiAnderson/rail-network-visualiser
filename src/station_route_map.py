@@ -167,9 +167,14 @@ def discover_routes(data, hub):
             continue
         # a route that is truncated: remember where it really goes
         far = c["ends"].most_common(1)[0][0]
-        routes.append({"toc": c["toc"], "seq": c["seq"], "tph": tph,
-                       "calls": {s for s in c["seq"] if c["calls"][s] / c["n"] >= 0.5},
-                       "true_ends": far})
+        calls = {s for s in c["seq"] if c["calls"][s] / c["n"] >= 0.5}
+        # the line is drawn out to the ends of seq: stations beyond the outermost ones most of the group calls at are
+        # the ends some of its trains run to (Cardiff on a CrossCountry group mostly from Birmingham), so they are
+        # stops too; without dots the line would run on past its last station to nowhere
+        idx = [i for i, s in enumerate(c["seq"]) if s in calls]
+        if idx:
+            calls |= set(c["seq"][:idx[0]]) | set(c["seq"][idx[-1] + 1:])
+        routes.append({"toc": c["toc"], "seq": c["seq"], "tph": tph, "calls": calls, "true_ends": far})
     letters = [chr(65 + i) if i < 26 else str(i) for i in range(len(routes))]
     for r, l in zip(routes, letters):
         r["id"] = l

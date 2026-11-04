@@ -32,6 +32,9 @@ W_CROSS, W_OVERLAP, W_SLACK, W_BEND, W_DEV, W_LEN = 100.0, 30.0, 4.0, 1.5, 1.0, 
 STUB = 1.6             # a spoke leaving a block junction keeps this many SPACINGs clear (for separation only)
 CORNER_KEEP = 15.0     # stations keep this far from a bend
 J_DIST = 34.0          # junction waypoint distance beyond a tree junction (as station_route_map.place)
+TAIL_AFTER = 3        # on a spoke carrying one route, after this many stations ...
+TAIL_STEP = 0.6       # ... the next ones are this fraction of SPACING apart (long single-route tails stay compact)
+TAIL_MIN = 38.0       # (never closer than this)
 
 _CACHE = {}            # skeleton signature -> chosen directions, so the spacing search does not repeat the search
 _WARM = {}             # (corridor stations, end) -> last chosen direction; (corridor stations,) -> middle: a warm start
@@ -703,8 +706,9 @@ def layout(routes, hub, data, verbose=False):
                 jpt, first = None, spacing
         origin = G["P"][jpt] if jpt else pv
         prev = v
+        tail = max(spacing * TAIL_STEP, TAIL_MIN) if lanes[cid] == 1 else spacing
         for i, s in enumerate(st[1:]):
-            d = first + i * spacing
+            d = first + min(i, TAIL_AFTER) * spacing + max(0, i - TAIL_AFTER) * min(tail, spacing)
             G["P"][s] = (origin[0] + math.cos(th) * d, origin[1] + math.sin(th) * d)
             G["tangent"][s] = th
             G["edge_path"][(prev, s)] = ([prev, jpt, s] if (jpt and i == 0) else [prev, s])

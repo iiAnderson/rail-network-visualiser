@@ -31,9 +31,18 @@ Judge a map by its rule report (`retrace`, `stubs`, `crossings`, `junction_cross
 
 ## Current state (2026-11-04)
 
-The blocks engine is built and verified on toy networks only. Next step is `plans/BLOCK_LAYOUT.md`
-step 6: run London Victoria and Clapham Junction on real data, compare with the old engine, then
-Manchester Piccadilly and Leeds.
+The blocks engine runs on real data and beats the tree engine on CLJ, VIC and LDS (`fair` 15 / 12 / 81 against
+396 / 196 / 224). Compare engines with `python tools/compare_engines.py --label <name> --against <earlier>`
+(CLJ, VIC, LDS and the toy networks, both engines; maps and `results.json` in `maps/compare/<label>/`). Its `fair`
+score counts a junction crossing in full, so the tree engine (which reports none) is not flattered.
+
+Most bad drawings so far came from the station graph, not the layout: a gap in a route's path becomes a line that
+is not there and a fake loop. The evidence step (`hub_map.expand_via_pdf`) judges chains whole by directness,
+refills paths from other routes' paths (`refine_by_evidence`), merges two stopping patterns of one line
+(`merge_stopping_patterns`), and lets loop services pass a station twice. Check a new oddity's paths first.
+
+Known gaps: Leeds keeps 2 turn-backs and 4 stubs; some tph labels float off their station; the block direction
+cache key ignores spacing, so a layout depends on the spacings tried before it.
 
 ## Previews
 
