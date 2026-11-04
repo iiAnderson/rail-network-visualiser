@@ -256,9 +256,13 @@ def safe_buffers(pts, radius, chunk=10):
 
 
 PAGE = ""   # " (page 2 of 3)" while a later page of a station is drawn
+LAYOUT = "tree"   # "tree": spanning tree with patched loops; "blocks": cycles laid out as graphs (block_layout)
 
 
 def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
+    if LAYOUT == "blocks":
+        import block_render
+        return block_render.render(data, hub, routes, spacing, hub_gap, loops, omitted)
     base.SPACING = float(spacing)
     base.HUB_GAP = float(hub_gap)
     L = layout(routes, hub, data, loops)
@@ -380,6 +384,23 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
         d = unit(P[ab[0]], P[ab[1]])
         return (d[1] * s, -d[0] * s)
 
+    scene = {"P": P, "hub_r": hub_r, "off": off, "ext": ext, "lanes": lanes, "end_edge": end_edge,
+             "is_leaf": lambda n: not children.get(n), "dirs": L["dir"], "retrace": retrace, "n_loops": len(chords),
+             "junction_centres": []}
+    return draw_scene(data, hub, routes, scene, spacing, omitted)
+
+
+def draw_scene(data, hub, routes, scene, spacing, omitted=()):
+    """Draw routes whose draw-node lists, lane offsets and positions are decided: dots, interchange capsules,
+    labels, the rule report and the SVG. The tree layout (render) and the block layout (block_render) both
+    end here. scene: P (positions), hub_r, off(rid, a, b) (lane offset on a drawn edge), ext[ab] (min and max
+    offset on a drawn edge), lanes[ab] (route ids on it), end_edge[n] (the drawn edge that reaches station
+    n), is_leaf(n), dirs[n] (direction of the line through n), retrace, n_loops, junction_centres
+    ((node, radius) pairs where crossings are allowed but reported)."""
+    P, hub_r, off, ext, lanes = scene["P"], scene["hub_r"], scene["off"], scene["ext"], scene["lanes"]
+    end_edge, is_leaf, dirs = scene["end_edge"], scene["is_leaf"], scene["dirs"]
+    retrace, n_loops = scene["retrace"], scene["n_loops"]
+    junction_centres = [(Point(P[n]), rad) for n, rad in scene["junction_centres"]]
     colours = {r["id"]: PALETTE[i % len(PALETTE)] for i, r in enumerate(routes)}
     paths, dots = [], []
     end_leaf, end_label = collections.defaultdict(list), collections.defaultdict(list)
@@ -393,7 +414,7 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
         for end, nxt in ((dn[0], dn[1]), (dn[-1], dn[-2])):
             if end == hub:
                 continue
-            if not children.get(end):
+            if is_leaf(end):
                 end_leaf[end].append((r["id"], unit(P[nxt], P[end])))
             else:
                 end_label[end].append(r["id"])
@@ -434,7 +455,7 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
         obstacles.extend(safe_buffers(_pts, LINE_W / 2 + 2.3))
     caps = {}
     for n in interchange:
-        th = L["dir"].get(n, 0.0)
+        th = dirs.get(n, 0.0)
         c, s_ = math.cos(th), math.sin(th)
         ab = end_edge.get(n)
         mn, mx = ext.get(ab, (0.0, 0.0)) if ab else (0.0, 0.0)
@@ -514,7 +535,7 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
             x, y = P[n]
             name = data.names.get(n, n)
             tw = text_w(name, FONT) + 6 + text_w(fmt_tph(tph[n]), 12, True) + 24 * len(end_label.get(n, []))
-            th_n = L["dir"].get(n, 0.0)
+            th_n = dirs.get(n, 0.0)
             ab_n = end_edge.get(n)
             anchors = [(x, y)]
             if ab_n and ab_n in ext:
@@ -619,7 +640,7 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
     for rid, _, pts in paths:
         lines[rid].append(LineString(pts))
     centres = [(Point(P[hub]), hub_r * 1.5)] + [(Point(P[n]), caps[n][3] + 10) for n in caps]
-    crossings = 0
+    crossings = junction_crossings = 0
     ids = list(lines)
     for i, a in enumerate(ids):
         for b in ids[i + 1:]:
@@ -633,13 +654,16 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
                     for p in ([x] if x.geom_type == "Point" else
                               [g for g in getattr(x, "geoms", []) if g.geom_type == "Point"]):
                         if all(p.distance(c) > rad for c, rad in centres):
+                            if any(p.distance(c) <= rad for c, rad in junction_centres):
+                                junction_crossings += 1     # at a junction of the drawn graph: allowed, but reported
+                                continue
                             crossings += 1
                             if len(where["cross"]) < 40:
                                 nn = min((n for n in P if not n.startswith("j:")), key=lambda n: p.distance(Point(P[n])))
                                 where["cross"].append((a, b, data.names.get(nn, nn), round(p.distance(Point(P[nn]))), round(p.x), round(p.y)))
     # lines of different routes running on top of each other (closer than a lane gap) for any real length
     branch_overlap = 0
-    keep_out = [c.buffer(rad) for c, rad in centres]
+    keep_out = [c.buffer(rad) for c, rad in centres + junction_centres]
     thin = {rid: [g for ln in lns for g in safe_buffers(list(ln.coords), 2.4)] for rid, lns in lines.items()}
     for i, a_ in enumerate(ids):
         for b_ in ids[i + 1:]:
@@ -668,11 +692,11 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
                 dot_on_line += 1
                 where["dots"].append((data.names.get(n, n), "on a line", ab))
     stubs = fold_stubs(routes, P)
-    report = {"routes": len(routes), "loops": len(chords), "retrace": retrace, "stubs": stubs, "dot_overlap": dot_overlap, "label_collision": int(label_fail),
-              "crossings": crossings, "branch_overlap": branch_overlap, "dot_on_line": dot_on_line,
+    report = {"routes": len(routes), "loops": n_loops, "retrace": retrace, "stubs": stubs, "dot_overlap": dot_overlap, "label_collision": int(label_fail),
+              "crossings": crossings, "junction_crossings": junction_crossings, "branch_overlap": branch_overlap, "dot_on_line": dot_on_line,
               "leader_lines": len(leaders)}
     # every rule failure counts fully; each leader line (a label that could not sit by its dots) counts a little
-    failures = dot_overlap + int(label_fail) + crossings + branch_overlap + dot_on_line + retrace + 0.15 * len(leaders) + (stubs if STUB_METRIC else 0)
+    failures = dot_overlap + int(label_fail) + crossings + 0.5 * junction_crossings + branch_overlap + dot_on_line + retrace + 0.15 * len(leaders) + (stubs if STUB_METRIC else 0)
 
     # ---- svg
     xs = [p[0] for p in P.values()] + [q.bounds[0] for q in placed] + [q.bounds[2] for q in placed]
@@ -768,12 +792,16 @@ def hard(rep):
     """Rule failures that count fully (leader lines are only a mild charge)."""
     # a route turning back on itself is the defect that misleads most, so it counts double
     return (sum(rep[k] for k in ("dot_overlap", "label_collision", "crossings", "branch_overlap", "dot_on_line"))
-            + 2 * rep["retrace"] + (STUB_WEIGHT * rep.get("stubs", 0) if STUB_METRIC else 0))
+            + 2 * rep["retrace"] + 0.5 * rep.get("junction_crossings", 0)
+            + (STUB_WEIGHT * rep.get("stubs", 0) if STUB_METRIC else 0))
 
 
 def letters(routes):
     for i, r in enumerate(routes):
         r["id"] = chr(65 + i) if i < 26 else str(i)
+
+
+PROBE_BUDGET = 80    # direction-search evaluations per block while probing a route set (the full search is for the final map)
 
 
 def probe(data, nr, hub, routes, spacings=None):
@@ -783,7 +811,14 @@ def probe(data, nr, hub, routes, spacings=None):
     expand_via_pdf(trial, nr, data)
     # each loop is judged later, so a trial gets the better of every loop drawn and none drawn
     parent, _ = base.build_tree(trial, hub)
-    modes = (True, False) if base.find_chords(trial, parent) else (True,)
+    modes = (True, False) if LAYOUT == "tree" and base.find_chords(trial, parent) else (True,)
+    if LAYOUT == "blocks":
+        import block_layout
+        saved, block_layout.BUDGET = block_layout.BUDGET, PROBE_BUDGET
+        try:
+            return min(hard(render(data, hub, trial, sp, hg)[1]) for sp, hg in (spacings or PROBE_SPACINGS))
+        finally:
+            block_layout.BUDGET = saved
     return min(hard(render(data, hub, trial, sp, hg, lp)[1]) for sp, hg in (spacings or PROBE_SPACINGS) for lp in modes)
 
 
@@ -875,21 +910,30 @@ def build_pages(data, nr, hub, verbose=True):
 
 
 # An engine is a named set of module settings; build_map_best draws a station with each and keeps the best.
-# name, PDF evidence + filter. (A new layout would add its own fields here.)
-ENGINES = [("old", False),
-           ("evidence", True)]
+# name, PDF evidence + filter, layout.
+ENGINES = [("old", False, "tree"),
+           ("evidence", True, "tree"),
+           ("blocks", True, "blocks")]
+
+
+def engine(name):
+    return next(e for e in ENGINES if e[0] == name)
+
+
+def set_engine(cfg):
+    global PDF_FILTER, LAYOUT
+    PDF_FILTER, LAYOUT = cfg[1], cfg[2]
 
 
 def with_engine(cfg, fn):
     """Run fn() with the given engine settings, restoring the module settings afterwards."""
-    global PDF_FILTER, STUB_METRIC
-    _name, pdf = cfg
-    saved = (PDF_FILTER, STUB_METRIC)
-    PDF_FILTER, STUB_METRIC = pdf, True
+    global PDF_FILTER, STUB_METRIC, LAYOUT
+    saved = (PDF_FILTER, STUB_METRIC, LAYOUT)
+    PDF_FILTER, STUB_METRIC, LAYOUT = cfg[1], True, cfg[2]
     try:
         return fn()
     finally:
-        PDF_FILTER, STUB_METRIC = saved
+        PDF_FILTER, STUB_METRIC, LAYOUT = saved
 
 
 def build_map_best(data, nr, hub, verbose=False, mode="all"):
@@ -954,7 +998,7 @@ def _render_best(data, nr, hub, routes, omitted, mode, verbose):
 
     chosen = pick(search(True))
     parent, _ = base.build_tree(routes, hub)
-    chords = sorted(base.find_chords(routes, parent), key=sorted)
+    chords = sorted(base.find_chords(routes, parent), key=sorted) if LAYOUT == "tree" else []
     if chosen[1][0] > 0 and chords:
         # a loop that does not help (or makes things worse) is dropped on its own, so trouble elsewhere
         # on the map cannot decide it; each is judged at the layout already chosen
@@ -980,8 +1024,11 @@ def main():
     ap.add_argument("--network", default=None, help="nr_schematic.json from extract_nr_schematic.py (optional)")
     ap.add_argument("--mode", choices=("clean", "all"), default="clean",
                     help="clean: legible routes; all: every grouped service pattern")
+    ap.add_argument("--engine", choices=[e[0] for e in ENGINES], default="old",
+                    help="blocks: cycles laid out as graphs; evidence: tree layout with evidence-first expansion")
     ap.add_argument("-v", action="store_true")
     a = ap.parse_args()
+    set_engine(engine(a.engine))
     os.makedirs(a.out, exist_ok=True)
     data = Data(a.patterns, a.tiplocs)
     nr = load_network(a.network, data)

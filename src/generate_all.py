@@ -93,7 +93,7 @@ def main():
     a = ap.parse_args()
 
     SINGLE = a.single
-    hm.PDF_FILTER = [e for e in hm.ENGINES if e[0] == a.engine][0][1]
+    hm.set_engine(hm.engine(a.engine))
     OUT = os.path.abspath(a.out)
     os.makedirs(OUT, exist_ok=True)
     shutil.copy(os.path.join(HERE, "..", "web", "index.html"), os.path.join(OUT, "index.html"))

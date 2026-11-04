@@ -1,5 +1,6 @@
 pandas>=2.2
 numpy>=1.26
 shapely>=2.0
+scipy>=1.11      # the blocks layout engine (linear program)
 # only for src/extract_nr_schematic.py:
 # pymupdf

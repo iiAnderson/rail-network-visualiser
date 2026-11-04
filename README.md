@@ -66,7 +66,7 @@ The per-map report looks like
 
 ```bash
 git clone git@github.com:iiAnderson/rail-network-visualiser.git && cd rail-network-visualiser
-python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
+python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt scipy
 python -m pytest tests            # smoke test on an invented network, no data needed
 
 # one station (CRS code), then open maps/BRI.svg
@@ -131,6 +131,9 @@ python3 -m venv /tmp/nrvenv && /tmp/nrvenv/bin/pip install pymupdf
 ```
 src/hub_map.py               the map builder and rule checks (start here)
 src/station_route_map.py     data loading, route discovery, tree layout, shared helpers
+src/skeleton.py              junctions and corridors of a station graph; src/loops.py finds its blocks
+src/block_layout.py          the blocks engine: octilinear layout of each block (linear program), spokes elsewhere
+src/block_render.py          lanes on the drawn graph; drawing is shared with the tree engine (hub_map.draw_scene)
 src/nr_route_map.py          loads the PDF-derived network; label placement helpers
 src/extract_nr_schematic.py  one-off: PDF -> data/nr_schematic.json
 src/generate_all.py          batch runner + station selector page
@@ -148,11 +151,34 @@ spacing. It is kept for its helper code; the maps were clearer on the evenly spa
 Everything is a constant at the top of `src/hub_map.py` / `src/station_route_map.py`:
 `WINDOW` (hours), `MAX_ROUTES`, `MIN_ROUTES`, `ROUTE_TOLERANCE`, `MIN_TPH`, `HUB_GAPS`, `SPACINGS`, `MAJOR_TPH`, `LABEL_MAX`, `PITCH` (lane gap).
 
+## Layout engines
+
+`--engine old` (the default) lays the station graph out as a spanning tree with patched loops. Where two
+corridors join the same places (Horsham via Dorking or via Crawley, Doncaster–Sheffield via Rotherham or via
+Meadowhall) a tree has no loop: the quieter corridor becomes a spur and a route on it folds back, or is left
+off the page. `--engine blocks` lays out the cyclic part of the graph as a graph instead
+(`plans/BLOCK_LAYOUT.md`): the station graph is split into 2-edge-connected blocks and bridges; inside a
+block, chains of stations collapse to corridors between junctions; each junction's corridor ends take
+compass directions in their real angular order; a linear program places the junctions and sizes the
+corridor segments so every cycle closes and every corridor fits its stations, with separation constraints
+added where two corridors come too close; stations are spaced along their corridor; the bridges hang off
+as spokes exactly as the tree engine draws them. Routes walk their real stations, so a fold-back is only
+ever a real reversal in the timetable. Lanes on a corridor are ordered by where each route goes after the
+far junction (then where it came from), and a crossing inside a junction counts half (`junction_crossings`).
+
+```bash
+python src/hub_map.py VIC CLJ --engine blocks --mode all --patterns ... --tiplocs ... --network ...
+python src/generate_all.py --engine blocks ...
+```
+
+`pip install scipy` first (the linear program). `hub_map.build_map_best` draws a station with every engine
+and keeps the one with the fewest hard failures.
+
 ## Known limitations
 
-- Where two corridors join the same places (Doncaster–Sheffield via Rotherham or via Meadowhall) the
-  diagram has no loops: the quieter corridor becomes a spur. Routes that need such a loop are
-  left out rather than drawn badly, so Sheffield shows 8 of its 15 routes.
+- The `old` engine draws no loops: where two corridors join the same places the quieter corridor becomes a
+  spur, and routes that need the loop are left out rather than drawn badly. Use `--engine blocks` for
+  those stations.
 - Very dense areas (Reading–Swindon–Gloucester, London) can still end with a few label clashes or
   one crossing; the report says how many. Stations where the report lists failures are best checked by eye.
 - Stations not in `tiplocs.csv` (e.g. the Elizabeth line) show a TIPLOC as their name.
