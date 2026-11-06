@@ -277,6 +277,20 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
                 return nrm[0] * (q0[0] - P[v][0]) + nrm[1] * (q0[1] - P[v][1])
         return None
 
+    def close_gaps(o):
+        """Inherited lanes with holes where other routes turned off: the longest unbroken run of lanes stays where
+        it is and the rest close up beside it, keeping their order (one line moves over, not the whole bundle)."""
+        rs_ = sorted(o, key=lambda r: -o[r])
+        if len(rs_) < 2:
+            return o
+        runs, s = [], 0
+        for i in range(1, len(rs_) + 1):
+            if i == len(rs_) or abs((o[rs_[i - 1]] - o[rs_[i]]) - PITCH) > 1e-6:
+                runs.append((i - s, s))
+                s = i
+        _, s = max(runs, key=lambda t: (t[0], -abs(o[rs_[t[1]]])))
+        return {r: o[rs_[s]] - (i - s) * PITCH for i, r in enumerate(rs_)}
+
     def solve(cid, stack=()):
         if cid in offs:
             return offs[cid]
@@ -291,8 +305,15 @@ def render(data, hub, routes, spacing, hub_gap=80.0, loops=True, omitted=()):
             # ... except straight on through a plain station where a side branch leaves (its first drawn step has
             # no waypoint): re-centred there, the routes going on would jog sideways across the branch's lanes
             straight_on = st[0] not in G["junctions"] and st[0] != hub and len(st) > 1 and len(step_path(st[0], st[1])) == 2
+            if not straight_on and st[0] != hub and len(st) > 1:
+                # ... or straight on through a junction (the main line on through Clapham Junction while the Windsor
+                # lines turn off): re-centred, the whole bundle would jog sideways there
+                d_in = arrival(cid, p)
+                first = step_path(st[0], st[1])
+                d_out = unit(P[first[0]], P[first[1]])
+                straight_on = d_in is not None and abs(d_in[0] - d_out[0]) < 1e-6 and abs(d_in[1] - d_out[1]) < 1e-6
             if all(rid in po for rid in rs) and (straight_on or max(abs(po[rid]) for rid in rs) <= (n - 1) / 2 * PITCH + PITCH + 1e-6):
-                offs[cid] = {rid: p[1] * po[rid] for rid in rs}
+                offs[cid] = close_gaps({rid: p[1] * po[rid] for rid in rs})
                 return offs[cid]
             if all(rid in po for rid in rs):
                 # a corridor that leaves the junction by a short jog onto a line parallel to the one its routes

@@ -22,9 +22,9 @@ sys.path.insert(0, str(ROOT / "tools"))
 import hub_map as hm, station_route_map as base  # noqa: E402
 
 TOYS = ("horsham", "don", "vic", "clj", "big")
-COLS = ("fair", "hard", "cross", "junction_crossings", "retrace", "stubs", "label_collision", "dot_on_line",
+COLS = ("fair", "hard", "cross", "junction_crossings", "retrace", "stubs", "label_collision", "dot_on_line", "dot_off_route",
         "branch_overlap", "dot_overlap", "leader_lines", "spacing", "routes", "secs")
-SHORT = dict(junction_crossings="junc", label_collision="labels", dot_on_line="dotline", branch_overlap="overlap",
+SHORT = dict(junction_crossings="junc", label_collision="labels", dot_on_line="dotline", dot_off_route="offroute", branch_overlap="overlap",
              dot_overlap="dotdot", leader_lines="leaders")
 DATA = NR = None   # set before the pool forks
 

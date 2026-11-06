@@ -138,3 +138,18 @@ def test_nested_blocks_and_a_route_through_the_hub_twice(tmp_path, monkeypatch):
     assert len(routes) == 5
     assert rep["retrace"] == 0 and rep["stubs"] == 0 and rep["crossings"] == 0 and rep["dot_overlap"] == 0
     assert len(rep["blocks"]) == 3 and all(b["cross"] == 0 and b["slack"] < 0.5 for b in rep["blocks"].values())
+
+
+def test_every_stop_dot_sits_on_its_route(tmp_path, monkeypatch):
+    """A stop dot off its own route's line says the train stops where it does not run: a bundle turning at an
+    interchange (Reading, Didcot) used to spread its dots evenly along the capsule instead of on the lanes."""
+    import importlib.util, pathlib
+    spec = importlib.util.spec_from_file_location("toy_station", pathlib.Path(__file__).parent.parent / "tools" / "toy_station.py")
+    toy = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(toy)
+    for net in ("clj", "vic", "don", "horsham"):
+        xy, services, hub = toy.NETS[net]
+        data = toy.make(tmp_path / net if (tmp_path / net).mkdir() is None else tmp_path / net, xy, services)
+        for engine in ("blocks", "old"):
+            rep = build(data, hub, engine, monkeypatch)[3]
+            assert rep["dot_off_route"] == 0, (net, engine, rep["where"]["off_route"])

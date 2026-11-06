@@ -585,31 +585,151 @@ def draw_scene(data, hub, routes, scene, spacing, omitted=()):
     obstacles.append(pill)
     for _rid, _d, _pts in paths:  # labels must clear the real lines, not the whole bundle width
         obstacles.extend(safe_buffers(_pts, LINE_W / 2 + 2.3))
-    caps = {}
-    for n in interchange:
-        th = dirs.get(n, 0.0)
-        c, s_ = math.cos(th), math.sin(th)
-        ab = end_edge.get(n)
-        mn, mx = ext.get(ab, (0.0, 0.0)) if ab else (0.0, 0.0)
-        mid = (mn + mx) / 2
-        cx_, cy_ = P[n][0] + s_ * mid, P[n][1] - c * mid
-        hw = (mx - mn) / 2 + PITCH / 2 + 5
-        caps[n] = (cx_, cy_, math.degrees(th), hw)
-        obstacles.append(Polygon([(cx_ + x * c - y * s_, cy_ + x * s_ + y * c)
-                                  for x, y in [(-8, -hw), (8, -hw), (8, hw), (-8, hw)]]).buffer(3))
+    # every stop dot sits on its own route's drawn line, at the point of that line nearest where the lanes put it
+    # (on a straight line that is the same point; on a curve it is the point the line really passes)
+    route_line = collections.defaultdict(list)
+    for rid, _d, pts in paths:
+        if len(pts) >= 2:
+            route_line[rid].append(LineString(pts))
+    for i, (rid, n, pt) in enumerate(dots):
+        best = None
+        for ls in route_line.get(rid, []):
+            q = ls.interpolate(ls.project(Point(pt)))
+            if best is None or q.distance(Point(pt)) < best.distance(Point(pt)):
+                best = q
+        if best is not None:
+            dots[i] = (rid, n, (best.x, best.y))
+    # an interchange is drawn where its bundle runs straight: on the busiest drawn edge at the station, as close to
+    # the station as every stopping route on that edge is straight (not in the curve of a junction, where the lanes
+    # cross the station's own position at scattered points). Its dots go where the routes cross that cross-section,
+    # one lane apart, and the capsule lies across them; a stopping route that arrives another way keeps its
+    # snapped dot and the capsule reaches over to it.
+    def cross_section(n):
+        """Where an interchange's dots go: (direction across which the capsule lies, {route: dot position}, the
+        routes placed). Candidates: on each edge at n, the first point where all its stopping routes run straight
+        (12 px short of the far end); and lines through n at every 22.5 degrees, where each stopping route crosses
+        them (at a turn the lanes cross the corner's bisector side by side). A stopping route a candidate does not
+        reach gets the point of its own line nearest the candidate's centre. Dots in a row (at most 24 px deep)
+        first, then fewest dots closer than DOT_GAP, then the smallest capsule."""
+        stoppers = sorted({rid for rid, nn, _ in dots if nn == n})
+        if not stoppers:
+            return None
+
+        def nearest_on(rid, q):
+            pts = [ls.interpolate(ls.project(Point(q))) for ls in route_line.get(rid, [])]
+            best = min(pts, key=lambda x: x.distance(Point(q)), default=None)
+            return (best.x, best.y) if best is not None else None
+
+        def straight_at(rid, q, t):
+            """The route's line passes q running along t (not merely through q: just past a turn, a lane's point on
+            the cross-section can lie on the same route's line where it still runs the other way)."""
+            for ls in route_line.get(rid, []):
+                if ls.distance(Point(q)) >= 0.8:
+                    continue
+                s0 = ls.project(Point(q))
+                a_, b_ = ls.interpolate(max(0.0, s0 - 3)), ls.interpolate(min(ls.length, s0 + 3))
+                dx, dy = b_.x - a_.x, b_.y - a_.y
+                L_ = math.hypot(dx, dy)
+                if L_ > 1e-6 and abs(dx * t[1] - dy * t[0]) / L_ < 0.03:
+                    return True
+            return False
+
+        cands = []      # (t: direction the capsule lies across, {route: point}, centre)
+        for ab, order in lanes.items():
+            if n not in ab or not order:
+                continue
+            m = ab[1] if ab[0] == n else ab[0]
+            on = [rid for rid in order if rid in stoppers]
+            if not on:
+                continue
+            t, L = unit(P[n], P[m]), math.dist(P[n], P[m])
+            d = 0.0
+            while d <= L - 12:
+                C = (P[n][0] + t[0] * d, P[n][1] + t[1] * d)
+                pts_ = {rid: add(C, off(rid, n, m)) for rid in order}
+                if all(straight_at(rid, pts_[rid], t) for rid in on):
+                    cands.append((t, pts_, C))
+                    break
+                d += 2.0
+        reach = 2 * max([abs(v) for o in ext.values() for v in o] + [20.0]) + 40
+        for j in range(8):
+            th = j * math.pi / 8
+            u = (math.cos(th), math.sin(th))
+            seg = LineString([(P[n][0] - u[0] * reach, P[n][1] - u[1] * reach), (P[n][0] + u[0] * reach, P[n][1] + u[1] * reach)])
+            pts_ = {}
+            for rid in stoppers:
+                hits = []
+                for ls in route_line.get(rid, []):
+                    x = ls.intersection(seg)
+                    hits += [g for g in getattr(x, "geoms", [x]) if g.geom_type == "Point"]
+                if hits:
+                    q = min(hits, key=lambda g: g.distance(Point(P[n])))
+                    pts_[rid] = (q.x, q.y)
+            if pts_:
+                cands.append(((u[1], -u[0]), pts_, P[n]))
+
+        best = None
+        for t, pts_, C in cands:
+            dots_ = {}
+            for rid in stoppers:
+                q = pts_.get(rid) or nearest_on(rid, C)
+                if q is not None:
+                    dots_[rid] = q
+            ps = list(dots_.values())
+            close = sum(1 for i_ in range(len(ps)) for j_ in range(i_ + 1, len(ps)) if math.dist(ps[i_], ps[j_]) < DOT_GAP)
+            # the capsule: extent along t and across it, over the dots (and the bundle where the candidate has one)
+            v = (-t[1], t[0])
+            al = [(q[0] - C[0]) * t[0] + (q[1] - C[1]) * t[1] for q in ps]
+            ac = [(q[0] - C[0]) * v[0] + (q[1] - C[1]) * v[1] for q in list(pts_.values()) + ps]
+            area = (max(al) - min(al) + 16) * (max(ac) - min(ac) + 16)
+            # dots in a row across the line read as one station; scattered they do not, even with none too close
+            key = (max(al) - min(al) > 24, close, area)
+            if best is None or key < best[0]:
+                span = [q for rid, q in pts_.items()]
+                best = (key, t, dots_, span)
+        if best is None:
+            return None
+        _, t, dots_, span = best
+        return t, dots_, list(dots_), span
+
     by_stn = collections.defaultdict(list)
     for i, (rid, n, pt) in enumerate(dots):
         by_stn[n].append(i)
-    for n in caps:
-        idx = sorted(by_stn[n], key=lambda i: (dots[i][2][0] * -math.sin(math.radians(caps[n][2]))
-                                               + dots[i][2][1] * math.cos(math.radians(caps[n][2]))))
-        m = len(idx)
-        th = math.radians(caps[n][2])
-        for j, i in enumerate(idx):
-            sft = (j - (m - 1) / 2) * (DOT_GAP + 1.6)
-            rid, nn, _ = dots[i]
-            dots[i] = (rid, nn, (caps[n][0] - math.sin(th) * sft, caps[n][1] + math.cos(th) * sft))
-        caps[n] = (caps[n][0], caps[n][1], caps[n][2], max(caps[n][3], (m * (DOT_GAP + 1.6)) / 2 + 3))
+    caps = {}
+    for n in interchange:
+        cs = cross_section(n)
+        if cs is not None:
+            t, lane_pts, on, span = cs
+            for i in by_stn.get(n, []):
+                rid = dots[i][0]
+                if rid in on:
+                    dots[i] = (rid, n, lane_pts[rid])
+            th = math.atan2(t[1], t[0])
+            ref = lane_pts[on[0]]
+        else:
+            th = dirs.get(n, 0.0)
+            ref = P[n]
+            span = []
+        u, v = (math.cos(th), math.sin(th)), (-math.sin(th), math.cos(th))   # along the line, across it
+        a_lo = b_lo = math.inf
+        a_hi = b_hi = -math.inf
+        # (point, padding along the line, padding across it): the bundle's lanes, then the dots
+        marks = [(q, 8.0, PITCH / 2 + 5) for q in span] + [(dots[i][2], DOT_R + 4, DOT_R + 4) for i in by_stn.get(n, [])]
+        for (x, y), pa, pb in marks:
+            a = (x - ref[0]) * u[0] + (y - ref[1]) * u[1]
+            b = (x - ref[0]) * v[0] + (y - ref[1]) * v[1]
+            a_lo, a_hi = min(a_lo, a - pa), max(a_hi, a + pa)
+            b_lo, b_hi = min(b_lo, b - pb), max(b_hi, b + pb)
+        if a_lo == math.inf:
+            continue
+        a_lo, a_hi = min(a_lo, -8.0), max(a_hi, 8.0)
+        ac, bc = (a_lo + a_hi) / 2, (b_lo + b_hi) / 2
+        cx_, cy_ = ref[0] + u[0] * ac + v[0] * bc, ref[1] + u[1] * ac + v[1] * bc
+        hw, ht = (b_hi - b_lo) / 2, (a_hi - a_lo) / 2
+        caps[n] = (cx_, cy_, math.degrees(th), hw, ht)
+        c, s_ = math.cos(th), math.sin(th)
+        obstacles.append(Polygon([(cx_ + x * c - y * s_, cy_ + x * s_ + y * c)
+                                  for x, y in [(-ht, -hw), (ht, -hw), (ht, hw), (-ht, hw)]]).buffer(3))
     for _, _, (x, y) in dots:
         obstacles.append(Point(x, y).buffer(5))
     for end, lst in end_leaf.items():
@@ -771,7 +891,12 @@ def draw_scene(data, hub, routes, scene, spacing, omitted=()):
     lines = collections.defaultdict(list)
     for rid, _, pts in paths:
         lines[rid].append(LineString(pts))
-    centres = [(Point(P[hub]), hub_r * 1.5)] + [(Point(P[n]), caps[n][3] + 10) for n in caps]
+    # crossings inside an interchange are part of the junction: the zone is the bundle at the station (as wide as
+    # its widest edge), whatever shape the capsule took
+    def zone(n):
+        w = max([abs(v) for ab, o in ext.items() if n in ab for v in o] + [0.0])
+        return max(w + PITCH / 2 + 5, caps[n][3], caps[n][4]) + 10
+    centres = [(Point(P[hub]), hub_r * 1.5)] + [(Point(P[n]), zone(n)) for n in caps]
     crossings = junction_crossings = 0
     ids = list(lines)
     for i, a in enumerate(ids):
@@ -823,12 +948,20 @@ def draw_scene(data, hub, routes, scene, spacing, omitted=()):
             if ls.distance(Point(P[n])) < w - 1:
                 dot_on_line += 1
                 where["dots"].append((data.names.get(n, n), "on a line", ab))
+    # a stop dot must sit on its own route's line: off it, the dot says the train stops somewhere it does not run
+    dot_off_route = 0
+    where["off_route"] = []
+    for rid, n, pt in dots:
+        dist = min((ls.distance(Point(pt)) for ls in route_line.get(rid, [])), default=0.0)
+        if dist > LINE_W / 2:
+            dot_off_route += 1
+            where["off_route"].append((data.names.get(n, n), rid, round(dist, 1)))
     stubs = fold_stubs(routes, P)
     report = {"routes": len(routes), "loops": n_loops, "retrace": retrace, "stubs": stubs, "dot_overlap": dot_overlap, "label_collision": int(label_fail),
               "crossings": crossings, "junction_crossings": junction_crossings, "branch_overlap": branch_overlap, "dot_on_line": dot_on_line,
-              "leader_lines": len(leaders)}
+              "dot_off_route": dot_off_route, "leader_lines": len(leaders)}
     # every rule failure counts fully; each leader line (a label that could not sit by its dots) counts a little
-    failures = dot_overlap + int(label_fail) + crossings + 0.5 * junction_crossings + branch_overlap + dot_on_line + retrace + 0.15 * len(leaders) + (stubs if STUB_METRIC else 0)
+    failures = dot_overlap + int(label_fail) + crossings + 0.5 * junction_crossings + branch_overlap + dot_on_line + dot_off_route + retrace + 0.15 * len(leaders) + (stubs if STUB_METRIC else 0)
 
     # ---- svg
     xs = [p[0] for p in P.values()] + [q.bounds[0] for q in placed] + [q.bounds[2] for q in placed]
@@ -859,9 +992,9 @@ def draw_scene(data, hub, routes, scene, spacing, omitted=()):
                  % (f(lx1), f(ly1), f(lx2), f(ly2)))
     o.append('<rect x="%s" y="%s" width="%s" height="%s" rx="15" fill="#fff" stroke="#111" stroke-width="3.5"/>'
              % (f(hx - hub_r), f(hy - hub_r), f(2 * hub_r), f(2 * hub_r)))
-    for n, (cx, cy, deg, hw) in caps.items():
-        o.append('<rect x="%s" y="%s" width="16" height="%s" rx="8" fill="#fff" stroke="#111" stroke-width="2.4" '
-                 'transform="rotate(%s %s %s)"/>' % (f(cx - 8), f(cy - hw), f(2 * hw), f(deg), f(cx), f(cy)))
+    for n, (cx, cy, deg, hw, ht) in caps.items():
+        o.append('<rect x="%s" y="%s" width="%s" height="%s" rx="8" fill="#fff" stroke="#111" stroke-width="2.4" '
+                 'transform="rotate(%s %s %s)"/>' % (f(cx - ht), f(cy - hw), f(2 * ht), f(2 * hw), f(deg), f(cx), f(cy)))
     for rid, n, (x, y) in dots:
         o.append('<circle cx="%s" cy="%s" r="%s" fill="#fff" stroke="#111" stroke-width="1.5"/>' % (f(x), f(y), DOT_R))
     _, htx, hty, hanchor, _ = hbest
@@ -923,7 +1056,8 @@ def fold_stubs(routes, P):
 def hard(rep):
     """Rule failures that count fully (leader lines are only a mild charge)."""
     # a route turning back on itself is the defect that misleads most, so it counts double
-    return (sum(rep[k] for k in ("dot_overlap", "label_collision", "crossings", "branch_overlap", "dot_on_line"))
+    return (sum(rep.get(k, 0) for k in ("dot_overlap", "label_collision", "crossings", "branch_overlap", "dot_on_line",
+                                        "dot_off_route"))
             + 2 * rep["retrace"] + 0.5 * rep.get("junction_crossings", 0)
             + (STUB_WEIGHT * rep.get("stubs", 0) if STUB_METRIC else 0))
 
