@@ -13,7 +13,6 @@ import collections
 import json
 import multiprocessing as mp
 import os
-import shutil
 import time
 import traceback
 
@@ -74,6 +73,15 @@ def write_selector(manifest, tph):
         json.dump(manifest, fh, indent=1)
 
 
+def write_viewer(out, maps_base="", site_head=""):
+    """The station viewer (web/index.html) beside the maps. maps_base is where it finds them relative to itself;
+    site_head is markup for its <head> when it is published as a page of rail.robbiea.co.uk (tools/site.sh)."""
+    page = open(os.path.join(HERE, "..", "web", "index.html")).read()
+    page = page.replace("__MAPS_BASE__", maps_base).replace("<!--site-head-->", site_head)
+    with open(os.path.join(out, "index.html"), "w") as fh:
+        fh.write(page)
+
+
 def main():
     global DATA, NR, OUT, SINGLE
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -96,7 +104,7 @@ def main():
     hm.set_engine(hm.engine(a.engine))
     OUT = os.path.abspath(a.out)
     os.makedirs(OUT, exist_ok=True)
-    shutil.copy(os.path.join(HERE, "..", "web", "index.html"), os.path.join(OUT, "index.html"))
+    write_viewer(OUT)
     DATA = base.Data(a.patterns, a.tiplocs)
     NR = hm.load_network(a.network, DATA)
 

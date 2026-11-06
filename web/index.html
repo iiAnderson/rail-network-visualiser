@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Station Route Maps</title>
+<!--site-head-->
 <style>
 :root{--bg:#fff;--fg:#1a1a1a;--mut:#666;--line:#8884}
 @media (prefers-color-scheme:dark){:root{--bg:#161618;--fg:#eee;--mut:#aaa}}
@@ -10,6 +11,14 @@ header{position:sticky;top:0;z-index:2;background:var(--bg);padding:10px 16px;bo
   display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 input,select{font-size:16px;padding:6px 10px;max-width:100%}
 small{color:var(--mut)}
+/* On rail.robbiea.co.uk the site rail sets data-theme and needs its tokens; locally neither is present. */
+:root[data-theme="dark"]{--bg:#0d1013;--fg:#e3e7ea;--mut:#969a9f;--line:#292d31;
+  --raised:#15191d;--hero:#f2f5f7;--ink:#e3e7ea;--ink2:#969a9f;--muted:#666b70;--rule:#292d31;--rs:#1d2125;--accent:#be8700;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
+:root[data-theme="light"]{--bg:#fbfbfa;--fg:#1c2024;--mut:#565d64;--line:#e0e3e6;
+  --raised:#ffffff;--hero:#12161a;--ink:#1c2024;--ink2:#565d64;--muted:#6b737a;--rule:#e0e3e6;--rs:#eef0f2;--accent:#8a6200;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
+:root[data-theme] body{font-family:var(--sans)}
 #stage{position:relative;flex:1;min-height:0;overflow:hidden;background:#fff;touch-action:pan-y;cursor:grab;user-select:none}
 #stage.zoomed{touch-action:none}
 #stage.drag{cursor:grabbing}
@@ -23,7 +32,7 @@ small{color:var(--mut)}
 #hint.on{opacity:1}
 body.embed header{display:none}
 body.embed #ctl{top:8px;right:8px}
-</style></head><body>
+</style></head><body data-page="routes">
 <header>
   <label for="q"><b>Station</b></label>
   <input id="q" type="search" placeholder="Search name or code" autocomplete="off">
@@ -44,8 +53,9 @@ body.embed #ctl{top:8px;right:8px}
   </div>
   <div id="hint"></div>
 </div>
-<script src="stations.js"></script>
+<script src="__MAPS_BASE__stations.js"></script>
 <script>
+const MAPS = "__MAPS_BASE__";   // where the maps are: "" beside this page, "routes/" on the site
 const all = window.STATIONS || [], q = document.getElementById("q"), s = document.getElementById("s"),
       m = document.getElementById("m"), n = document.getElementById("n");
 function fill() {
@@ -81,7 +91,7 @@ function show(ev) {
   document.getElementById("pgw").style.display = n > 1 ? "" : "none";
   const k = parseInt(pg.value || "1", 10);
   if (s.value) {
-    m.src = loom ? "loom/" + s.value + ".svg" : s.value + (k > 1 ? "_" + k : "") + ".svg";
+    m.src = MAPS + (loom ? "loom/" + s.value + ".svg" : s.value + (k > 1 ? "_" + k : "") + ".svg");
     try { location.hash = s.value + (md.value === "loom" ? "~loom" : ""); } catch (e) {}
   }
 }

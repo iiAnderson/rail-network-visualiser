@@ -126,6 +126,12 @@ python3 -m venv /tmp/nrvenv && /tmp/nrvenv/bin/pip install pymupdf
 /tmp/nrvenv/bin/python -I src/extract_nr_schematic.py National_Rail_All_Stations_Route_Map.pdf data/nr_schematic.json
 ```
 
+## Published maps
+
+Every station is published at **<https://rail.robbiea.co.uk/routes>** (`/routes#CLJ` for one station), one of
+the visualisations on the rail site. Rebuild and publish with `tools/site.sh release`; the process, what this
+repository owns on that site and how to roll back are in [docs/DEPLOY.md](docs/DEPLOY.md).
+
 ## Repository layout
 
 ```
@@ -138,7 +144,9 @@ src/nr_route_map.py          loads the PDF-derived network; label placement help
 src/extract_nr_schematic.py  one-off: PDF -> data/nr_schematic.json
 src/generate_all.py          batch runner + station selector page
 sql/  tools/                 how to get the input CSVs
-web/index.html               selector template (copied into maps/)
+tools/compare_engines.py     both engines on CLJ, VIC, LDS and the toy networks, one comparable score
+tools/site.sh                rebuild every station and publish to rail.robbiea.co.uk/routes (docs/DEPLOY.md)
+web/index.html               the station viewer (written beside the maps; also the page /routes on the site)
 docs/examples/               three finished maps
 tests/                       smoke test
 ```

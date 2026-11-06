@@ -44,6 +44,13 @@ refills paths from other routes' paths (`refine_by_evidence`), merges two stoppi
 Known gaps: Leeds keeps 2 turn-backs and 4 stubs; some tph labels float off their station; the block direction
 cache key ignores spacing, so a layout depends on the spacings tried before it.
 
+## Publishing
+
+The maps are live at rail.robbiea.co.uk/routes. `tools/site.sh build` rebuilds every station into `maps_single/`,
+`tools/site.sh publish` uploads it (`--dry-run` first). Process and ownership: `docs/DEPLOY.md`. This repo owns
+only `/routes.html` and `/routes/*` on that site; uk-rail-open-data owns the rest, including the nav (`rail.js`).
+Publishing is outward-facing: only when asked.
+
 ## Previews
 
 `cairosvg` ignores `paint-order`, so the white label halo hides the text in a PNG; strip the

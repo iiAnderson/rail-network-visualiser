@@ -11,3 +11,4 @@ __pycache__/
 # earlier output sets and review copies
 maps_*/
 review/
+maps_*.log
