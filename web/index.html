@@ -102,11 +102,11 @@ body.embed #ctl{top:8px;right:8px}
   </div>
   <div id="hint"></div>
 </div>
-<script src="__MAPS_BASE__stations.js"></script>
+<script src="__MAPS_BASE__stations.js__STATIONS_V__"></script>
 <script>
 const MAPS = "__MAPS_BASE__";   // where the maps are: "" beside this page, "routes/" on the site
 const DEFAULT = "BRI";          // Bristol Temple Meads, when the address names no station
-const VIEW = [1200, 950];       // opening view: about this much of the map (in its own units) around the station
+const VIEW = [950, 750];        // opening view: about this much of the map (in its own units) around the station
 const all = window.STATIONS || [], q = document.getElementById("q"), s = document.getElementById("s"),
       m = document.getElementById("m"), pg = document.getElementById("pg");
 const fmt = x => (x == null ? "–" : String(x));

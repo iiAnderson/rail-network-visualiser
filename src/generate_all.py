@@ -101,11 +101,13 @@ def refresh_selector(out):
     write_selector(json.load(open(os.path.join(out, "manifest.json"))), tph, out)
 
 
-def write_viewer(out, maps_base="", site_head=""):
+def write_viewer(out, maps_base="", site_head="", stations_v=""):
     """The station viewer (web/index.html) beside the maps. maps_base is where it finds them relative to itself;
-    site_head is markup for its <head> when it is published as a page of rail.robbiea.co.uk (tools/site.sh)."""
+    site_head is markup for its <head> when it is published as a page of rail.robbiea.co.uk (tools/site.sh), and
+    stations_v a query string ("?v=<hash>") that makes a rebuilt stations.js a new URL there."""
     page = open(os.path.join(HERE, "..", "web", "index.html")).read()
     page = page.replace("__MAPS_BASE__", maps_base).replace("<!--site-head-->", site_head)
+    page = page.replace("__STATIONS_V__", stations_v)
     with open(os.path.join(out, "index.html"), "w") as fh:
         fh.write(page)
 

@@ -25,6 +25,7 @@ ROOT="$(pwd)"
 
 MAPS="${MAPS:-maps_single}"
 PY="${PYTHON:-$ROOT/.venv/bin/python}"
+CACHE="public, max-age=300"
 MIN_MAPS=1000          # refuse to publish a set this small: it is a failed or partial build, and --delete would
                        # take every missing station off the site
 
@@ -85,7 +86,9 @@ publish() {
   # rail.js is loaded as rail.js?v=<its hash>, as uk-rail-open-data's pages load it, so a changed rail is a new URL
   # and browsers fetch it rather than keeping a stale copy
   local RAIL_V; RAIL_V="$(shasum "$SITE_REPO/site/rail.js" | cut -c1-10)"
-  "$PY" - "$STAGE" "$RAIL_V" <<'EOF'
+  # stations.js likewise, by its own hash: it changes with every build, under the same name
+  local STATIONS_V; STATIONS_V="$(shasum "$MAPS/stations.js" | cut -c1-10)"
+  "$PY" - "$STAGE" "$RAIL_V" "$STATIONS_V" <<'EOF'
 import sys
 sys.path.insert(0, "src")
 import generate_all
@@ -97,16 +100,19 @@ try{var t=localStorage.getItem('site-theme')||localStorage.getItem('tracks-theme
     document.documentElement.dataset.theme=t==='light'?'light':'dark';}catch(e){}
 </script>
 <script src="rail.js?v=%s" defer></script>""" % sys.argv[2]
-generate_all.write_viewer(sys.argv[1], maps_base="routes/", site_head=head)
+generate_all.write_viewer(sys.argv[1], maps_base="routes/", site_head=head, stations_v="?v=" + sys.argv[3])
 EOF
   mv "$STAGE/index.html" "$STAGE/routes.html"
   perl -pi -e 's{<title>.*?</title>}{<title>Network diagrams — every service pattern from every British station</title>}' "$STAGE/routes.html"
 
   # Maps first, page second: a reader who loads the new page during the upload still finds every map it names.
   # --delete is scoped to routes/, so it can only remove maps of stations that dropped out of the set.
-  aws s3 sync "$MAPS/" "s3://$BUCKET/routes/" --delete $DRY \
+  # Cache-Control: without it browsers guess how long to keep a file and can show a stale map or station list for
+  # days; five minutes, then a cheap revalidation (an unchanged file is a 304).
+  aws s3 sync "$MAPS/" "s3://$BUCKET/routes/" --delete $DRY --cache-control "$CACHE" \
       --exclude 'index.html' --exclude '*.log' --exclude '.*'
-  aws s3 cp "$STAGE/routes.html" "s3://$BUCKET/routes.html" --content-type 'text/html; charset=utf-8' $DRY
+  aws s3 cp "$STAGE/routes.html" "s3://$BUCKET/routes.html" --content-type 'text/html; charset=utf-8' \
+      --cache-control "$CACHE" $DRY
   if [ -n "$DRY" ]; then echo "dry run: nothing uploaded, nothing invalidated"; return; fi
   echo "published to s3://$BUCKET/routes.html and routes/"
 

@@ -84,6 +84,17 @@ without a new URL a browser that has seen the old rail keeps it for days or week
 so after changing `rail.js`, deploy that repository **and** run `tools/site.sh publish` here, or `/routes` keeps
 loading the old version.
 
+## Caching
+
+Everything under `/routes/` and `routes.html` is uploaded with `Cache-Control: public, max-age=300`, and the page
+loads `stations.js?v=<hash>` and `rail.js?v=<hash>`. Without that, browsers guess how long to keep a file with no
+cache header and can show a stale station list (or navigation) for days after a publish.
+
+To change the headers of objects already uploaded, re-upload them from the local build
+(`aws s3 cp maps_single/ s3://uk-rail-dashboard/routes/ --recursive --exclude index.html --cache-control ...`).
+**Do not** copy them in place with `--metadata-directive REPLACE`: that resets every content type to
+`binary/octet-stream`, and browsers will not render an SVG served as that.
+
 ## Requirements
 
 - The inputs in `data/` or `../rail-network-visualiser-data/` (`DATA_DIR` to point elsewhere): see README.
