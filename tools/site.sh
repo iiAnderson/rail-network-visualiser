@@ -79,10 +79,13 @@ publish() {
 
   # The page: the same viewer as maps_single/index.html, pointed at routes/ and given the site's head (fonts,
   # theme before first paint, the shared navigation rail). rail.js lives at the site root, deployed by
-  # uk-rail-open-data; its ITEMS list carries the "Station routes" entry.
+  # uk-rail-open-data; its ITEMS list carries the "Network diagrams" entry.
   STAGE="$(mktemp -d)"          # global: the EXIT trap runs after this function has returned
   trap 'rm -rf "${STAGE:-}"' EXIT
-  "$PY" - "$STAGE" <<'EOF'
+  # rail.js is loaded as rail.js?v=<its hash>, as uk-rail-open-data's pages load it, so a changed rail is a new URL
+  # and browsers fetch it rather than keeping a stale copy
+  local RAIL_V; RAIL_V="$(shasum "$SITE_REPO/site/rail.js" | cut -c1-10)"
+  "$PY" - "$STAGE" "$RAIL_V" <<'EOF'
 import sys
 sys.path.insert(0, "src")
 import generate_all
@@ -96,11 +99,11 @@ head = """<meta name="description" content="Every service pattern from every sta
 try{var t=localStorage.getItem('site-theme')||localStorage.getItem('tracks-theme');
     document.documentElement.dataset.theme=t==='light'?'light':'dark';}catch(e){}
 </script>
-<script src="rail.js" defer></script>"""
+<script src="rail.js?v=%s" defer></script>""" % sys.argv[2]
 generate_all.write_viewer(sys.argv[1], maps_base="routes/", site_head=head)
 EOF
   mv "$STAGE/index.html" "$STAGE/routes.html"
-  perl -pi -e 's{<title>.*?</title>}{<title>Station routes — every service pattern from every British station</title>}' "$STAGE/routes.html"
+  perl -pi -e 's{<title>.*?</title>}{<title>Network diagrams — every service pattern from every British station</title>}' "$STAGE/routes.html"
 
   # Maps first, page second: a reader who loads the new page during the upload still finds every map it names.
   # --delete is scoped to routes/, so it can only remove maps of stations that dropped out of the set.

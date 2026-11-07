@@ -13,7 +13,7 @@ pages and `rail.js`, the navigation rail every page shares. This repository owns
 |---|---|---|
 | `/routes.html` (served at `/routes`) | the station viewer, `web/index.html` with the site's head | `tools/site.sh publish` |
 | `/routes/*` | `stations.js`, `manifest.json` and one SVG per station page | `tools/site.sh publish` |
-| `/rail.js` | the navigation rail, including the "Station routes" entry | uk-rail-open-data `deploy.sh` |
+| `/rail.js` | the navigation rail, including the "Network diagrams" entry | uk-rail-open-data `deploy.sh` |
 
 The two deploys never touch each other's files: `tools/site.sh` only writes `routes.html` and syncs only under
 `routes/`, and uk-rail-open-data's `deploy.sh` excludes both (as it excludes `data/`, which its Lambdas own).
@@ -74,13 +74,13 @@ The viewer is one file for both uses. `__MAPS_BASE__` is where it finds the maps
 
 ### Adding or renaming the entry in the site navigation
 
-That is uk-rail-open-data's `site/rail.js` (the `ITEMS` list), published by its `deploy.sh`. Its `deploy.sh`
-needs `CARTO_KEY` for the track map's basemap; to publish `rail.js` alone without it:
+That is uk-rail-open-data's `site/rail.js` (the `ITEMS` list), published by its `deploy.sh`.
 
-```bash
-aws s3 cp site/rail.js s3://uk-rail-dashboard/rail.js
-aws cloudfront create-invalidation --distribution-id E13AWQUY35SVGX --paths '/rail.js'
-```
+Every page loads it as `rail.js?v=<first 10 hex digits of its SHA-1>`: the file carries no Cache-Control, so
+without a new URL a browser that has seen the old rail keeps it for days or weeks. uk-rail-open-data's
+`deploy.sh` fills the version into its pages, and `tools/site.sh publish` into `/routes`, from the same file —
+so after changing `rail.js`, deploy that repository **and** run `tools/site.sh publish` here, or `/routes` keeps
+loading the old version.
 
 ## Requirements
 
