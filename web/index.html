@@ -1,53 +1,102 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Station Route Maps</title>
+<title>Network diagrams</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <!--site-head-->
 <style>
-:root{--bg:#fff;--fg:#1a1a1a;--mut:#666;--line:#8884}
-@media (prefers-color-scheme:dark){:root{--bg:#161618;--fg:#eee;--mut:#aaa}}
+/* The rail site's tokens (as on /tracks): dark by default, light when the site rail sets data-theme="light".
+   The diagrams themselves are drawn black on white, so they sit on a light panel in either theme. */
+:root{
+  --bg:#0d1013; --raised:#15191d; --hero:#f2f5f7; --ink:#e3e7ea; --ink2:#969a9f;
+  --muted:#666b70; --rule:#292d31; --rs:#1d2125;
+  --accent:#be8700; --accent-line:#3b3121; --hover:#d9a11a;
+  --mapbg:#11151a; --paper:#ffffff; --overlay:rgba(13,16,19,.82);
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+:root[data-theme="light"]{
+  --bg:#fbfbfa; --raised:#ffffff; --hero:#12161a; --ink:#1c2024; --ink2:#565d64;
+  --muted:#6b737a; --rule:#e0e3e6; --rs:#eef0f2;
+  --accent:#8a6200; --accent-line:#d8c9a4; --hover:#6d4d00;
+  --mapbg:#e9ebed; --overlay:rgba(255,255,255,.88);
+}
+*{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font-family:Helvetica Neue,Helvetica,Arial,sans-serif}
-header{position:sticky;top:0;z-index:2;background:var(--bg);padding:10px 16px;border-bottom:1px solid var(--line);
-  display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-input,select{font-size:16px;padding:6px 10px;max-width:100%}
-small{color:var(--mut)}
-/* On rail.robbiea.co.uk the site rail sets data-theme and needs its tokens; locally neither is present. */
-:root[data-theme="dark"]{--bg:#0d1013;--fg:#e3e7ea;--mut:#969a9f;--line:#292d31;
-  --raised:#15191d;--hero:#f2f5f7;--ink:#e3e7ea;--ink2:#969a9f;--muted:#666b70;--rule:#292d31;--rs:#1d2125;--accent:#be8700;
-  --sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
-:root[data-theme="light"]{--bg:#fbfbfa;--fg:#1c2024;--mut:#565d64;--line:#e0e3e6;
-  --raised:#ffffff;--hero:#12161a;--ink:#1c2024;--ink2:#565d64;--muted:#6b737a;--rule:#e0e3e6;--rs:#eef0f2;--accent:#8a6200;
-  --sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
-:root[data-theme] body{font-family:var(--sans)}
-#stage{position:relative;flex:1;min-height:0;overflow:hidden;background:#fff;touch-action:pan-y;cursor:grab;user-select:none}
+body{margin:0;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font-family:var(--sans);
+     -webkit-font-smoothing:antialiased;font-size:14px;overflow:hidden}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.hd{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+
+/* masthead */
+.bar{display:flex;align-items:center;gap:18px;padding:11px 20px;border-bottom:1px solid var(--rule);
+     background:var(--bg);flex-wrap:wrap;row-gap:10px;flex:none}
+.brand{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--accent);white-space:nowrap}
+.pick{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input[type=search],select{background:var(--raised);color:var(--ink);border:1px solid var(--rule);border-radius:3px;
+       font-family:var(--mono);font-size:11px;padding:6px 9px;accent-color:var(--accent)}
+input[type=search]{width:200px}
+input[type=search]::placeholder{color:var(--muted)}
+input[type=search]:focus,select:focus{outline:none;border-color:var(--accent-line)}
+select{min-width:240px;max-width:100%}
+#pg{min-width:150px}
+.spacer{flex:1}
+.pills{display:flex;gap:26px}
+.pill-v{font-family:var(--mono);font-size:17px;font-weight:500;letter-spacing:-.02em;margin-top:2px;color:var(--hero)}
+
+/* the map */
+#stage{position:relative;flex:1;min-height:0;overflow:hidden;background:var(--mapbg);touch-action:pan-y;
+       cursor:grab;user-select:none}
 #stage.zoomed{touch-action:none}
 #stage.drag{cursor:grabbing}
-#m{position:absolute;left:0;top:0;height:auto;max-width:none;background:#fff;-webkit-user-drag:none;pointer-events:none}
-#ctl{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px;z-index:1}
-#ctl button,#ctl a{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font:20px/1 Helvetica,Arial,sans-serif;
-  color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;cursor:pointer;text-decoration:none;box-shadow:0 1px 4px #0003}
-#ctl button:hover,#ctl a:hover{background:#8882}
-#hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);max-width:90%;padding:6px 12px;border-radius:16px;font-size:13px;
-  background:#000b;color:#fff;pointer-events:none;opacity:0;transition:opacity .4s;text-align:center}
+#m{position:absolute;left:0;top:0;height:auto;max-width:none;background:var(--paper);-webkit-user-drag:none;
+   pointer-events:none;box-shadow:0 0 0 1px var(--rule),0 6px 30px rgba(0,0,0,.35)}
+#ctl{position:absolute;right:14px;top:14px;display:flex;flex-direction:column;z-index:1;
+     border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+#ctl button,#ctl a{width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  font:16px/1 var(--mono);color:var(--ink);background:var(--raised);border:0;border-bottom:1px solid var(--rule);
+  cursor:pointer;text-decoration:none}
+#ctl>:last-child{border-bottom:0}
+#ctl button:hover,#ctl a:hover{background:var(--rs)}
+#hint{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);max-width:90%;padding:6px 12px;border-radius:3px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;background:var(--overlay);color:var(--ink2);
+  border:1px solid var(--rule);pointer-events:none;opacity:0;transition:opacity .4s;text-align:center}
 #hint.on{opacity:1}
-body.embed header{display:none}
+
+body.embed .bar{display:none}
 body.embed #ctl{top:8px;right:8px}
+@media (max-width:900px){
+  .bar{gap:12px}
+  .pills{gap:18px}
+  input[type=search]{width:140px}
+  select{min-width:0;flex:1}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style></head><body data-page="routes">
-<header>
-  <label for="q"><b>Station</b></label>
-  <input id="q" type="search" placeholder="Search name or code" autocomplete="off">
-  <select id="s" aria-label="Station"></select>
-  <label id="mdw" style="display:none"><b>Model</b> <select id="md" aria-label="Layout model">
-    <option value="tree">Tree (hub-centred)</option><option value="loom">Network (graph layout)</option></select></label>
-  <label id="pgw" style="display:none"><b>Services</b> <select id="pg" aria-label="Page of services"></select></label>
-  <small id="n"></small>
+<header class="bar">
+  <span class="brand">NETWORK DIAGRAMS</span>
+  <div class="pick">
+    <label class="vh" for="q">Search stations</label>
+    <input id="q" type="search" placeholder="Search a station or code" autocomplete="off">
+    <label class="vh" for="s">Station</label>
+    <select id="s"></select>
+    <label id="pgw" hidden><span class="vh">Page of services</span><select id="pg"></select></label>
+  </div>
+  <span class="spacer"></span>
+  <div class="pills">
+    <div><div class="hd">Trains / hour</div><div class="pill-v" id="ptph">–</div></div>
+    <div><div class="hd">Routes</div><div class="pill-v" id="proutes">–</div></div>
+    <div><div class="hd">Stations</div><div class="pill-v" id="pn">–</div></div>
+  </div>
 </header>
-<div id="stage" tabindex="0" aria-label="Route map. Drag to pan, scroll or pinch to zoom, plus and minus keys to zoom.">
+<div id="stage" tabindex="0" aria-label="Route map. Drag to pan, scroll or pinch to zoom, plus and minus keys to zoom, 0 for the whole map, S for the station.">
   <img id="m" alt="Route map" draggable="false">
   <div id="ctl">
     <button id="zi" title="Zoom in" aria-label="Zoom in">+</button>
     <button id="zo" title="Zoom out" aria-label="Zoom out">&minus;</button>
-    <button id="zf" title="Fit to window" aria-label="Fit to window">&#x2922;</button>
+    <button id="zh" title="Zoom to the station" aria-label="Zoom to the station">&#x25CE;</button>
+    <button id="zf" title="Whole map" aria-label="Whole map">&#x2922;</button>
     <button id="fs" title="Full screen" aria-label="Full screen">&#x26F6;</button>
     <a id="ext" href="#" target="_blank" rel="noopener" title="Open full size in a new tab" aria-label="Open full size in a new tab" style="display:none">&#x2197;</a>
   </div>
@@ -56,50 +105,56 @@ body.embed #ctl{top:8px;right:8px}
 <script src="__MAPS_BASE__stations.js"></script>
 <script>
 const MAPS = "__MAPS_BASE__";   // where the maps are: "" beside this page, "routes/" on the site
+const DEFAULT = "BRI";          // Bristol Temple Meads, when the address names no station
+const VIEW = [1200, 950];       // opening view: about this much of the map (in its own units) around the station
 const all = window.STATIONS || [], q = document.getElementById("q"), s = document.getElementById("s"),
-      m = document.getElementById("m"), n = document.getElementById("n");
+      m = document.getElementById("m"), pg = document.getElementById("pg");
+const fmt = x => (x == null ? "–" : String(x));
+let focusNext = null, hubNow = null;
 function fill() {
   const t = q.value.trim().toLowerCase(), keep = s.value;
   s.innerHTML = "";
   for (const r of all) {
     if (t && !(r.name.toLowerCase().includes(t) || r.crs.toLowerCase() === t)) continue;
     const o = document.createElement("option");
-    o.value = r.crs; o.textContent = r.name + " (" + r.crs + ") · " + r.tph + " tph";
+    o.value = r.crs; o.textContent = r.name + " (" + r.crs + ")";
     s.appendChild(o);
   }
   if ([...s.options].some(o => o.value === keep)) s.value = keep;
-  n.textContent = s.options.length + " of " + all.length + " stations";
+  document.getElementById("pn").textContent = t ? s.options.length + " / " + all.length : all.length.toLocaleString("en-GB");
   show();
 }
-const md = document.getElementById("md"), hasLoom = all.some(r => r.loom);
-document.getElementById("mdw").style.display = hasLoom ? "" : "none";
 function show(ev) {
-  const r = all.find(x => x.crs === s.value), pg = document.getElementById("pg");
-  let n = (r && r.pages) || 1;
-  const loom = md.value === "loom" && r && r.loom;
-  if (md.value === "loom" && r && !r.loom) say("No network map for this station: showing the tree map");
-  MAXK = loom ? 80 : 12;   // the network maps are large: allow much deeper zoom
-  if (loom) n = 1;
-  if (!ev || ev.target !== pg) {  // a new station: rebuild the page list
+  const r = all.find(x => x.crs === s.value), n = (r && r.pages) || 1;
+  if (!ev || ev.target !== pg) {   // a new station: rebuild the page list
     pg.innerHTML = "";
     for (let i = 1; i <= n; i++) {
       const o = document.createElement("option"); o.value = i;
-      o.textContent = n === 1 ? "" : "Page " + i + " of " + n + (r.page_routes ? " (" + r.page_routes[i - 1] + " routes)" : "");
+      o.textContent = "Page " + i + " of " + n + (r && r.page_routes ? " (" + r.page_routes[i - 1] + " routes)" : "");
       pg.appendChild(o);
     }
   }
-  document.getElementById("pgw").style.display = n > 1 ? "" : "none";
+  document.getElementById("pgw").hidden = n <= 1;
+  document.getElementById("ptph").textContent = fmt(r && r.tph);
+  document.getElementById("proutes").textContent = fmt(r && r.routes);
   const k = parseInt(pg.value || "1", 10);
   if (s.value) {
-    m.src = MAPS + (loom ? "loom/" + s.value + ".svg" : s.value + (k > 1 ? "_" + k : "") + ".svg");
-    try { location.hash = s.value + (md.value === "loom" ? "~loom" : ""); } catch (e) {}
+    focusNext = k === 1 && r && r.hub ? r.hub : null;
+    m.src = MAPS + s.value + (k > 1 ? "_" + k : "") + ".svg";
+    try { history.replaceState(null, "", "#" + s.value); } catch (e) {}
   }
 }
-md.onchange = show;
-document.getElementById("pg").onchange = show;
-q.oninput = fill; s.onchange = show;
-const hh = location.hash.slice(1).split("~"), h = hh[0]; if (hh[1] === "loom") md.value = "loom";
-setTimeout(() => { fill(); if (h && all.some(r => r.crs === h)) { s.value = h; show(); } }, 0);   // after the declarations below
+pg.onchange = show; q.oninput = fill; s.onchange = show;
+const h = location.hash.slice(1).split("~")[0];
+setTimeout(() => {      // after the declarations below
+  fill();
+  const want = all.some(r => r.crs === h) ? h : all.some(r => r.crs === DEFAULT) ? DEFAULT : "";
+  if (want) { s.value = want; show(); }
+}, 0);
+addEventListener("hashchange", () => {
+  const c = location.hash.slice(1);
+  if (c !== s.value && all.some(r => r.crs === c)) { q.value = ""; fill(); s.value = c; show(); }
+});
 
 // ---- pan / zoom: the image is resized (not CSS-scaled) so the SVG stays sharp at any zoom ----
 const embed = /[?&]embed=1\b/.test(location.search), stage = document.getElementById("stage"), hint = document.getElementById("hint");
@@ -108,8 +163,8 @@ if (embed) {
   const x = document.getElementById("ext"); x.style.display = "";
   const open = () => { x.href = location.pathname + (s.value ? "#" + s.value : ""); }; open(); addEventListener("hashchange", open);
 }
-let k = 1, ox = 0, oy = 0, ratio = 0, sw = 0, sh = 0, fitW = 0, ht;   // k: zoom over fit; ox/oy: image top-left in stage px
-let MAXK = 12; const W = () => fitW * k, H = () => fitW * k * ratio;
+let k = 1, ox = 0, oy = 0, ratio = 0, sw = 0, sh = 0, fitW = 0, ht;
+const MAXK = 12; const W = () => fitW * k, H = () => fitW * k * ratio;
 function say(t) { hint.textContent = t; hint.classList.add("on"); clearTimeout(ht); ht = setTimeout(() => hint.classList.remove("on"), 2600); }
 function clamp() {
   const w = W(), h = H(), pad = 40;
@@ -125,27 +180,42 @@ function fit() {
   if (!ratio) return;
   fitW = Math.min(sw, sh / ratio); k = 1; apply();
 }
+// the station in the middle with about VIEW map units on screen (never less than the whole map)
+function toStation(hub) {
+  fit();
+  if (!hub || !ratio) return;
+  const [fx, fy, unitsW] = hub, scale = Math.min(sw / VIEW[0], sh / VIEW[1]);   // screen px per map unit
+  k = Math.min(MAXK, Math.max(1, scale * unitsW / fitW));
+  ox = sw / 2 - fx * W(); oy = sh / 2 - fy * H(); apply();
+}
 function zoomAt(f, cx, cy) {
   const nk = Math.min(MAXK, Math.max(1, k * f)); f = nk / k; if (f === 1) return;
   ox = cx - (cx - ox) * f; oy = cy - (cy - oy) * f; k = nk; apply();
 }
 const mid = () => [stage.clientWidth / 2, stage.clientHeight / 2];
 m.onload = () => {
-  m.style.width = "100px"; ratio = m.offsetHeight / m.offsetWidth || 1; fit();
-  if (!sessionStorageSeen()) say(embed ? "Drag to pan \u00b7 Ctrl + scroll or pinch to zoom \u00b7 double-click to zoom in" : "Scroll or pinch to zoom \u00b7 drag to pan \u00b7 double-click to zoom in");
+  m.style.width = "100px"; ratio = m.offsetHeight / m.offsetWidth || 1;
+  hubNow = focusNext; toStation(hubNow);
+  if (!seen()) say(embed ? "Drag to pan · Ctrl + scroll or pinch to zoom · ⤢ for the whole map"
+                         : "Scroll or pinch to zoom · drag to pan · ⤢ for the whole map");
 };
-function sessionStorageSeen() { try { if (sessionStorage.hint) return true; sessionStorage.hint = 1; } catch (e) {} return false; }
-addEventListener("resize", fit);
+function seen() { try { if (sessionStorage.hint) return true; sessionStorage.hint = 1; } catch (e) {} return false; }
+function resized() {
+  const whole = k <= 1.001; sw = stage.clientWidth; sh = stage.clientHeight;
+  if (whole) fit(); else apply();
+}
+addEventListener("resize", resized);
+addEventListener("railresize", () => setTimeout(resized, 200));   // the site rail pinned or unpinned
 stage.addEventListener("wheel", e => {
   if (embed && !(e.ctrlKey || e.metaKey)) { if (k <= 1.001) say("Use Ctrl + scroll to zoom"); else e.preventDefault(), ox -= e.deltaX, oy -= e.deltaY, apply(); return; }
   e.preventDefault();
   const r = stage.getBoundingClientRect();
   zoomAt(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.002)), e.clientX - r.left, e.clientY - r.top);
 }, { passive: false });
-const ptr = new Map(); let pd = 0, moved = 0;
+const ptr = new Map(); let pd = 0;
 stage.addEventListener("pointerdown", e => {
   if (e.target.closest("#ctl")) return;
-  stage.setPointerCapture(e.pointerId); ptr.set(e.pointerId, [e.clientX, e.clientY]); moved = 0;
+  stage.setPointerCapture(e.pointerId); ptr.set(e.pointerId, [e.clientX, e.clientY]);
   pd = ptr.size === 2 ? Math.hypot(...[...ptr.values()].reduce((a, b) => [a[0] - b[0], a[1] - b[1]])) : 0;
   stage.classList.add("drag");
 });
@@ -157,7 +227,6 @@ stage.addEventListener("pointermove", e => {
     if (pd) zoomAt(d / pd, (e.clientX + o[0]) / 2 - r.left, (e.clientY + o[1]) / 2 - r.top);
     pd = d;
   } else { ox += e.clientX - p[0]; oy += e.clientY - p[1]; apply(); }
-  moved += Math.abs(e.clientX - p[0]) + Math.abs(e.clientY - p[1]);
   ptr.set(e.pointerId, [e.clientX, e.clientY]);
 });
 const up = e => { ptr.delete(e.pointerId); pd = 0; if (!ptr.size) stage.classList.remove("drag"); };
@@ -171,12 +240,14 @@ stage.addEventListener("keydown", e => {
   if (e.key === "+" || e.key === "=") zoomAt(1.4, cx, cy);
   else if (e.key === "-") zoomAt(1 / 1.4, cx, cy);
   else if (e.key === "0") fit();
+  else if (e.key === "s" || e.key === "S") toStation(hubNow);
   else if (e.key.startsWith("Arrow")) { const d = 60; ox += e.key === "ArrowLeft" ? d : e.key === "ArrowRight" ? -d : 0; oy += e.key === "ArrowUp" ? d : e.key === "ArrowDown" ? -d : 0; apply(); }
   else return;
   e.preventDefault();
 });
 document.getElementById("zi").onclick = () => zoomAt(1.5, ...mid());
 document.getElementById("zo").onclick = () => zoomAt(1 / 1.5, ...mid());
+document.getElementById("zh").onclick = () => toStation(hubNow);
 document.getElementById("zf").onclick = fit;
 const fsb = document.getElementById("fs"), fsEl = document.documentElement;
 if (!(fsEl.requestFullscreen || fsEl.webkitRequestFullscreen)) fsb.style.display = "none";
@@ -184,5 +255,5 @@ fsb.onclick = () => {
   if (document.fullscreenElement) document.exitFullscreen();
   else (fsEl.requestFullscreen || fsEl.webkitRequestFullscreen).call(fsEl);
 };
-document.addEventListener("fullscreenchange", () => setTimeout(fit, 50));
+document.addEventListener("fullscreenchange", () => setTimeout(() => toStation(hubNow), 50));
 </script></body></html>

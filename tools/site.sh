@@ -77,8 +77,8 @@ publish() {
   local DISTRIBUTION="${DISTRIBUTION_ID:-$(terraform -chdir="$SITE_REPO/terraform" output -raw distribution_id)}"
   check "$MAPS"
 
-  # The page: the same viewer as maps_single/index.html, pointed at routes/ and given the site's head (fonts,
-  # theme before first paint, the shared navigation rail). rail.js lives at the site root, deployed by
+  # The page: the same viewer as maps_single/index.html, pointed at routes/ and given the site's head (canonical
+  # link, theme before first paint, the shared navigation rail; the fonts are in the viewer itself). rail.js lives at the site root, deployed by
   # uk-rail-open-data; its ITEMS list carries the "Network diagrams" entry.
   STAGE="$(mktemp -d)"          # global: the EXIT trap runs after this function has returned
   trap 'rm -rf "${STAGE:-}"' EXIT
@@ -91,9 +91,6 @@ sys.path.insert(0, "src")
 import generate_all
 head = """<meta name="description" content="Every service pattern from every station on the British network, drawn as a route map.">
 <link rel="canonical" href="https://rail.robbiea.co.uk/routes">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <script>
 /* Set before first paint, as on every page of the site; rail.js owns the toggle. */
 try{var t=localStorage.getItem('site-theme')||localStorage.getItem('tracks-theme');

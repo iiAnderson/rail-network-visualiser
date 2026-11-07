@@ -13,6 +13,7 @@ import collections
 import json
 import multiprocessing as mp
 import os
+import re
 import time
 import traceback
 
@@ -60,17 +61,44 @@ def work(crs):
         return crs, "error", traceback.format_exc(), time.time() - started
 
 
-def write_selector(manifest, tph):
+HUB_BOX = re.compile(r'<rect x="([-\d.]+)" y="([-\d.]+)" width="([\d.]+)" height="([\d.]+)" rx="15"')
+VIEWBOX = re.compile(r'viewBox="([-\d.]+) ([-\d.]+) ([\d.]+) ([\d.]+)"')
+
+
+def hub_at(out, crs):
+    """Where the station itself is on its map: [x, y] as fractions of the drawing, and the drawing's width in map
+    units, so the viewer can open zoomed in on it. Read from the SVG (the hub is the one box drawn with rx=15)."""
+    try:
+        head = open(os.path.join(out, crs + ".svg")).read()
+    except OSError:
+        return None
+    vb, hb = VIEWBOX.search(head), HUB_BOX.search(head)
+    if not vb or not hb:
+        return None
+    x0, y0, w, h = map(float, vb.groups())
+    hx, hy, hw, hh = map(float, hb.groups())
+    return [round((hx + hw / 2 - x0) / w, 4), round((hy + hh / 2 - y0) / h, 4), round(w)]
+
+
+def write_selector(manifest, tph, out=None):
+    out = out or OUT
     rows = []
     for crs, m in manifest.items():
         rows.append({"crs": crs, "name": m["name"], "tph": round(tph.get(crs, 0), 1),
                      "routes": m.get("routes"), "spacing": m.get("spacing"),
-                     "pages": m.get("pages", 1), "page_routes": m.get("page_routes")})
+                     "pages": m.get("pages", 1), "page_routes": m.get("page_routes"), "hub": hub_at(out, crs)})
     rows.sort(key=lambda r: -r["tph"])
-    with open(os.path.join(OUT, "stations.js"), "w") as fh:
+    with open(os.path.join(out, "stations.js"), "w") as fh:
         fh.write("window.STATIONS = " + json.dumps(rows) + ";\n")
-    with open(os.path.join(OUT, "manifest.json"), "w") as fh:
+    with open(os.path.join(out, "manifest.json"), "w") as fh:
         json.dump(manifest, fh, indent=1)
+
+
+def refresh_selector(out):
+    """Rewrite stations.js for maps already drawn (keeps each station's tph from the current stations.js)."""
+    old = open(os.path.join(out, "stations.js")).read()
+    tph = {r["crs"]: r["tph"] for r in json.loads(old[old.index("["):old.rindex("]") + 1])}
+    write_selector(json.load(open(os.path.join(out, "manifest.json"))), tph, out)
 
 
 def write_viewer(out, maps_base="", site_head=""):
