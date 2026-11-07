@@ -20,8 +20,10 @@ The two deploys never touch each other's files: `tools/site.sh` only writes `rou
 **Keep that exclusion.** Its sync runs with `--delete`, so without it the next deploy of the rest of the site
 removes every map.
 
-The CloudFront function rewrites `/routes` to `/routes.html`, as it does for `/tracks`; the page loads its maps
-from `routes/` beside it and links to a station with `#CRS` (`/routes#CLJ`).
+The CloudFront function rewrites `/routes` to `/routes.html`, as it does for `/tracks`, and the bare host `/` to
+`/routes.html` too: the network diagrams are the site's front door (uk-rail-open-data `terraform/pretty-urls.js`
+and `default_root_object`). The page loads its maps from `routes/` relative to itself, so it works at both, and
+links to a station with `#CRS` (`/routes#CLJ`, `/#CLJ`).
 
 The site is also listed on the robbiea.co.uk landing page ([robbiea-home](https://github.com/iiAnderson),
 private): an entry in the Visualisations list in `site/index.html` and one in `site/activity.json`.
